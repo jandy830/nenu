@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>ゆめかわ♡きせかえ＆ともだち広場＆双子公園✨</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-title">
+        <h1>✨ ゆめかわ♡きせかえ ✨</h1>
+      </div>
+      <div class="header-controls">
+        <button id="btn-friends" class="btn btn-friends" onclick="openFriendsSquare()">
+          <span class="icon">🌸</span> ともだち広場
+        </button>
+        <button id="btn-twin" class="btn btn-twin" onclick="openTwinPark()">
+          <span class="icon">👯‍♀️</span> 双子公園
+        </button>
+        <button id="btn-faq" class="btn btn-faq" onclick="openFaqModal()">
+          <span class="icon">❓</span> 質問コーナー
+        </button>
+        <button id="btn-warp" class="btn btn-warp" onclick="warpToDreamWorld()">
+          <span class="icon">✨</span> 魔法の世界へワープ！
+        </button>
+
+        <!-- BGM Track Selector Dropdown -->
+        <div class="bgm-selector-group">
+          <button id="btn-bgm" class="btn btn-bgm" onclick="toggleBgm()">
+            <span class="icon">🎵</span> BGM: オフ
+          </button>
+          <select id="bgm-track-select" class="bgm-select" onchange="changeBgmTrack(this.value)">
+            <option value="0">🎵 1. ゆめかわワルツ</option>
+            <option value="1">🎶 2. エレクトロポップ</option>
+            <option value="2">🌙 3. ほしぞらオルゴール</option>
+            <option value="3">🌸 4. さくらのマーチ</option>
+            <option value="4">✨ 5. きらめきシンセ</option>
+          </select>
+        </div>
+
+        <button id="btn-random" class="btn btn-random" onclick="triggerRandomOutfit()">
+          <span class="icon">🎲</span> おまかせコーデ！
+        </button>
+        <button id="btn-save" class="btn btn-save" onclick="savePhoto()">
+          <span class="icon">📸</span> しゃしんを保存
+        </button>
+        <button id="btn-reset" class="btn btn-reset" onclick="resetOutfit()">
+          <span class="icon">🔄</span> リセット
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <!-- Stage Section (Left) -->
+      <section class="stage-card">
+        <div id="stage-wrapper" class="stage-wrapper">
+          <!-- Main Character Canvas -->
+          <svg id="stage-svg" class="stage-canvas" viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">
+            <g id="layer-background"></g>
+            <g id="layer-aura"></g>
+            <g id="layer-hair-back"></g>
+            <g id="layer-body"></g>
+            <g id="layer-face"></g>
+            <g id="layer-bottoms"></g>
+            <g id="layer-tops"></g>
+            <g id="layer-shoes"></g>
+            <g id="layer-hair-front"></g>
+            <g id="layer-accessories"></g>
+          </svg>
+
+          <!-- Particle Canvas for interactive sparkles/stars -->
+          <canvas id="particle-canvas"></canvas>
+        </div>
+      </section>
+
+      <!-- Wardrobe Section (Right) -->
+      <section class="wardrobe-card">
+        <!-- Tabs -->
+        <div class="tab-container">
+          <button class="tab-btn active" onclick="switchCategory('hair', this)">💇‍♀️ かみがた</button>
+          <button class="tab-btn" onclick="switchCategory('face', this)">😊 ひょうじょう</button>
+          <button class="tab-btn" onclick="switchCategory('tops', this)">👗 トップス</button>
+          <button class="tab-btn" onclick="switchCategory('bottoms', this)">👖 ボトムス</button>
+          <button class="tab-btn" onclick="switchCategory('shoes', this)">👟 くつ</button>
+          <button class="tab-btn" onclick="switchCategory('accessories', this)">🎀 アクセ</button>
+          <button class="tab-btn" onclick="switchCategory('background', this)">🖼️ はいけい</button>
+        </div>
+
+        <!-- Items Grid -->
+        <div id="items-grid" class="items-grid">
+          <!-- Dynamically populated by app.js -->
+        </div>
+
+        <!-- Color Customizer Palette -->
+        <div id="color-bar" class="color-bar">
+          <span class="color-bar-label">🎨 いろがえ:</span>
+          <div id="color-palette" class="color-palette">
+            <!-- Dynamically populated by app.js -->
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal 1: Dedicated Fullscreen Friends Square (🌸 ゆめかわ・みんなでおしゃべり広場) -->
+  <div id="friends-modal" class="friends-modal">
+    <div class="friends-window fullscreen-window">
+      <!-- Fullscreen Header Bar -->
+      <div class="fullscreen-header">
+        <div class="friends-title">
+          <h2>🌸 ゆめかわ・みんなでおしゃべり広場 🌸</h2>
+          <p>みんな大集合！おかしを食べたり、みんなで賑やかにおしゃべり＆お散歩しよう！</p>
+        </div>
+        <button class="big-close-btn" onclick="closeFriendsSquare()">✖ 閉じる</button>
+      </div>
+
+      <!-- Mode Switcher Bar (All Friends Party vs 1-on-1 Room) -->
+      <div class="friend-cards-bar" onclick="event.stopPropagation()">
+        <span class="bar-label">🎉 あそびかたモード:</span>
+        <div id="mode-party-btn" class="friend-card active" onclick="switchFriendsMode('party')">
+          <div class="friend-avatar-icon">🎉</div>
+          <div class="friend-card-name">みんなでパーティー</div>
+        </div>
+        <div id="mode-single-btn" class="friend-card" onclick="switchFriendsMode('single')">
+          <div class="friend-avatar-icon">🏠</div>
+          <div class="friend-card-name">1人のお部屋へ</div>
+        </div>
+
+        <!-- Individual Friend Selector Cards Bar (Shown in single mode) -->
+        <div id="single-friends-selector" style="display: none; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <div class="friend-card active" data-friend="nyanko" onclick="selectFriendBot('nyanko', this)">
+            <div class="friend-avatar-icon">🐱</div>
+            <div class="friend-card-name">にゃんこ</div>
+          </div>
+          <div class="friend-card" data-friend="usako" onclick="selectFriendBot('usako', this)">
+            <div class="friend-avatar-icon">🐰</div>
+            <div class="friend-card-name">うさこ</div>
+          </div>
+          <div class="friend-card" data-friend="uniko" onclick="selectFriendBot('uniko', this)">
+            <div class="friend-avatar-icon">🦄</div>
+            <div class="friend-card-name">ユニこ</div>
+          </div>
+          <div class="friend-card" data-friend="kumagoro" onclick="selectFriendBot('kumagoro', this)">
+            <div class="friend-avatar-icon">🐻</div>
+            <div class="friend-card-name">くまごろう</div>
+          </div>
+          <div class="friend-card" data-friend="kitsune" onclick="selectFriendBot('kitsune', this)">
+            <div class="friend-avatar-icon">🦊</div>
+            <div class="friend-card-name">きつね</div>
+          </div>
+          <div class="friend-card" data-friend="penpen" onclick="selectFriendBot('penpen', this)">
+            <div class="friend-avatar-icon">🐧</div>
+            <div class="friend-card-name">ぺんぺん</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Stage View (Multi-Friend Party Stage or Single Friend Room) -->
+      <div class="friend-room-view fullscreen-room-view party-room-bg" id="friend-room-container" onclick="handleFloorClick(event)">
+        <div class="friend-speech-bubble fullscreen-bubble" id="friend-speech-bubble" onclick="event.stopPropagation()">
+          わぁ〜〜！みんな大集合だよ！🎉✨<br>『みんなでおしゃべり』ボタンを押すと、みんなでワイワイお話するよ！
+        </div>
+
+        <!-- Party Stage Layout: All Friends Gathering Stage -->
+        <div id="party-stage-container" class="party-stage-container">
+          <!-- Dynamically populated with all 6 friends & user avatar -->
+        </div>
+
+        <!-- Single Friend Stage Layout: Side-by-Side 1-on-1 Room -->
+        <div id="single-stage-container" class="single-stage-container" style="display: none;">
+          <div class="twin-avatars-stage" id="single-avatars-stage">
+            <div class="twin-avatar-wrapper">
+              <div class="twin-avatar-label">💖 あなた</div>
+              <svg id="single-user-svg" viewBox="0 0 360 480" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"></svg>
+            </div>
+            <div class="twin-avatar-wrapper" id="friend-bot-preview">
+              <div class="twin-avatar-label" id="single-friend-label">🐱 にゃんこ</div>
+              <svg id="friend-bot-svg" viewBox="0 0 360 480" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Controls Bar -->
+      <div class="friend-action-controls" onclick="event.stopPropagation()">
+        <div class="walk-buttons-group">
+          <button class="walk-btn" onclick="moveFriendAvatar(-60)">◀ ひだりに歩く</button>
+          <button class="walk-btn" onclick="autoWalkAround()">✨ みんなでお散歩＆ダンス</button>
+          <button class="walk-btn" onclick="moveFriendAvatar(60)">▶ みぎに歩く</button>
+        </div>
+        <button class="friend-act-btn" onclick="talkToFriendBot('chat')">💬 みんなでおはなし</button>
+        <button class="friend-act-btn" onclick="talkToFriendBot('praise')">💖 お互いのお洋服をほめる</button>
+        <button class="friend-act-btn" onclick="talkToFriendBot('treat')">🍰 みんなでおかしパーティ</button>
+        <button class="friend-act-btn" onclick="talkToFriendBot('riddle')">🧩 なぞなぞ＆大喜利大会</button>
+        <button class="friend-act-btn" id="btn-group-photo-act" onclick="saveGroupPhoto()">📸 全員で集合写真を撮る！</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Dedicated Fullscreen Twin Park (👯‍♀️ 双子公園 - Twin Dress-up Stage) -->
+  <div id="twin-park-modal" class="friends-modal">
+    <div class="friends-window fullscreen-window">
+      <!-- Fullscreen Header Bar -->
+      <div class="fullscreen-header twin-header">
+        <div class="friends-title">
+          <h2>👯‍♀️ ゆめかわ・双子公園 👯‍♀️</h2>
+          <p>ふたりで並んで双子コーデ！おそろいのお洋服でお散歩＆写真を撮ろう！</p>
+        </div>
+        <button class="big-close-btn" onclick="closeTwinPark()">✖ 閉じる</button>
+      </div>
+
+      <!-- Twin Partner Selector Cards Bar -->
+      <div class="friend-cards-bar" onclick="event.stopPropagation()">
+        <span class="bar-label">👯‍♀️ 双子パートナーをえらぶ:</span>
+        <div class="friend-card active" data-twin="nyanko" onclick="selectTwinPartner('nyanko', this)">
+          <div class="friend-avatar-icon">🐱</div>
+          <div class="friend-card-name">にゃんこ</div>
+        </div>
+        <div class="friend-card" data-twin="usako" onclick="selectTwinPartner('usako', this)">
+          <div class="friend-avatar-icon">🐰</div>
+          <div class="friend-card-name">うさこ</div>
+        </div>
+        <div class="friend-card" data-twin="uniko" onclick="selectTwinPartner('uniko', this)">
+          <div class="friend-avatar-icon">🦄</div>
+          <div class="friend-card-name">ユニこ</div>
+        </div>
+        <div class="friend-card" data-twin="kumagoro" onclick="selectTwinPartner('kumagoro', this)">
+          <div class="friend-avatar-icon">🐻</div>
+          <div class="friend-card-name">くまごろう</div>
+        </div>
+        <div class="friend-card" data-twin="kitsune" onclick="selectTwinPartner('kitsune', this)">
+          <div class="friend-avatar-icon">🦊</div>
+          <div class="friend-card-name">きつね</div>
+        </div>
+        <div class="friend-card" data-twin="penpen" onclick="selectTwinPartner('penpen', this)">
+          <div class="friend-avatar-icon">🐧</div>
+          <div class="friend-card-name">ぺんぺん</div>
+        </div>
+      </div>
+
+      <!-- Twin Park Stage View (Side-by-Side Twin Avatars) -->
+      <div class="friend-room-view fullscreen-room-view twin-park-bg" id="twin-park-container" onclick="handleTwinFloorClick(event)">
+        <div class="friend-speech-bubble fullscreen-bubble" id="twin-speech-bubble" onclick="event.stopPropagation()">
+          わぁ〜〜！ふたりで並んで双子コーデ！👯‍♀️💖<br>『おそろいコーデ』ボタンを押すと おそろいのお洋服になれるよ！
+        </div>
+
+        <div class="twin-avatars-stage" id="twin-avatars-stage">
+          <!-- Left: User Custom Avatar -->
+          <div class="twin-avatar-wrapper" id="twin-user-wrapper">
+            <div class="twin-avatar-label">💖 あなた</div>
+            <svg id="twin-user-svg" viewBox="0 0 360 480" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+
+          <!-- Right: Friend Bot Avatar -->
+          <div class="twin-avatar-wrapper" id="twin-friend-wrapper">
+            <div class="twin-avatar-label" id="twin-friend-label">🐱 にゃんこ</div>
+            <svg id="twin-friend-svg" viewBox="0 0 360 480" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Twin Controls Bar -->
+      <div class="friend-action-controls" onclick="event.stopPropagation()">
+        <div class="walk-buttons-group">
+          <button class="walk-btn" onclick="moveTwinAvatars(-50)">◀ ひだりに歩く</button>
+          <button class="walk-btn" onclick="autoWalkTwin()">✨ ふたりでお散歩</button>
+          <button class="walk-btn" onclick="moveTwinAvatars(50)">▶ みぎに歩く</button>
+        </div>
+        <button class="friend-act-btn" onclick="makeTwinMatchingOutfit()">👯‍♀️ おそろいコーデにする！</button>
+        <button class="friend-act-btn" onclick="saveTwinPhoto()">📸 ふたりで記念撮影！</button>
+        <button class="friend-act-btn" onclick="talkToTwinBots()">💬 ふたりでお話する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Fullscreen FAQ & Question Corner (❓ よくある質問 & 💬 質問コーナー) -->
+  <div id="faq-modal" class="friends-modal">
+    <div class="friends-window fullscreen-window faq-window">
+      <!-- Fullscreen Header Bar -->
+      <div class="fullscreen-header faq-header">
+        <div class="friends-title">
+          <h2>❓ よくある質問 & 💬 質問コーナー ❓</h2>
+          <p>あそびかたや質問が読めるよ！作者（かんりしゃ）モードで質問を追加・編集できるよ！</p>
+        </div>
+        <button class="big-close-btn" onclick="closeFaqModal()">✖ 閉じる</button>
+      </div>
+
+      <div class="faq-content-container">
+        <!-- Mode Switcher Bar -->
+        <div class="faq-admin-bar">
+          <div id="admin-status-badge" class="admin-badge visitor">👤 あそびに来たひとモード</div>
+          <button id="btn-admin-toggle" class="btn btn-admin" onclick="toggleAdminMode()">🔑 作者（かんりしゃ）モードに入る</button>
+        </div>
+
+        <!-- Section 1: Preset FAQ Accordion (よくある質問) -->
+        <div class="faq-section">
+          <h3>🌸 よくある質問 (FAQ)</h3>
+          <div id="preset-faq-list" class="faq-accordion-list">
+            <!-- Dynamically populated by app.js -->
+          </div>
+        </div>
+
+        <!-- Section 2: Creator-Only Form (作者しか打てない質問追加フォーム) -->
+        <div id="creator-form-card" class="creator-form-card" style="display: none;">
+          <h3>👑 【作者限定】新しい「よくある質問」を追加する</h3>
+          <div class="form-group">
+            <label for="new-faq-q">質問 (Q):</label>
+            <input type="text" id="new-faq-q" placeholder="例: どうやっておそろいコーデにするの？" class="faq-input">
+          </div>
+          <div class="form-group">
+            <label for="new-faq-a">こたえ (A):</label>
+            <textarea id="new-faq-a" placeholder="例: 「双子公園」にいって「おそろいコーデにする」ボタンを押してね！" class="faq-textarea"></textarea>
+          </div>
+          <button class="btn btn-save-faq" onclick="addCustomFaq()">✨ 質問を追加する！</button>
+        </div>
+
+        <!-- Section 3: Community Q&A Corner (みんなの質問コーナー) -->
+        <div class="faq-section">
+          <h3>💬 みんなの質問コーナー</h3>
+          <div class="ask-box">
+            <input type="text" id="user-question-input" placeholder="聞きたい質問を入力してね！" class="faq-input">
+            <button class="btn btn-ask" onclick="submitUserQuestion()">📨 質問を投稿する</button>
+          </div>
+          <div id="user-questions-list" class="user-questions-list">
+            <!-- Dynamically populated by app.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Magical Dream World Modal -->
+  <div id="dream-world-modal" class="dream-world-modal">
+    <div id="warp-portal-effect" class="warp-portal-effect"></div>
+
+    <div class="dream-world-container">
+      <button class="btn-return" onclick="closeDreamWorld()">🔙 もとの部屋にもどる</button>
+
+      <div class="dream-avatar-stage">
+        <div class="bot-speech-bubble" id="world-speech-bubble">
+          <span id="world-speech-text">わぁ〜！魔法の世界へようこそ！✨<br>このステキなお洋服を着せてくれてありがとう！💖</span>
+        </div>
+
+        <div class="dream-character-wrapper" id="dream-character-wrapper">
+          <svg id="dream-stage-svg" class="dream-stage-canvas" viewBox="0 0 360 480" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          </svg>
+        </div>
+      </div>
+
+      <div class="interactive-world-toys">
+        <button class="toy-btn" onclick="triggerToyEffect('balloon')">🎈 風船をあげる</button>
+        <button class="toy-btn" onclick="triggerToyEffect('candy')">🍰 パフェをあげる</button>
+        <button class="toy-btn" onclick="triggerToyEffect('star')">⭐ 流れ星にねがいごと</button>
+      </div>
+
+      <div class="dream-chat-controls">
+        <button class="dream-action-btn" onclick="talkToWorldBot('outfit')">👗 お洋服の感想を聞く</button>
+        <button class="dream-action-btn" onclick="talkToWorldBot('riddle')">🧩 なぞなぞを出してもらう</button>
+        <button class="dream-action-btn" onclick="talkToWorldBot('fortune')">🔮 今日の星うらない</button>
+        <button class="dream-action-btn" onclick="talkToWorldBot('chat')">💬 なかよしおしゃべり</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <span id="toast-icon">✨</span> <span id="toast-msg">コーデがかんせいしたよ！</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

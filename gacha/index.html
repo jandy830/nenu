@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>🍣すし・🍞パン・✨魔法少女・🍔食・🐬海・💖めっちゃかわ・🎤アイドル ガチャ</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍣</text></svg>">
+  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="theme-sushi">
+
+  <!-- ヘッダー -->
+  <header class="header">
+    <h1>🍣すし 🍞パン ✨魔法 🍔食 🐬海 💖かわ 🎤アイドル ガチャ</h1>
+    
+    <!-- 15ガチャ切り替えタブ -->
+    <div class="gacha-tabs">
+      <button class="gacha-tab active" id="tab-sushi" data-mode="sushi">🍣 すしガチャ</button>
+      <button class="gacha-tab" id="tab-pan" data-mode="pan">🍞 パンガチャ</button>
+      <button class="gacha-tab" id="tab-mahou" data-mode="mahou">✨ まほう</button>
+      <button class="gacha-tab" id="tab-food" data-mode="food">🍔 たべもの</button>
+      <button class="gacha-tab" id="tab-sea" data-mode="sea">🐬 うみのいきもの</button>
+      <button class="gacha-tab" id="tab-kawaii" data-mode="kawaii">💖 めっちゃかわ</button>
+      <button class="gacha-tab" id="tab-idol" data-mode="idol">🎤 アイドル</button>
+      <button class="gacha-tab" id="tab-cool" data-mode="cool">🔥 かっこいい</button>
+      <button class="gacha-tab" id="tab-space" data-mode="space">🚀 うちゅう</button>
+      <button class="gacha-tab" id="tab-pixel" data-mode="pixel">🎮 レトロゲーム</button>
+      <button class="gacha-tab" id="tab-yokai" data-mode="yokai">👻 ようかい</button>
+      <button class="gacha-tab" id="tab-dino" data-mode="dino">🦖 きょうりゅう</button>
+      <button class="gacha-tab" id="tab-car" data-mode="car">🚗 くるま</button>
+      <button class="gacha-tab" id="tab-sweets" data-mode="sweets">🍰 スイーツ</button>
+      <button class="gacha-tab" id="tab-pet" data-mode="pet">🐶 ペット</button>
+    </div>
+
+    <div class="coin-display">
+      <span class="coin-icon">🪙</span>
+      <span class="coin-label">コイン:</span>
+      <span id="coin-count">10</span> まい
+      <button id="omikuji-btn" class="btn-small">🔮 おみくじ</button>
+      <button id="rhythm-game-btn" class="btn-small" style="background: linear-gradient(135deg, #e040fb, #7c4dff); color: white;">🎵 リズムゲーム</button>
+      <button id="bgm-toggle-btn" class="btn-bgm">🎵 BGM: OFF</button>
+      <button id="reset-data-btn" class="btn-small" style="background: #e53935; color: white;">🔄 データをリセット</button>
+    </div>
+    <div id="bgm-title-badge" class="bgm-title-badge hidden">🎶 <span id="bgm-title-text">すし音頭</span></div>
+  </header>
+
+  <main class="game-container">
+    <!-- ガチャマシンエリア -->
+    <section class="machine-section">
+      <div class="gacha-machine" id="gacha-machine">
+        <div class="machine-top">
+          <span class="sparkle">✨</span>
+          <span class="title-text" id="machine-title">すしガチャ</span>
+          <span class="sparkle">✨</span>
+        </div>
+
+        <div class="machine-window">
+          <div class="capsules-inside" id="capsules-inside">
+            <div class="inside-capsule c-red"></div>
+            <div class="inside-capsule c-yellow"></div>
+            <div class="inside-capsule c-blue"></div>
+            <div class="inside-capsule c-pink"></div>
+            <div class="inside-capsule c-green"></div>
+            <div class="inside-capsule c-gold"></div>
+          </div>
+        </div>
+
+        <div class="machine-body">
+          <div class="coin-slot-container">
+            <div class="coin-slot" id="coin-slot">
+              <span id="slot-text">🪙 コインぐち</span>
+            </div>
+            <button id="insert-coin-btn" class="btn-action">1️⃣ コインをいれる (1まい)</button>
+            <button id="ten-gacha-btn" class="btn-action btn-ten">🎁 10れんガチャ！ (10まい)</button>
+          </div>
+
+          <div class="handle-container">
+            <div class="handle-base">
+              <div class="handle" id="gacha-handle">
+                <div class="handle-bar"></div>
+                <div class="handle-knob"></div>
+              </div>
+            </div>
+            <button id="turn-handle-btn" class="btn-action btn-turn" disabled>2️⃣ ハンドルをまわす！</button>
+          </div>
+        </div>
+
+        <div class="machine-exit">
+          <div class="exit-label">カプセルでぐち</div>
+          <div class="dropped-capsule-area" id="dropped-capsule-area"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ガチャ結果モーダル -->
+    <div id="result-modal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <div class="gacha-result-card" id="result-card">
+          <div class="rarity-badge" id="result-rarity">✨ UR ✨</div>
+          <div class="result-image-container">
+            <img id="result-img" src="" alt="ガチャ結果">
+          </div>
+          <h2 id="result-name">たまごずしにゃんこ</h2>
+          <p id="result-desc">ふわふわの シャリねこちゃんの上に 玉子焼きがのっているよ！</p>
+          <button id="close-modal-btn" class="btn-primary">やったー！つぎへ</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎁 10連ガチャ結果モーダル -->
+    <div id="ten-result-modal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content ten-result-card">
+        <h2>🎁 10れんガチャけっか！</h2>
+        <div class="ten-result-grid" id="ten-result-grid"></div>
+        <button id="close-ten-modal-btn" class="btn-primary">ぜんぶゲット！</button>
+      </div>
+    </div>
+
+    <!-- 🔮 今日のラッキーおみくじモーダル -->
+    <div id="omikuji-modal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content omikuji-card">
+        <h2>🔮 今日のラッキーおみくじ宝箱！</h2>
+        <div id="omikuji-body" class="omikuji-body">
+          <p class="omikuji-desc">宝箱をあけて 今日のラッキー運勢を占おう！<br>超大吉が出ると コインが30枚もらえるよ！✨</p>
+          <div id="omikuji-box-icon" class="omikuji-box-icon">🎁</div>
+          <button id="draw-omikuji-btn" class="btn-primary">🧰 宝箱をあける！</button>
+        </div>
+        <div id="omikuji-result" class="omikuji-result hidden">
+          <div id="omikuji-fortune-badge" class="fortune-badge">超大吉</div>
+          <div id="omikuji-reward-text" class="reward-text">コイン +30枚 ゲット！🎉</div>
+          <p id="omikuji-msg" class="omikuji-msg">今日は超ラッキーな1日！ガチャを回しまくろう！</p>
+          <button id="close-omikuji-modal-btn" class="btn-primary">やったー！</button>
+        </div>
+      </div>
+    </div>
+    <div id="rhythm-modal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content rhythm-card">
+        <h2>🎵 わくわくリズムゲーム！</h2>
+        <p class="rhythm-desc">音符🎵がワクにかさなるタイミングで ボタンを押そう！<br>パーフェクトでコインを大量ゲット！</p>
+        
+        <div class="rhythm-stage">
+          <div id="rhythm-note" class="rhythm-note">🎵</div>
+          <div class="rhythm-target-ring">🎯</div>
+          <div id="rhythm-judgment" class="rhythm-judgment hidden">PERFECT!</div>
+        </div>
+
+        <div class="rhythm-stats">
+          <span>スコア: <strong id="rhythm-score">0</strong></span>
+          <span>かくとくコイン: <strong id="rhythm-coins">+0</strong></span>
+        </div>
+
+        <button id="rhythm-hit-btn" class="rhythm-hit-btn">🎵 タイミングよく押す！</button>
+        <button id="close-rhythm-modal-btn" class="btn-primary" style="margin-top: 15px; background: #78909c;">おわる</button>
+      </div>
+    </div>
+
+    <!-- 📖 図鑑 一覧エリア -->
+    <section class="zukan-section">
+      <div class="zukan-header">
+        <div class="zukan-title-area">
+          <h2>📖 <span id="zukan-title-text">すしずかん</span> (<span id="zukan-count">0</span> / <span id="zukan-total">6</span>)</h2>
+          <span id="complete-badge" class="complete-badge hidden">🏆 コンプリート！</span>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+          </div>
+          <span id="progress-text" class="progress-text">0%</span>
+        </div>
+
+        <div class="zukan-filter">
+          <button class="filter-btn active" data-filter="all">すべて</button>
+          <button class="filter-btn" data-filter="R">⭐ レア</button>
+          <button class="filter-btn" data-filter="SSR">🌟 スーパーレア</button>
+          <button class="filter-btn" data-filter="UR">👑 ウルトラレア</button>
+        </div>
+      </div>
+
+      <div class="zukan-grid" id="zukan-grid"></div>
+    </section>
+
+    <!-- 🔧 バグの修正 & 💬 質問コーナーエリア -->
+    <section class="faq-section">
+      <h2>🔧 バグの修正 ＆ 💬 しつもんコーナー</h2>
+
+      <!-- よくある質問リスト -->
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary class="faq-question">❓ コインがなくなっちゃったら どうすればいい？</summary>
+          <div class="faq-answer">
+            <p>画面のうえにある <strong>「🔮 おみくじ」</strong> を引くか、**「🎵 リズムゲーム」** をタイミングよく遊ぶと、コインがたくさんもらえるよ！楽しくあそんでコインをゲットしてね♪</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">❓ ガチャは何種類あるの？</summary>
+          <div class="faq-answer">
+            <p><strong>「🍣 すし」「🍞 パン」「✨ まほう」「🍔 たべもの」「🐬 うみのいきもの」「💖 めっちゃかわ」「🎤 アイドル」「🔥 かっこいい」「🚀 うちゅう」「🎮 レトロゲーム」「👻 ようかい」「🦖 きょうりゅう」「🚗 くるま」「🍰 スイーツ」「🐶 ペット」</strong> の15個があるよ！ぜんぶで 98種類あるよ！コンプリートをめざしてね！</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">❓ ぐるぐるマーク（再読み込み）を押したら 集めたキャラが消えちゃう？</summary>
+          <div class="faq-answer">
+            <p><strong>大丈夫だよ！集めたキャラクターやコインは自動でずーっとセーブ（保存）されるよ！</strong> ぐるぐるマークを押しても、集めたキャラは絶対消えないから安心してね！</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">❓ 画像やボタンが動かないバグが起きたら？</summary>
+          <div class="faq-answer">
+            <p>ブラウザの <strong>「再読み込み（リフレッシュ/ぐるぐるマーク）」</strong> ボタンを押してみてね！下のフォームから教えてもらえると AIがすぐに直すよ！</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- 💬 質問・バグ報告フォーム -->
+      <div class="feedback-box">
+        <h3>💬 AIへ しつもん や バグのおしらせ</h3>
+        <p class="feedback-desc">「ここを直して！」「新しいガチャを作って！」など、なんでも書いたら送信ボタンをおしてね！</p>
+        <div class="feedback-form">
+          <input type="text" id="feedback-input" placeholder="ここになんでも書いてね！(例: 恐竜ガチャを追加して！)" />
+          <button id="feedback-submit-btn">送信（そうしん）する</button>
+        </div>
+        <p id="feedback-thanks" class="feedback-thanks hidden">✨ おたより ありがとう！AIがかくにんして 修正や新しいガチャをつくるよ！✨</p>
+      </div>
+    </section>
+
+    <!-- 📖 図鑑詳細モーダル -->
+    <div id="zukan-detail-modal" class="modal hidden">
+      <div class="modal-backdrop" id="detail-backdrop"></div>
+      <div class="modal-content">
+        <div class="zukan-detail-card">
+          <div class="rarity-badge" id="detail-rarity">⭐ レア</div>
+          <div class="detail-img-container">
+            <img id="detail-img" src="" alt="詳細画像">
+          </div>
+          <h2 id="detail-name">たまごずしにゃんこ</h2>
+          <div class="detail-info-list">
+            <p><strong>せいそくち (すみか):</strong> <span id="detail-habitat">回転寿司のレーン</span></p>
+            <p><strong>すきなもの:</strong> <span id="detail-favorite">甘い玉子焼き</span></p>
+            <p><strong>であえた回数:</strong> <span id="detail-count">1</span> 回</p>
+          </div>
+          <p id="detail-desc" class="detail-description"></p>
+          <button id="close-detail-btn" class="btn-primary">とじる</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <script src="images.js"></script>
+  <script src="script.js?v=41"></script>
+</body>
+</html>
