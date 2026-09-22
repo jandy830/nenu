@@ -74,26 +74,45 @@
       <div id="dressup-screen" class="overlay-screen modal-overlay">
         <div class="overlay-card modal-card dressup-card">
           <button id="btn-dressup-close-corner" class="modal-close-corner" title="とじる">✖</button>
-          <div class="shop-header">
-            <h2 class="modal-title">👗 女の子のきせかえ 🎀</h2>
-            <div class="shop-bank">
-              もっている: <span class="highlight" id="dressup-sweets-val">0</span> 🍓
+          
+          <div class="dressup-header-fixed">
+            <div class="shop-header">
+              <h2 class="modal-title">👗 女の子のきせかえ 🎀</h2>
+              <div class="shop-bank">
+                もっている: <span class="highlight" id="dressup-sweets-val">0</span> 🍓
+              </div>
+            </div>
+            
+            <div class="dressup-preview-wrap">
+              <div id="dressup-char-preview" class="dressup-char-preview"></div>
+            </div>
+
+            <!-- カテゴリ切り替えタブ -->
+            <div class="dressup-category-tabs">
+              <button class="dressup-cat-tab active" data-category="all">✨ ぜんぶ</button>
+              <button class="dressup-cat-tab" data-category="dress">👗 ドレス</button>
+              <button class="dressup-cat-tab" data-category="headwear">🎀 あたま</button>
+              <button class="dressup-cat-tab" data-category="back">🪽 せなか・よこ</button>
             </div>
           </div>
-          <p class="modal-subtitle">すきなドレスやアクセサリーをえらんでね！</p>
-          
-          <div class="dressup-preview-wrap">
-            <div id="dressup-char-preview" class="dressup-char-preview"></div>
+
+          <!-- スクロール可能なパレットエリア -->
+          <div class="dressup-scroll-area" id="dressup-scroll-area">
+            <div class="dressup-section-group" id="dressup-group-dress">
+              <div class="dressup-section-title">👗 ドレスのいろ</div>
+              <div class="dress-palette" id="dress-palette"></div>
+            </div>
+
+            <div class="dressup-section-group" id="dressup-group-headwear">
+              <div class="dressup-section-title">🎀 あたまのかざり</div>
+              <div class="headwear-palette" id="headwear-palette"></div>
+            </div>
+
+            <div class="dressup-section-group" id="dressup-group-back">
+              <div class="dressup-section-title">🪽 せなか・よこのアクセサリー</div>
+              <div class="back-acc-palette" id="back-acc-palette"></div>
+            </div>
           </div>
-
-          <div class="dressup-section-title">✨ ドレスのいろ</div>
-          <div class="dress-palette" id="dress-palette"></div>
-
-          <div class="dressup-section-title">✨ あたまのかざり</div>
-          <div class="headwear-palette" id="headwear-palette"></div>
-
-          <div class="dressup-section-title">✨ せなか・よこのアクセサリー</div>
-          <div class="back-acc-palette" id="back-acc-palette"></div>
 
           <div class="dressup-buttons">
             <button id="btn-dressup-to-shop" class="btn-sub-action">🛍️ ショップで増やす</button>

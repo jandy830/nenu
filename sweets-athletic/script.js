@@ -1524,9 +1524,36 @@ function setupModalEvents() {
     });
   }
 
+  // きせかえカテゴリ切り替え
+  const dressupCatTabs = document.querySelectorAll('.dressup-cat-tab');
+  function applyDressupCategoryFilter(cat) {
+    const groupDress = document.getElementById('dressup-group-dress');
+    const groupHeadwear = document.getElementById('dressup-group-headwear');
+    const groupBack = document.getElementById('dressup-group-back');
+    if (groupDress) groupDress.style.display = (cat === 'all' || cat === 'dress') ? 'block' : 'none';
+    if (groupHeadwear) groupHeadwear.style.display = (cat === 'all' || cat === 'headwear') ? 'block' : 'none';
+    if (groupBack) groupBack.style.display = (cat === 'all' || cat === 'back') ? 'block' : 'none';
+    const scrollArea = document.getElementById('dressup-scroll-area');
+    if (scrollArea) scrollArea.scrollTop = 0;
+  }
+
+  dressupCatTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      dressupCatTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      applyDressupCategoryFilter(tab.dataset.category || 'all');
+      sounds.playCollect();
+    });
+  });
+
   // きせかえ開閉
   function openDressup() {
     renderDressUpModal();
+    dressupCatTabs.forEach(t => {
+      if (t.dataset.category === 'all') t.classList.add('active');
+      else t.classList.remove('active');
+    });
+    applyDressupCategoryFilter('all');
     if (dressupScreen) dressupScreen.classList.add('active');
     sounds.init();
   }
