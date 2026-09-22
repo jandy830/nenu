@@ -190,6 +190,65 @@ class SoundSystem {
     } catch (e) {}
   }
 
+  // いたっ！ダメージ音
+  playDamage() {
+    if (!this.soundEnabled || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(340, t);
+      osc.frequency.exponentialRampToValueAtTime(140, t + 0.16);
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.linearRampToValueAtTime(0, t + 0.16);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.17);
+    } catch (e) {}
+  }
+
+  // 💖 ハート回復音
+  playHeal() {
+    if (!this.soundEnabled || !this.ctx) return;
+    try {
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const t = this.ctx.currentTime + idx * 0.05;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.18, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.16);
+      });
+    } catch (e) {}
+  }
+
+  // ☁️ わたあめ大ジャンプ音
+  playCottonJump() {
+    if (!this.soundEnabled || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(280, t);
+      osc.frequency.exponentialRampToValueAtTime(950, t + 0.28);
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.linearRampToValueAtTime(0, t + 0.3);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.31);
+    } catch (e) {}
+  }
+
   // お菓子の国のはずむBGM
   startBgm() {
     if (!this.soundEnabled) return;
@@ -1740,7 +1799,11 @@ const player = {
   isParachuting: false,
   jumpHeldLastFrame: false,
   blinkTimer: 0,
-  isBlinking: false
+  isBlinking: false,
+  hp: 3,
+  maxHp: 3,
+  invincibleTimer: 0,
+  trailTimer: 0
 };
 
 // ペット（女の子についてくるおともだち）
@@ -1770,29 +1833,45 @@ const checkpoints = {
   4: { x: 3517, y: 806, color: 'white', name: 'しろステージ' }
 };
 
-// キャンディUIの更新
+// キャンディ表示更新
 function updateCandyUI(color) {
   const dot = document.getElementById('candy-dot');
   const name = document.getElementById('candy-name');
   if (!dot || !name) return;
 
-  const map = {
-    red: { icon: '🔴', text: 'あか' },
-    yellow: { icon: '🟡', text: 'きいろ' },
-    black: { icon: '⚫', text: 'くろ' },
-    white: { icon: '⚪', text: 'しろ' },
-    rainbow: { icon: '🌈', text: 'レインボー' }
+  const names = {
+    red: 'あか',
+    yellow: 'きいろ',
+    black: 'くろ',
+    white: 'しろ',
+    rainbow: 'にじいろ'
   };
 
-  const info = map[color] || map.red;
-  dot.textContent = info.icon;
-  name.textContent = info.text;
+  const dots = {
+    red: '🔴',
+    yellow: '🟡',
+    black: '⚫',
+    white: '⚪',
+    rainbow: '🌈'
+  };
+
+  dot.textContent = dots[color] || '🔴';
+  name.textContent = names[color] || 'あか';
 
   if (color === 'rainbow') {
     name.classList.add('rainbow-text');
   } else {
     name.classList.remove('rainbow-text');
   }
+}
+
+// 💖 ハート（たいりょく）表示の更新
+function updateHeartsUI() {
+  const heartsEl = document.getElementById('hearts-display');
+  if (!heartsEl) return;
+  const current = Math.max(0, Math.min(player.maxHp, player.hp));
+  const empty = Math.max(0, player.maxHp - current);
+  heartsEl.textContent = '💖'.repeat(current) + '🖤'.repeat(empty);
 }
 
 // ステージデータ（お菓子の世界：4つのカラーエリア）
@@ -1802,6 +1881,7 @@ let goal = { x: 4850, y: 220, width: 160, height: 140 };
 let particles = [];
 let updrafts = [];
 let donuts = [];
+let spikes = [];
 let stageWidth = 5200;
 let stageHeight = 2400;
 
@@ -1819,6 +1899,8 @@ function initStage() {
     { x: 330, y: 2220, width: 75, height: 30, type: 'pudding', tier: 1, colorTier: 'red' },
     { x: 490, y: 2180, width: 130, height: 32, type: 'wafer', tier: 1, colorTier: 'red' },
     { x: 680, y: 2100, width: 140, height: 32, type: 'wafer', tier: 1, colorTier: 'red' },
+    // ☁️ わたあめのふかふかスーパージャンプ！
+    { x: 740, y: 2190, width: 85, height: 32, type: 'cotton_candy', tier: 1, colorTier: 'red', squash: 0 },
     { x: 880, y: 2020, width: 110, height: 30, type: 'macaron', tier: 1, color: '#ff2a6d', vy: 0.8, minY: 1980, maxY: 2060, colorTier: 'red' },
     { x: 1060, y: 1950, width: 130, height: 36, type: 'cookie', tier: 1, colorTier: 'red' },
     // 赤から黄色へ届くステップ！
@@ -1833,7 +1915,8 @@ function initStage() {
     // 🍮 プリンのトランポリン
     { x: 1640, y: 1760, width: 75, height: 28, type: 'pudding', tier: 2, colorTier: 'yellow' },
     { x: 1710, y: 1630, width: 85, height: 24, type: 'macaron', tier: 2, color: '#ffdd00', vy: -0.8, minY: 1590, maxY: 1670, colorTier: 'yellow' },
-    { x: 1850, y: 1550, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
+    // 🍦 つるつるアイスクリーム床（きいろエリア）
+    { x: 1850, y: 1550, width: 95, height: 26, type: 'ice_cream', tier: 2, colorTier: 'yellow' },
     // 🍫 とけるチョコの足場（きいろエリア）
     { x: 1950, y: 1510, width: 90, height: 28, type: 'melting_choco', tier: 2, colorTier: 'yellow', initialY: 1510, meltTimer: 0, isMelted: false, respawnTimer: 0, isStepped: false, shake: 0 },
     { x: 2050, y: 1470, width: 110, height: 36, type: 'cookie', tier: 2, colorTier: 'yellow' },
@@ -1866,9 +1949,10 @@ function initStage() {
     // 🍮 プリンのトランポリン
     { x: 4000, y: 740, width: 75, height: 28, type: 'pudding', tier: 4, colorTier: 'white' },
     { x: 4080, y: 620, width: 140, height: 32, type: 'wafer', tier: 4, colorTier: 'white' },
-    // 🍫 とけるチョコの足場（しろエリア）
-    { x: 4180, y: 585, width: 95, height: 28, type: 'melting_choco', tier: 4, colorTier: 'white', initialY: 585, meltTimer: 0, isMelted: false, respawnTimer: 0, isStepped: false, shake: 0 },
-    { x: 4280, y: 550, width: 160, height: 40, type: 'cookie', tier: 4, colorTier: 'white' },
+    // ☁️ わたあめのふかふかスーパージャンプ！
+    { x: 4180, y: 585, width: 85, height: 30, type: 'cotton_candy', tier: 4, colorTier: 'white', squash: 0 },
+    // 🍦 つるつるアイスクリーム床
+    { x: 4280, y: 550, width: 160, height: 35, type: 'ice_cream', tier: 4, colorTier: 'white' },
 
     // 天空への架け橋（虹のブリッジ）
     { x: 4500, y: 460, width: 150, height: 32, type: 'wafer', tier: 4, colorTier: 'rainbow' },
@@ -1885,11 +1969,25 @@ function initStage() {
     { x: 3260, y: 850, width: 85, height: 260 }
   ];
 
+  // 🌵 とげとげ障害物（金平糖トゲ ＆ チョコツノ）
+  spikes = [
+    // 赤エリア：クッキーの間の地面にトゲ
+    { x: 620, y: 2235, width: 50, height: 18, type: 'konpeito', color: '#ff66aa' },
+    { x: 990, y: 2235, width: 60, height: 18, type: 'konpeito', color: '#ff88bb' },
+    // 黄エリア：足場間のトゲ
+    { x: 1780, y: 1770, width: 45, height: 18, type: 'konpeito', color: '#ffbb00' },
+    // 黒エリア：ビターチョコツノ
+    { x: 2630, y: 1335, width: 50, height: 20, type: 'choco_spike', color: '#331a0e' },
+    { x: 2930, y: 1220, width: 45, height: 20, type: 'choco_spike', color: '#331a0e' },
+    // 白エリア：クリスタル金平糖トゲ
+    { x: 3840, y: 840, width: 45, height: 18, type: 'konpeito', color: '#aaddff' }
+  ];
+
   // 🍩 ころがるトッピングドーナツ
   donuts = [
-    { x: 220, y: 2232, radius: 18, vx: 1.5, minX: 80, maxX: 420, rotation: 0, dough: '#f6be79', frosting: '#ff6088', sprinkles: true },
-    { x: 2420, y: 1302, radius: 18, vx: -1.7, minX: 2330, maxX: 2490, rotation: 0, dough: '#4a2818', frosting: '#ffffff', sprinkles: true },
-    { x: 3580, y: 842, radius: 18, vx: 1.9, minX: 3500, maxX: 3660, rotation: 0, dough: '#f6e4cc', frosting: '#ff80bb', sprinkles: true }
+    { x: 220, y: 2232, radius: 18, vx: 1.5, minX: 80, maxX: 420, rotation: 0, dough: '#f6be79', frosting: '#ff6088', sprinkles: true, squash: 0 },
+    { x: 2420, y: 1302, radius: 18, vx: -1.7, minX: 2330, maxX: 2490, rotation: 0, dough: '#4a2818', frosting: '#ffffff', sprinkles: true, squash: 0 },
+    { x: 3580, y: 842, radius: 18, vx: 1.9, minX: 3500, maxX: 3660, rotation: 0, dough: '#f6e4cc', frosting: '#ff80bb', sprinkles: true, squash: 0 }
   ];
 
   // あつめるスイーツアイテム（各エリアにたっぷり配置）
@@ -1898,19 +1996,23 @@ function initStage() {
     { x: 220, y: 2200, type: '🍓', collected: false, floatOffset: 0 },
     { x: 370, y: 2200, type: '🍒', collected: false, floatOffset: 1 },
     { x: 550, y: 2130, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 640, y: 2040, type: '💖', collected: false, floatOffset: 1 }, // 回復ハート
     { x: 740, y: 2050, type: '🍓', collected: false, floatOffset: 3 },
+    { x: 780, y: 1950, type: '⭐', collected: false, floatOffset: 2 }, // わたあめ大ジャンプ上空スター
     { x: 930, y: 1970, type: '🍭', collected: false, floatOffset: 4 },
 
     // 黄エリア
     { x: 1430, y: 1730, type: '🍋', collected: false, floatOffset: 0 },
     { x: 1600, y: 1650, type: '🍌', collected: false, floatOffset: 1 },
     { x: 1740, y: 1570, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 1830, y: 1510, type: '💖', collected: false, floatOffset: 2 }, // 回復ハート
     { x: 1890, y: 1490, type: '🍯', collected: false, floatOffset: 3 },
     { x: 2045, y: 1410, type: '💛', collected: false, floatOffset: 4 },
 
     // 黒エリア
     { x: 2440, y: 1270, type: '🍫', collected: false, floatOffset: 0 },
     { x: 2670, y: 1190, type: '🍪', collected: false, floatOffset: 1 },
+    { x: 2840, y: 1070, type: '💖', collected: false, floatOffset: 3 }, // 回復ハート
     { x: 2850, y: 1110, type: '⭐', collected: false, floatOffset: 2 },
     { x: 3050, y: 1030, type: '☕', collected: false, floatOffset: 3 },
     { x: 3260, y: 960, type: '🖤', collected: false, floatOffset: 4 },
@@ -1919,7 +2021,9 @@ function initStage() {
     { x: 3560, y: 810, type: '☁️', collected: false, floatOffset: 0 },
     { x: 3760, y: 730, type: '🧁', collected: false, floatOffset: 1 },
     { x: 3940, y: 650, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 3950, y: 660, type: '💖', collected: false, floatOffset: 0 }, // 回復ハート
     { x: 4140, y: 570, type: '🍦', collected: false, floatOffset: 3 },
+    { x: 4220, y: 380, type: '⭐', collected: false, floatOffset: 1 }, // わたあめ大ジャンプ上空スター
     { x: 4340, y: 500, type: '🤍', collected: false, floatOffset: 4 },
 
     // レインボー城
@@ -1976,6 +2080,109 @@ function createFloatingText(x, y, text) {
 }
 
 
+// 💔 プレイヤーダメージ処理（ハート減少・ノックバック・スイーツこぼし）
+function damagePlayer(amount = 1, knockbackDirX = 0) {
+  if (gameState !== 'PLAYING' || player.invincibleTimer > 0) return;
+
+  player.hp = Math.max(0, player.hp - amount);
+  player.invincibleTimer = 90; // 約1.5秒（60fps）無敵時間
+  player.vy = -6.8;
+  player.vx = (knockbackDirX !== 0 ? knockbackDirX : (player.facingRight ? -1 : 1)) * 5.2;
+  player.isGrounded = false;
+
+  // スイーツこぼし（集めたスイーツがポロポロ落ちる！）
+  const dropCount = Math.min(score, 3);
+  if (dropCount > 0) {
+    score -= dropCount;
+    const scoreEl = document.getElementById('score-val');
+    if (scoreEl) scoreEl.textContent = score;
+    createFloatingText(player.x + player.width / 2, player.y - 10, `-${dropCount} 🍓`);
+    for (let i = 0; i < dropCount * 3; i++) {
+      particles.push({
+        x: player.x + player.width / 2,
+        y: player.y + player.height / 2,
+        vx: (Math.random() - 0.5) * 6,
+        vy: -(Math.random() * 5 + 2),
+        size: 8,
+        color: '#ff2b75',
+        alpha: 1,
+        type: 'dust',
+        rot: 0,
+        vRot: 0.1
+      });
+    }
+  }
+
+  createFloatingText(player.x + player.width / 2, player.y - 32, `-${amount} 💔`);
+  updateHeartsUI();
+
+  const heartsBox = document.getElementById('hearts-box');
+  if (heartsBox) {
+    heartsBox.classList.remove('damaged');
+    void heartsBox.offsetWidth;
+    heartsBox.classList.add('damaged');
+  }
+
+  sounds.playDamage();
+
+  // ハートが0になったら「どんまい！」画面
+  if (player.hp <= 0) {
+    triggerFailScreen();
+  }
+}
+
+// しっぱい（ゲームオーバー）画面の表示
+function triggerFailScreen() {
+  gameState = 'FAIL';
+  sounds.playFall();
+  const failScreen = document.getElementById('fail-screen');
+  if (failScreen) failScreen.classList.add('active');
+  if (timerInterval) clearInterval(timerInterval);
+}
+
+// チェックポイントからの復活（もう１かい！）
+function retryFromCheckpoint() {
+  const failScreen = document.getElementById('fail-screen');
+  if (failScreen) failScreen.classList.remove('active');
+
+  player.hp = player.maxHp;
+  updateHeartsUI();
+  player.invincibleTimer = 60; // 復活後1秒無敵
+
+  const currentCpTier = player.checkpointTier || player.currentTier || 1;
+  const cp = checkpoints[currentCpTier] || checkpoints[1];
+  player.x = cp.x;
+  player.y = cp.y;
+  player.safeX = cp.x;
+  player.safeY = cp.y;
+  player.vx = 0;
+  player.vy = 0;
+  player.isGrounded = true;
+  player.canDoubleJump = true;
+  player.isParachuting = false;
+
+  pet.x = cp.x - 30;
+  pet.y = cp.y + player.height - 30;
+  pet.vx = 0;
+  pet.vy = 0;
+
+  camera.x = Math.max(0, Math.min(stageWidth - V_WIDTH, player.x - V_WIDTH * 0.35));
+  camera.y = Math.max(0, Math.min(stageHeight - V_HEIGHT, player.y - V_HEIGHT * 0.55));
+
+  sounds.init();
+  sounds.startBgm();
+
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (gameState === 'PLAYING') {
+      gameTime++;
+      document.getElementById('timer-val').textContent = gameTime;
+    }
+  }, 1000);
+
+  gameState = 'PLAYING';
+}
+
 // ==========================================
 // 4. ゲームの更新と描画
 // ==========================================
@@ -1986,11 +2193,29 @@ function update() {
     return;
   }
 
+  // 無敵タイマーのカウントダウン
+  if (player.invincibleTimer > 0) {
+    player.invincibleTimer--;
+  }
+
   // 1. プレイヤーの移動（きいろ以上のキャンディでダッシュ！）
   const candyRank = CANDY_RANK[player.candyColor] || 1;
   let currentSpeed = player.speed;
   if (candyRank >= 2) {
     currentSpeed = 6.2; // きいろキャンディのスピードアップ！
+  }
+
+  // アイスクリーム床の上にいるか判定
+  let onIce = false;
+  if (player.isGrounded) {
+    platforms.forEach(p => {
+      if (p.type === 'ice_cream' &&
+          player.x + player.width > p.x &&
+          player.x < p.x + p.width &&
+          Math.abs(player.y + player.height - p.y) < 8) {
+        onIce = true;
+      }
+    });
   }
 
   if (keys.left) {
@@ -2002,8 +2227,28 @@ function update() {
     player.facingRight = true;
     player.walkFrame += 0.2;
   } else {
-    player.vx *= 0.65; // 摩擦でスムーズに停止
-    if (Math.abs(player.vx) < 0.2) player.vx = 0;
+    // 摩擦で減速（アイス床ならスーッと滑る！）
+    player.vx *= onIce ? 0.982 : 0.65;
+    if (Math.abs(player.vx) < 0.15) player.vx = 0;
+  }
+
+  // ✨ キラキラのあしあとエフェクト（走ると足元からハートや星が舞う！）
+  if (player.isGrounded && Math.abs(player.vx) > 1.0) {
+    player.trailTimer = (player.trailTimer || 0) + 1;
+    if (player.trailTimer % 4 === 0) {
+      particles.push({
+        x: player.x + (player.facingRight ? 6 : player.width - 6) + (Math.random() - 0.5) * 6,
+        y: player.y + player.height - 2,
+        vx: (player.facingRight ? -1 : 1) * (Math.random() * 0.8 + 0.3),
+        vy: -(Math.random() * 1.5 + 0.4),
+        size: Math.random() * 5 + 3,
+        color: (player.trailTimer % 8 === 0) ? '#ff66aa' : (player.trailTimer % 12 === 0 ? '#ffcc00' : '#66ccff'),
+        alpha: 0.85,
+        type: (player.trailTimer % 8 === 0) ? 'heart' : 'sparkle',
+        rot: 0,
+        vRot: 0
+      });
+    }
   }
 
   // きいろキャンディの足元キラキラスパーク
@@ -2158,6 +2403,19 @@ function update() {
         return;
       }
 
+      // ☁️ わたあめのふかふかスーパージャンプ！
+      if (p.type === 'cotton_candy') {
+        player.y = p.y - player.height;
+        player.vy = -20.5; // 空高く大ジャンプ！
+        player.isGrounded = false;
+        player.canDoubleJump = true;
+        sounds.playCottonJump();
+        createParticles(player.x + player.width / 2, p.y, 'star', 16);
+        createFloatingText(player.x + player.width / 2, p.y - 30, '☁️ スーパージャンプ！ ✨');
+        p.squash = 16;
+        return;
+      }
+
       // 🍫 とけるチョコの足場
       if (p.type === 'melting_choco') {
         p.isStepped = true;
@@ -2204,10 +2462,23 @@ function update() {
       }
 
       // 安全な復帰ポイントを更新（落下救済用：クッキーやウエハースなど安定した足場）
-      if (p.type !== 'macaron' && p.type !== 'melting_choco') {
+      if (p.type !== 'macaron' && p.type !== 'melting_choco' && p.type !== 'cotton_candy') {
         player.safeX = Math.max(40, p.x + p.width / 2 - player.width / 2);
         player.safeY = p.y - player.height;
       }
+    }
+  });
+
+  // 🌵 とげとげ障害物（金平糖トゲ・チョコツノ）との衝突判定
+  spikes.forEach(sp => {
+    if (
+      player.x + player.width > sp.x + 6 &&
+      player.x < sp.x + sp.width - 6 &&
+      player.y + player.height > sp.y + 4 &&
+      player.y < sp.y + sp.height
+    ) {
+      const knockDir = (player.x + player.width / 2 < sp.x + sp.width / 2) ? -1 : 1;
+      damagePlayer(1, knockDir);
     }
   });
 
@@ -2238,7 +2509,7 @@ function update() {
     }
   });
 
-  // 🍩 ころがるトッピングドーナツの移動と衝突
+  // 🍩 ころがるトッピングドーナツの移動と衝突（踏みつけ大ジャンプ vs 体当たりダメージ！）
   donuts.forEach(d => {
     d.x += d.vx;
     d.rotation += d.vx / d.radius;
@@ -2250,16 +2521,29 @@ function update() {
       d.vx *= -1;
     }
 
-    // プレイヤーとの接触判定（ポヨヨンとはじかれる！）
+    if (d.squash > 0) d.squash -= 0.5;
+
+    // プレイヤーとの接触判定
     const pCenterX = player.x + player.width / 2;
     const pCenterY = player.y + player.height / 2;
     const dist = Math.hypot(pCenterX - d.x, pCenterY - (d.y - d.radius));
     if (dist < player.width * 0.45 + d.radius) {
-      player.vy = -7.5;
-      player.vx = (d.vx > 0 ? 1 : -1) * 3.5;
-      player.isGrounded = false;
-      sounds.playBoing();
-      createParticles(d.x, d.y - d.radius, 'star', 8);
+      // 上から踏みつけた場合（踏みつけ大ジャンプ！）
+      const prevPlayerBottom = (player.y - player.vy) + player.height;
+      const donutTop = d.y - d.radius * 1.8;
+      if (player.vy > 0 && prevPlayerBottom <= donutTop + 16) {
+        player.vy = -13.5;
+        player.isGrounded = false;
+        player.canDoubleJump = true;
+        d.squash = 10;
+        sounds.playBoing();
+        createParticles(d.x, d.y - d.radius, 'star', 14);
+        createFloatingText(d.x, d.y - d.radius - 20, '🍩 ナイスジャンプ！');
+      } else {
+        // 横から当たった場合（悪いこと：ダメージ＆跳ね飛ばし！）
+        const knockDir = pCenterX < d.x ? -1 : 1;
+        damagePlayer(1, knockDir);
+      }
     }
   });
 
@@ -2275,51 +2559,86 @@ function update() {
         player.y < itY + 28
       ) {
         it.collected = true;
-        const currentPet = PET_LIST.find(p => p.id === getSelectedPet()) || PET_LIST[0];
-        const earnAmount = currentPet.coinPower || 1;
-        score += earnAmount;
-        document.getElementById('score-val').textContent = score;
-        addTotalSweets(earnAmount); // ペットのコインパワー分たまる！
-        sounds.playCollect();
-        createParticles(itX + 10, itY + 10, 'sparkle', 10);
-        createFloatingText(itX + 10, itY - 10, `+${earnAmount} 🍓`);
+        // 💖 回復ハート
+        if (it.type === '💖') {
+          if (player.hp < player.maxHp) {
+            player.hp = Math.min(player.maxHp, player.hp + 1);
+            updateHeartsUI();
+            sounds.playHeal();
+            createParticles(itX + 10, itY + 10, 'heart', 15);
+            createFloatingText(itX + 10, itY - 10, '💖 かいふく！');
+          } else {
+            // HP満タンならボーナススイーツ+5！
+            score += 5;
+            document.getElementById('score-val').textContent = score;
+            addTotalSweets(5);
+            sounds.playCandyLevelUp();
+            createParticles(itX + 10, itY + 10, 'star', 15);
+            createFloatingText(itX + 10, itY - 10, '+5 🍓 ボーナス！');
+          }
+        } else {
+          // 通常のスイーツアイテム
+          const currentPet = PET_LIST.find(p => p.id === getSelectedPet()) || PET_LIST[0];
+          const earnAmount = currentPet.coinPower || 1;
+          score += earnAmount;
+          document.getElementById('score-val').textContent = score;
+          addTotalSweets(earnAmount); // ペットのコインパワー分たまる！
+          sounds.playCollect();
+          createParticles(itX + 10, itY + 10, 'sparkle', 10);
+          createFloatingText(itX + 10, itY - 10, `+${earnAmount} 🍓`);
+        }
       }
     }
   });
 
-  // 6. 穴に落ちたときの処理（取った最新のチェックポイントの旗から復活！キャンディの色はずっとキープ！）
+  // 6. 穴に落ちたときの処理（ハート-1消費＆チェックポイントから復活！）
   if (player.y > player.safeY + 360 || player.y > stageHeight + 40) {
-    sounds.playFall();
+    player.hp = Math.max(0, player.hp - 1);
+    updateHeartsUI();
+    createFloatingText(player.x, player.y - 20, '-1 💔');
 
-    // 取った最新のチェックポイント（旗）から再開！
-    const currentCpTier = player.checkpointTier || player.currentTier || 1;
-    player.currentTier = currentCpTier;
-    // キャンディの色は手に入れた色をキープ！
-    player.candyColor = loadCandyColor();
-    updateCandyUI(player.candyColor);
+    const heartsBox = document.getElementById('hearts-box');
+    if (heartsBox) {
+      heartsBox.classList.remove('damaged');
+      void heartsBox.offsetWidth;
+      heartsBox.classList.add('damaged');
+    }
 
-    const cp = checkpoints[currentCpTier] || checkpoints[1];
-    player.x = cp.x;
-    player.y = cp.y;
-    player.safeX = cp.x;
-    player.safeY = cp.y;
-    player.vx = 0;
-    player.vy = 0;
-    player.isGrounded = true; // しっかり接地状態で復活！
-    player.canDoubleJump = true;
-    player.isParachuting = false;
+    if (player.hp <= 0) {
+      triggerFailScreen();
+    } else {
+      sounds.playFall();
+      player.invincibleTimer = 60; // 復帰後少し無敵
 
-    // ペットもチェックポイントのプレイヤーの横に移動
-    pet.x = cp.x - 30;
-    pet.y = cp.y + player.height - 30;
-    pet.vx = 0;
-    pet.vy = 0;
+      // 取った最新のチェックポイント（旗）から再開！
+      const currentCpTier = player.checkpointTier || player.currentTier || 1;
+      player.currentTier = currentCpTier;
+      player.candyColor = loadCandyColor();
+      updateCandyUI(player.candyColor);
 
-    // カメラもチェックポイントへ瞬時に合わせる
-    camera.x = Math.max(0, Math.min(stageWidth - V_WIDTH, player.x - V_WIDTH * 0.35));
-    camera.y = Math.max(0, Math.min(stageHeight - V_HEIGHT, player.y - V_HEIGHT * 0.55));
+      const cp = checkpoints[currentCpTier] || checkpoints[1];
+      player.x = cp.x;
+      player.y = cp.y;
+      player.safeX = cp.x;
+      player.safeY = cp.y;
+      player.vx = 0;
+      player.vy = 0;
+      player.isGrounded = true; // しっかり接地状態で復活！
+      player.canDoubleJump = true;
+      player.isParachuting = false;
 
-    createParticles(player.x + player.width / 2, player.y + player.height / 2, 'heart', 12);
+      // ペットもチェックポイントのプレイヤーの横に移動
+      pet.x = cp.x - 30;
+      pet.y = cp.y + player.height - 30;
+      pet.vx = 0;
+      pet.vy = 0;
+
+      // カメラもチェックポイントへ瞬時に合わせる
+      camera.x = Math.max(0, Math.min(stageWidth - V_WIDTH, player.x - V_WIDTH * 0.35));
+      camera.y = Math.max(0, Math.min(stageHeight - V_HEIGHT, player.y - V_HEIGHT * 0.55));
+
+      createParticles(player.x + player.width / 2, player.y + player.height / 2, 'heart', 12);
+    }
   }
 
   // 7. ゴール判定（大ケーキに到達）
@@ -2395,6 +2714,9 @@ function render() {
 
   // 足場の描画
   platforms.forEach(drawPlatform);
+
+  // 🌵 とげとげ障害物の描画
+  spikes.forEach(drawSpike);
 
   // ころがるドーナツの描画
   donuts.forEach(drawDonut);
@@ -2614,6 +2936,66 @@ function drawMarshmallowCloud(x, y, s) {
   ctx.fill();
 }
 
+// 🌵 とげとげ障害物（金平糖トゲ・チョコツノ）の描画
+function drawSpike(sp) {
+  ctx.save();
+  if (sp.type === 'konpeito') {
+    // カラフルな金平糖トゲ
+    const baseColor = sp.color || '#ff66aa';
+    const numPoints = 5;
+    const step = sp.width / numPoints;
+    for (let i = 0; i < numPoints; i++) {
+      const px = sp.x + i * step + step / 2;
+      const py = sp.y + sp.height;
+      const tipY = sp.y;
+
+      ctx.beginPath();
+      ctx.moveTo(px - step * 0.45, py);
+      ctx.lineTo(px, tipY);
+      ctx.lineTo(px + step * 0.45, py);
+      ctx.closePath();
+
+      const grad = ctx.createLinearGradient(px, tipY, px, py);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.35, baseColor);
+      grad.addColorStop(1, '#ff3388');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  } else {
+    // チョコツノ（ビターチョコレートのピラミッドトゲ）
+    const numPoints = 4;
+    const step = sp.width / numPoints;
+    for (let i = 0; i < numPoints; i++) {
+      const px = sp.x + i * step + step / 2;
+      const py = sp.y + sp.height;
+      const tipY = sp.y;
+
+      ctx.beginPath();
+      ctx.moveTo(px - step * 0.48, py);
+      ctx.lineTo(px, tipY);
+      ctx.lineTo(px + step * 0.48, py);
+      ctx.closePath();
+
+      const grad = ctx.createLinearGradient(px - step * 0.5, tipY, px + step * 0.5, py);
+      grad.addColorStop(0, '#663319');
+      grad.addColorStop(0.6, '#331a0e');
+      grad.addColorStop(1, '#1a0c06');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.strokeStyle = '#8b4513';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
 // 足場の描画
 function drawPlatform(p) {
   const colorTier = p.colorTier || 'red';
@@ -2823,6 +3205,71 @@ function drawPlatform(p) {
     ctx.fillText('🍒', p.x + p.width / 2, py - 3);
 
     ctx.restore();
+  } else if (p.type === 'cotton_candy') {
+    // ☁️ ふわふわわたあめのスーパージャンプ台
+    const squash = p.squash || 0;
+    if (p.squash > 0) p.squash *= 0.82;
+    if (p.squash < 0.1) p.squash = 0;
+
+    const pw = p.width + squash * 1.8;
+    const ph = Math.max(14, p.height - squash);
+    const px = p.x - (pw - p.width) / 2;
+    const py = p.y + (p.height - ph);
+
+    ctx.save();
+    const grad = ctx.createLinearGradient(px, py, px + pw, py + ph);
+    grad.addColorStop(0, '#ffd1ea');
+    grad.addColorStop(0.5, '#cce6ff');
+    grad.addColorStop(1, '#ffc2eb');
+    ctx.fillStyle = grad;
+
+    // もこもこ丸の連続
+    const r = ph * 0.7;
+    ctx.beginPath();
+    ctx.arc(px + r, py + ph / 2, r, 0, Math.PI * 2);
+    ctx.arc(px + pw / 2, py + ph / 2 - 4, r * 1.1, 0, Math.PI * 2);
+    ctx.arc(px + pw - r, py + ph / 2, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // キラキラ星飾り
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(px + pw * 0.35, py + 8, 3, 0, Math.PI * 2);
+    ctx.arc(px + pw * 0.65, py + 8, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.restore();
+  } else if (p.type === 'ice_cream') {
+    // 🍦 つるつるアイスクリーム床
+    ctx.save();
+    const grad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.height);
+    grad.addColorStop(0, '#e6f7ff');
+    grad.addColorStop(0.4, '#b3e6ff');
+    grad.addColorStop(1, '#80d4ff');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(p.x, p.y, p.width, p.height, 12);
+    ctx.fill();
+
+    // 氷のキラッと光るツヤ
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+    ctx.fillRect(p.x + 8, p.y + 3, p.width - 16, 4);
+
+    // 下のとろけるしずく
+    ctx.fillStyle = '#b3e6ff';
+    for (let x = p.x + 16; x < p.x + p.width - 10; x += 28) {
+      ctx.beginPath();
+      ctx.arc(x, p.y + p.height + 3, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
   }
 
   // チェックポイントのフラッグ表示
@@ -2896,6 +3343,13 @@ function drawGoal() {
 function drawPlayer() {
   ctx.save();
   ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+
+  // 無敵時間中の半透明点滅
+  if (player.invincibleTimer > 0) {
+    if (Math.floor(player.invincibleTimer / 4) % 2 === 0) {
+      ctx.globalAlpha = 0.35;
+    }
+  }
 
   // 向きに合わせて反転
   if (!player.facingRight) {
@@ -3137,6 +3591,9 @@ function startGame() {
   player.candyColor = loadCandyColor(); // 保存されたキャンディの色を引き継ぐ！
   player.currentTier = CANDY_RANK[player.candyColor] || 1;
   player.checkpointTier = 1;
+  player.hp = player.maxHp;
+  player.invincibleTimer = 0;
+  updateHeartsUI();
   updateCandyUI(player.candyColor);
   updateCharPreview(player.candyColor);
   camera.x = 0;
@@ -3236,7 +3693,7 @@ function setupControls() {
   // スタート・リトライボタン
   document.getElementById('btn-start').addEventListener('click', startGame);
   document.getElementById('btn-clear-retry').addEventListener('click', startGame);
-  document.getElementById('btn-fail-retry').addEventListener('click', startGame);
+  document.getElementById('btn-fail-retry').addEventListener('click', retryFromCheckpoint);
 
   // ヘッダーボタン
   document.getElementById('btn-sound').addEventListener('click', () => {
