@@ -1137,7 +1137,6 @@ let goal = { x: 4850, y: 220, width: 160, height: 140 };
 let particles = [];
 let updrafts = [];
 let donuts = [];
-let warpCandies = [];
 let stageWidth = 5200;
 let stageHeight = 2400;
 
@@ -1226,14 +1225,6 @@ function initStage() {
     { x: 220, y: 2232, radius: 18, vx: 1.5, minX: 80, maxX: 420, rotation: 0, dough: '#f6be79', frosting: '#ff6088', sprinkles: true },
     { x: 2420, y: 1302, radius: 18, vx: -1.7, minX: 2330, maxX: 2490, rotation: 0, dough: '#4a2818', frosting: '#ffffff', sprinkles: true },
     { x: 3580, y: 842, radius: 18, vx: 1.9, minX: 3500, maxX: 3660, rotation: 0, dough: '#f6e4cc', frosting: '#ff80bb', sprinkles: true }
-  ];
-
-  // 🍬 ワープキャンディ（まほうの扉）
-  warpCandies = [
-    { id: 'w1a', x: 740, y: 2040, targetX: 1440, targetY: 1720, targetTier: 2, color: '#ff2a6d', cooldown: 0 },
-    { id: 'w1b', x: 1440, y: 1720, targetX: 740, targetY: 2040, targetTier: 1, color: '#ffcc00', cooldown: 0 },
-    { id: 'w2a', x: 2640, y: 1180, targetX: 3540, targetY: 800, targetTier: 4, color: '#382521', cooldown: 0 },
-    { id: 'w2b', x: 3540, y: 800, targetX: 2640, targetY: 1180, targetTier: 3, color: '#ffffff', cooldown: 0 }
   ];
 
   // あつめるスイーツアイテム（各エリアにたっぷり配置）
@@ -1607,40 +1598,6 @@ function update() {
     }
   });
 
-  // 🍬 ワープキャンディ（まほうの扉）
-  warpCandies.forEach(w => {
-    if (w.cooldown > 0) w.cooldown--;
-    const pCenterX = player.x + player.width / 2;
-    const pCenterY = player.y + player.height / 2;
-    const dist = Math.hypot(pCenterX - w.x, pCenterY - w.y);
-    if (dist < 28 && w.cooldown <= 0) {
-      const partner = warpCandies.find(other => other.x === w.targetX && other.y === w.targetY);
-      w.cooldown = 120;
-      if (partner) partner.cooldown = 120;
-
-      player.x = w.targetX - player.width / 2;
-      player.y = w.targetY - player.height;
-      player.vx = 0;
-      player.vy = -2.5;
-
-      if (w.targetTier && w.targetTier > player.currentTier && w.targetTier <= 4) {
-        player.currentTier = w.targetTier;
-        const tierColorMap = { 1: 'red', 2: 'yellow', 3: 'black', 4: 'white' };
-        const newColor = tierColorMap[w.targetTier];
-        if (CANDY_RANK[newColor] > (CANDY_RANK[player.candyColor] || 1)) {
-          player.candyColor = newColor;
-          saveCandyColor(player.candyColor);
-          updateCandyUI(player.candyColor);
-        }
-      }
-
-      sounds.playWarp();
-      createParticles(w.x, w.y, 'star', 20);
-      createParticles(w.targetX, w.targetY, 'star', 20);
-      showBanner('🌀 まほうのキャンディワープ！ 🍬✨');
-    }
-  });
-
   // 5. アイテム取得判定
   items.forEach(it => {
     if (!it.collected) {
@@ -1771,9 +1728,6 @@ function render() {
   // ふわふわキャンディの風（上昇気流・一番奥に描画）
   updrafts.forEach(drawUpdraft);
 
-  // ワープキャンディの描画
-  warpCandies.forEach(drawWarpCandy);
-
   // 足場の描画
   platforms.forEach(drawPlatform);
 
@@ -1898,51 +1852,6 @@ function drawDonut(d) {
     ctx.fillRect(sx - 1.5, sy - 1, 3, 2);
   });
 
-  ctx.restore();
-}
-
-// 🍬 ワープキャンディの描画
-function drawWarpCandy(w) {
-  ctx.save();
-  const floatY = w.y + Math.sin(Date.now() * 0.005 + (w.id.charCodeAt(1) || 0)) * 5;
-  ctx.translate(w.x, floatY);
-
-  // 回転するうずまき
-  const rot = Date.now() * 0.003;
-
-  // 外側の光のオーラ
-  ctx.fillStyle = isNightMode ? 'rgba(255, 120, 240, 0.28)' : 'rgba(255, 180, 220, 0.32)';
-  ctx.beginPath();
-  ctx.arc(0, 0, 24, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.rotate(rot);
-
-  // キャンディ本体
-  ctx.fillStyle = w.color || '#ff4088';
-  ctx.beginPath();
-  ctx.arc(0, 0, 16, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
-
-  // うずまきライン
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineWidth = 2.5;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.arc(0, 0, 9, 0, Math.PI * 1.5);
-  ctx.stroke();
-
-  ctx.restore();
-
-  // ワープラベル
-  ctx.save();
-  ctx.font = 'bold 12px "M PLUS Rounded 1c", sans-serif';
-  ctx.fillStyle = isNightMode ? '#ffccff' : '#ff4785';
-  ctx.textAlign = 'center';
-  ctx.fillText('🍬 ワープ', w.x, floatY - 26);
   ctx.restore();
 }
 
