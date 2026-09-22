@@ -1,5 +1,147 @@
 // ===== バターASMR メインスクリプト =====
 
+// ----- サウンドマネージャー (Web Audio API) -----
+class SoundManager {
+  constructor() {
+    this.ctx = null;
+  }
+
+  init() {
+    try {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) this.ctx = new AudioCtx();
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    } catch (e) {
+      console.warn('AudioContext init notice:', e);
+    }
+  }
+
+  // パキッ音（軽め〜重め、crackCountに応じて変化）
+  playCrack(progress) {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // ノイズバースト（パキッの質感）
+    const bufSize = this.ctx.sampleRate * 0.06;
+    const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      // 急速に減衰するノイズ
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 3);
+    }
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buf;
+
+    // フィルタ：進捗に応じて低音が増える
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 3000 - progress * 2000; // 3000Hz → 1000Hz
+    filter.Q.value = 1.5;
+
+    // ゲイン
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.4 + progress * 0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.08);
+
+    // クリック音（アタック感）
+    const osc = this.ctx.createOscillator();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(800 - progress * 400, now);
+    osc.frequency.exponentialRampToValueAtTime(100, now + 0.03);
+
+    const clickGain = this.ctx.createGain();
+    clickGain.gain.setValueAtTime(0.15, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+    osc.connect(clickGain);
+    clickGain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.05);
+  }
+
+  // 完全に割れた時の音
+  playBreak() {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // 重い割れ音
+    const bufSize = this.ctx.sampleRate * 0.3;
+    const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 2);
+    }
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buf;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 2000;
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.5, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.3);
+
+    // 低音のインパクト
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+
+    const impactGain = this.ctx.createGain();
+    impactGain.gain.setValueAtTime(0.3, now);
+    impactGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+    osc.connect(impactGain);
+    impactGain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.25);
+  }
+
+  // キラキラ音
+  playSparkle(index) {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // 高音のサイン波
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    const baseFreq = 1200 + index * 150;
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + 0.15);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+}
+
+const sound = new SoundManager();
+
 // ----- バターデータ -----
 const BUTTERS = {
   normal: {
@@ -127,6 +269,9 @@ function addCrack(x, y) {
 
   crackCount++;
 
+  // パキッ音を鳴らす（進捗に応じて音が変化）
+  sound.playCrack(crackCount / MAX_CRACKS);
+
   // ランダムな方向にヒビ線を2〜3本生成
   const numLines = 2 + Math.floor(Math.random() * 2);
   for (let i = 0; i < numLines; i++) {
@@ -190,6 +335,9 @@ butterArea.addEventListener('touchmove', (e) => {
 
 // ----- 完成演出 -----
 function onComplete() {
+  // 割れた音を鳴らす
+  sound.playBreak();
+
   // バターが揺れる
   butterSvg.style.transition = 'transform 0.3s ease, opacity 0.5s ease';
   butterSvg.style.transform = 'scale(1.05)';
@@ -268,6 +416,9 @@ function spawnSparkles() {
       sparkle.style.top = (rect.top + Math.random() * rect.height) + 'px';
       sparkle.style.fontSize = (18 + Math.random() * 16) + 'px';
       butterArea.appendChild(sparkle);
+
+      // キラキラ音
+      sound.playSparkle(i);
 
       setTimeout(() => sparkle.remove(), 900);
     }, i * 100);
