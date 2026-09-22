@@ -1863,8 +1863,8 @@ const player = {
   height: 54,
   vx: 0,
   vy: 0,
-  speed: 4.8,
-  jumpPower: -12.8, // ジャンプ力を強化（高くふわっと跳べる）
+  speed: 5.8, // パワーアップ！すばやくキビキビ走れる
+  jumpPower: -14.2, // パワーアップ！高くふわっと大ジャンプ
   isGrounded: false,
   facingRight: true,
   walkFrame: 0,
@@ -2658,11 +2658,11 @@ function update() {
     player.invincibleTimer--;
   }
 
-  // 1. プレイヤーの移動（きいろ以上のキャンディでダッシュ！）
+  // 1. プレイヤーの移動（きいろ以上のキャンディでさらに超ダッシュ！）
   const candyRank = CANDY_RANK[player.candyColor] || 1;
   let currentSpeed = player.speed;
   if (candyRank >= 2) {
-    currentSpeed = 6.2; // きいろキャンディのスピードアップ！
+    currentSpeed = 7.2; // きいろキャンディ以上のスーパースピードダッシュ！
   }
 
   // アイスクリーム床の上にいるか判定
@@ -2727,27 +2727,28 @@ function update() {
     });
   }
 
-  // 2. ジャンプ＆2段ジャンプ（レインボーキャンディ）
+  // 2. ジャンプ＆パワーアップ2段ジャンプ（いつでも2段ジャンプ可能！）
   const justPressedJump = keys.jump && !player.jumpHeldLastFrame;
 
   if (justPressedJump && player.isGrounded) {
     player.vy = player.jumpPower;
     player.isGrounded = false;
+    player.canDoubleJump = true;
     sounds.playJump();
     createParticles(player.x + player.width / 2, player.y + player.height, 'dust', 4);
-  } else if (justPressedJump && !player.isGrounded && player.canDoubleJump && candyRank >= 5) {
-    // レインボーキャンディ：空中2段ジャンプ！
-    player.vy = player.jumpPower * 0.92;
+  } else if (justPressedJump && !player.isGrounded && player.canDoubleJump) {
+    // 最初からいつでも空中2段ジャンプ可能！
+    player.vy = player.jumpPower * 0.94;
     player.canDoubleJump = false;
     sounds.playJump();
-    createParticles(player.x + player.width / 2, player.y + player.height / 2, 'star', 16);
-    showBanner('✨ 2だんジャンプ！ 🌈');
+    createParticles(player.x + player.width / 2, player.y + player.height / 2, candyRank >= 5 ? 'heart' : 'star', 16);
+    showBanner(candyRank >= 5 ? '✨ レインボー2だんジャンプ！ 🌈' : '✨ 2だんジャンプ！ 🎀');
   }
 
-  // しろキャンディ＆レインボー：ふわふわパラシュート（空中でジャンプ長押しでゆっくり降下）
-  if (keys.jump && player.vy > 0 && !player.isGrounded && candyRank >= 4) {
+  // ふわふわパラシュート（空中でジャンプ長押しでゆっくり優雅に降下！）
+  if (keys.jump && player.vy > 0 && !player.isGrounded) {
     player.isParachuting = true;
-    player.vy = Math.min(player.vy, 2.2); // 落下速度をゆっくり制限
+    player.vy = Math.min(player.vy, 2.3); // 落下速度をゆっくり制限
     if (Math.random() < 0.25) {
       particles.push({
         x: player.x + player.width / 2 + (Math.random() - 0.5) * 20,
@@ -2755,7 +2756,7 @@ function update() {
         vx: (Math.random() - 0.5) * 1.5,
         vy: -0.5,
         size: Math.random() * 5 + 3,
-        color: '#ffffff',
+        color: candyRank >= 5 ? '#ff99dd' : '#ffffff',
         alpha: 0.85,
         type: 'sparkle',
         rot: 0,
