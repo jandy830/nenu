@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+  <title>🍰 お菓子の国のアスレチック 🎀</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍰</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ゲームコンテナ -->
+  <div class="game-container">
+
+    <!-- トップヘッダー / ステータスバー -->
+    <header class="game-header">
+      <a href="../index.html" class="btn-home" title="あそびばへもどる">🏠 あそびば</a>
+      <div class="header-status">
+        <div class="status-item sweets-score">
+          <span class="icon">🍓</span>
+          <span id="score-val">0</span>
+        </div>
+        <div class="status-item timer-box">
+          <span class="icon">⏱️</span>
+          <span id="timer-val">0</span>s
+        </div>
+      </div>
+      <div class="header-tools">
+        <button id="btn-sound" class="icon-btn" title="おとのきりかえ">🎵</button>
+        <button id="btn-restart" class="icon-btn" title="さいしょから">🔄</button>
+      </div>
+    </header>
+
+    <!-- メインのゲーム画面（Canvas） -->
+    <div class="canvas-wrapper">
+      <canvas id="game-canvas" width="800" height="450"></canvas>
+      
+      <!-- スタートオーバーレイ画面 -->
+      <div id="start-screen" class="overlay-screen active">
+        <div class="overlay-card">
+          <div class="badge-title">✨ スイーツ・アクション ✨</div>
+          <h1 class="title">お菓子の国の<br>アスレチック 🍰🎀</h1>
+          <div class="character-preview" id="char-preview"></div>
+          <p class="guide-text">いちごやキャンディをあつめて<br>ケーキのゴールをめざそう！</p>
+          <button id="btn-start" class="btn-play">💖 あそぶ 💖</button>
+        </div>
+      </div>
+
+      <!-- ゴール（クリア）画面 -->
+      <div id="clear-screen" class="overlay-screen">
+        <div class="overlay-card clear-card">
+          <div class="celebrate-emoji">🎉🎂✨</div>
+          <h2 class="title-clear">ゴール！クリアおめでとう！</h2>
+          <div class="clear-stats">
+            <p>あつめたスイーツ: <span class="highlight" id="clear-sweets">0</span> こ 🍓</p>
+            <p>タイム: <span class="highlight" id="clear-time">0</span> びょう ⏱️</p>
+          </div>
+          <div class="clear-rank" id="clear-rank">⭐⭐⭐</div>
+          <button id="btn-clear-retry" class="btn-play">🔁 もう１かいあそぶ</button>
+        </div>
+      </div>
+
+      <!-- しっぱい（リトライ）画面 -->
+      <div id="fail-screen" class="overlay-screen">
+        <div class="overlay-card fail-card">
+          <div class="celebrate-emoji">🥺🍰💦</div>
+          <h2 class="title-fail">どんまい！おちちゃった！</h2>
+          <p class="guide-text">もういっかいちょうせんしよう！</p>
+          <button id="btn-fail-retry" class="btn-play">🔁 もう１かい！</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- スマホ・タッチ用 コントローラー -->
+    <div class="touch-controls">
+      <div class="d-pad">
+        <button id="btn-left" class="ctrl-btn btn-dir" aria-label="ひだり">◀</button>
+        <button id="btn-right" class="ctrl-btn btn-dir" aria-label="みぎ">▶</button>
+      </div>
+      <div class="action-pad">
+        <button id="btn-jump" class="ctrl-btn btn-action" aria-label="ジャンプ">⤴️ ジャンプ</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
