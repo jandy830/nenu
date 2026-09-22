@@ -297,6 +297,10 @@ body {
   touch-action: none;
 }
 
+.butter-area.hidden {
+  display: none !important;
+}
+
 /* むにゅむにゅモード切り替えバナー */
 .squish-banner {
   background: linear-gradient(135deg, #ff85a2 0%, #ff5fa2 100%);
@@ -397,6 +401,10 @@ body.mode-squish .core-body {
   padding: 12px 16px 24px;
   width: 100%;
   max-width: 400px;
+}
+
+.complete-buttons.hidden {
+  display: none !important;
 }
 
 .btn-action {
