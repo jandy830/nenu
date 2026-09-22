@@ -278,13 +278,69 @@ body {
   border: 2px solid #ffb3d9;
 }
 
-/* ペットショップモーダル */
+/* ペットショップモーダル（画面全体にきれいに表示） */
+.shop-overlay {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 9999 !important;
+  background: rgba(45, 25, 40, 0.72) !important;
+  backdrop-filter: blur(8px);
+  padding: 14px;
+  overflow: hidden;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.shop-overlay.active {
+  display: flex !important;
+}
+
 .shop-card {
-  max-width: 620px;
-  max-height: 85vh;
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  max-height: 90dvh;
+  background: #ffffff;
+  border: 4px solid #ffb3d9;
+  border-radius: 28px;
   display: flex;
   flex-direction: column;
-  padding: 20px 16px;
+  padding: 18px 16px 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+  animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.shop-close-corner {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff0f7;
+  border: 2px solid #ffb3d9;
+  color: #ff3377;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease;
+  z-index: 10;
+}
+
+.shop-close-corner:active {
+  transform: scale(0.92);
 }
 
 .shop-header {
@@ -292,38 +348,44 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4px;
-  padding: 0 8px;
+  padding-right: 42px; /* ✕ボタンと被らないように余白 */
+  padding-left: 4px;
 }
 
 .title-shop {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 900;
   color: #ff4088;
 }
 
 .shop-bank {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
   background: #fff0f7;
   padding: 4px 12px;
   border-radius: 16px;
   border: 2px solid #ffb3d9;
   color: #ff3377;
+  white-space: nowrap;
 }
 
 .shop-subtitle {
   font-size: 13px;
   font-weight: 700;
   color: #7b5971;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  text-align: left;
+  padding-left: 4px;
 }
 
 .pet-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+  gap: 8px;
   overflow-y: auto;
-  padding: 6px;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px;
+  flex: 1 1 auto;
   max-height: 52vh;
   margin-bottom: 12px;
 }
@@ -332,7 +394,7 @@ body {
   background: #ffffff;
   border: 3px solid #ffccd9;
   border-radius: 18px;
-  padding: 10px 6px;
+  padding: 10px 4px;
   text-align: center;
   box-shadow: 0 4px 10px rgba(255, 140, 180, 0.15);
   display: flex;
@@ -348,7 +410,7 @@ body {
 }
 
 .pet-icon {
-  font-size: 34px;
+  font-size: 32px;
   line-height: 1.2;
   margin-bottom: 2px;
 }
@@ -357,7 +419,7 @@ body {
   font-size: 12px;
   font-weight: 900;
   color: #553344;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .pet-price {
@@ -372,11 +434,11 @@ body {
   font-size: 12px;
   font-weight: 900;
   border-radius: 14px;
-  padding: 4px 12px;
+  padding: 5px 10px;
   cursor: pointer;
   border: 2px solid transparent;
   transition: transform 0.08s ease;
-  width: 90%;
+  width: 92%;
 }
 
 .btn-pet-action.btn-buy {
@@ -395,15 +457,30 @@ body {
   color: #ffffff;
 }
 
-.btn-close {
-  background: #f0f0f5;
-  border: 2px solid #d0d0d8;
-  border-radius: 20px;
-  padding: 8px 24px;
-  font-size: 14px;
+.btn-play-with-pet {
+  background: linear-gradient(135deg, #ff66aa 0%, #ff3377 100%);
+  color: #ffffff;
+  border: 3px solid #ffffff;
+  border-radius: 28px;
+  padding: 12px 24px;
+  font-size: 17px;
   font-weight: 900;
+  font-family: inherit;
+  box-shadow: 0 6px 18px rgba(255, 51, 119, 0.4);
   cursor: pointer;
   align-self: center;
+  transition: transform 0.12s ease;
+  width: 100%;
+  max-width: 340px;
+  flex-shrink: 0;
+}
+
+.btn-play-with-pet:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.btn-play-with-pet:active {
+  transform: translateY(2px) scale(0.98);
 }
 
 /* クリア画面・失敗画面の装飾 */

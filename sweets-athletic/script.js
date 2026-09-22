@@ -507,6 +507,17 @@ function renderPetShop() {
     `;
     grid.appendChild(card);
   });
+
+  // 選択中のペットに合わせて「あそぶ」ボタンを更新
+  const currentPetItem = PET_LIST.find(p => p.id === selected) || PET_LIST[0];
+  const btnClose = document.getElementById('btn-close-shop');
+  if (btnClose) {
+    if (gameState === 'PLAYING') {
+      btnClose.textContent = `🎮 ${currentPetItem.name} とつづきをあそぶ！ 💖`;
+    } else {
+      btnClose.textContent = `💖 ${currentPetItem.name} とあそぶ！ 🎮`;
+    }
+  }
 }
 
 window.selectPetAction = function(petId) {
@@ -529,19 +540,13 @@ window.buyPetAction = function(petId) {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  const savedColor = loadCandyColor();
-  updateCharPreview(savedColor);
-  updateCandyUI(savedColor);
-  updateSweetsUI();
-  renderPetShop();
-
-  // ショップ開閉
+function setupShopEvents() {
   const btnOpenShop = document.getElementById('btn-open-shop');
   const btnHeaderShop = document.getElementById('btn-header-shop');
   const btnClearShop = document.getElementById('btn-clear-shop');
   const btnFailShop = document.getElementById('btn-fail-shop');
   const btnCloseShop = document.getElementById('btn-close-shop');
+  const btnShopCloseCorner = document.getElementById('btn-shop-close-corner');
   const shopScreen = document.getElementById('shop-screen');
 
   function openShopModal() {
@@ -550,17 +555,55 @@ document.addEventListener('DOMContentLoaded', () => {
     sounds.init();
   }
 
+  // 「このペットとあそぶ！」ボタン：ゲームへ戻る＆開始！
+  function closeShopAndResumeGame() {
+    if (shopScreen) shopScreen.classList.remove('active');
+    sounds.init();
+    sounds.playJump();
+
+    // まだスタートしていない・またはクリア/失敗画面ならゲームをスタート！
+    if (gameState === 'START' || gameState === 'CLEAR' || gameState === 'FAIL') {
+      startGame();
+    }
+  }
+
+  function closeShopOnly() {
+    if (shopScreen) shopScreen.classList.remove('active');
+    sounds.init();
+  }
+
   if (btnOpenShop) btnOpenShop.addEventListener('click', openShopModal);
   if (btnHeaderShop) btnHeaderShop.addEventListener('click', openShopModal);
   if (btnClearShop) btnClearShop.addEventListener('click', openShopModal);
   if (btnFailShop) btnFailShop.addEventListener('click', openShopModal);
 
-  if (btnCloseShop && shopScreen) {
-    btnCloseShop.addEventListener('click', () => {
-      shopScreen.classList.remove('active');
+  if (btnCloseShop) btnCloseShop.addEventListener('click', closeShopAndResumeGame);
+  if (btnShopCloseCorner) btnShopCloseCorner.addEventListener('click', closeShopOnly);
+
+  // モーダルの外側（背景）タップでも安全にとじる
+  if (shopScreen) {
+    shopScreen.addEventListener('click', (e) => {
+      if (e.target === shopScreen) {
+        closeShopOnly();
+      }
     });
   }
-});
+}
+
+function initApp() {
+  const savedColor = loadCandyColor();
+  updateCharPreview(savedColor);
+  updateCandyUI(savedColor);
+  updateSweetsUI();
+  renderPetShop();
+  setupShopEvents();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 
 
 // ==========================================
