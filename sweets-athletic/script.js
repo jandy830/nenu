@@ -294,13 +294,13 @@ let timerInterval = null;
 // カメラ
 const camera = {
   x: 0,
-  y: 0
+  y: 950
 };
 
 // プレイヤー
 const player = {
   x: 80,
-  y: 280,
+  y: 1180,
   width: 46,
   height: 54,
   vx: 0,
@@ -311,7 +311,7 @@ const player = {
   facingRight: true,
   walkFrame: 0,
   safeX: 80,
-  safeY: 280,
+  safeY: 1180,
   blinkTimer: 0,
   isBlinking: false
 };
@@ -326,59 +326,90 @@ const keys = {
 // ステージデータ（お菓子の世界）
 let platforms = [];
 let items = [];
-let goal = { x: 2600, y: 190, width: 90, height: 110 };
+let goal = { x: 4420, y: 170, width: 150, height: 140 };
 let particles = [];
-let stageWidth = 2900;
+let stageWidth = 4800;
+let stageHeight = 1400;
 
 // ステージ初期化
 function initStage() {
+  stageWidth = 4800;
+  stageHeight = 1400;
+
   platforms = [
-    // スタート地点のクッキー地面
-    { x: 0, y: 360, width: 380, height: 90, type: 'cookie' },
-    
-    // サクサクウエハースのステップ
-    { x: 440, y: 310, width: 130, height: 32, type: 'wafer' },
-    { x: 630, y: 250, width: 140, height: 32, type: 'wafer' },
-    
-    // ふわふわマカロン（ピンク・ミント）
-    { x: 840, y: 220, width: 100, height: 30, type: 'macaron', color: '#ffb3d9', vy: 0.8, minY: 190, maxY: 260 },
-    { x: 1010, y: 270, width: 150, height: 36, type: 'cookie' },
+    // --- エリア1: クッキースタート広場（地上 y: 1250〜1100） ---
+    { x: 0, y: 1250, width: 440, height: 160, type: 'cookie' },
+    { x: 490, y: 1190, width: 130, height: 32, type: 'wafer' },
+    { x: 670, y: 1120, width: 140, height: 32, type: 'wafer' },
+    { x: 860, y: 1050, width: 110, height: 30, type: 'macaron', color: '#ffb3d9', vy: 0.8, minY: 1010, maxY: 1090 },
 
-    // キャンディステップの階段
-    { x: 1220, y: 320, width: 120, height: 32, type: 'wafer' },
-    { x: 1400, y: 260, width: 130, height: 32, type: 'wafer' },
-    { x: 1590, y: 200, width: 110, height: 30, type: 'macaron', color: '#b3f0ff', vy: -0.9, minY: 160, maxY: 240 },
+    // --- エリア2: マカロンとウエハースの坂道（y: 1050〜850） ---
+    { x: 1030, y: 1000, width: 180, height: 50, type: 'cookie' },
+    { x: 1270, y: 940, width: 130, height: 32, type: 'wafer' },
+    { x: 1460, y: 880, width: 120, height: 30, type: 'macaron', color: '#b3f0ff', vy: -0.9, minY: 840, maxY: 920 },
+    { x: 1640, y: 820, width: 140, height: 32, type: 'wafer' },
+    { x: 1840, y: 860, width: 220, height: 60, type: 'cookie' },
 
-    // 巨大チョコチップクッキーの丘
-    { x: 1760, y: 290, width: 220, height: 160, type: 'cookie' },
-    { x: 2040, y: 230, width: 140, height: 32, type: 'wafer' },
-    { x: 2240, y: 270, width: 120, height: 30, type: 'macaron', color: '#ffd9b3', vy: 0.7, minY: 220, maxY: 300 },
+    // --- エリア3: スイーツタワーのぼり（y: 800〜580） ---
+    { x: 2120, y: 800, width: 130, height: 32, type: 'wafer' },
+    { x: 2310, y: 730, width: 140, height: 32, type: 'wafer' },
+    { x: 2510, y: 670, width: 120, height: 30, type: 'macaron', color: '#ffd9b3', vy: 0.9, minY: 630, maxY: 710 },
+    { x: 2690, y: 610, width: 150, height: 32, type: 'wafer' },
+    { x: 2900, y: 650, width: 260, height: 70, type: 'cookie' },
 
-    // ゴール手前の大ケーキ広場
-    { x: 2420, y: 330, width: 480, height: 120, type: 'cake_ground' }
+    // --- エリア4: 天空のふわふわロード（y: 580〜360） ---
+    { x: 3220, y: 580, width: 130, height: 32, type: 'wafer' },
+    { x: 3410, y: 510, width: 120, height: 30, type: 'macaron', color: '#ffcce6', vy: -0.8, minY: 470, maxY: 550 },
+    { x: 3590, y: 440, width: 140, height: 32, type: 'wafer' },
+    { x: 3790, y: 380, width: 130, height: 32, type: 'wafer' },
+    { x: 3980, y: 320, width: 120, height: 30, type: 'macaron', color: '#c2f0c2', vy: 0.7, minY: 280, maxY: 360 },
+
+    // --- エリア5: 天空のショートケーキ城 ゴール広場（y: 300） ---
+    { x: 4180, y: 310, width: 620, height: 180, type: 'cake_ground' }
   ];
 
-  // あつめるスイーツアイテム（いちご・キャンディ・星）
+  // あつめるスイーツアイテム（いちご・キャンディ・星など全24個！）
   items = [
-    { x: 200, y: 310, type: '🍓', collected: false, floatOffset: 0 },
-    { x: 490, y: 260, type: '🍬', collected: false, floatOffset: 1 },
-    { x: 690, y: 200, type: '⭐', collected: false, floatOffset: 2 },
-    { x: 880, y: 160, type: '🍓', collected: false, floatOffset: 3 },
-    { x: 1070, y: 220, type: '🍭', collected: false, floatOffset: 4 },
-    { x: 1270, y: 270, type: '🍓', collected: false, floatOffset: 0 },
-    { x: 1450, y: 210, type: '⭐', collected: false, floatOffset: 1 },
-    { x: 1630, y: 150, type: '🍬', collected: false, floatOffset: 2 },
-    { x: 1850, y: 240, type: '🍓', collected: false, floatOffset: 3 },
-    { x: 2100, y: 180, type: '🍭', collected: false, floatOffset: 4 },
-    { x: 2290, y: 220, type: '⭐', collected: false, floatOffset: 1 },
-    { x: 2520, y: 280, type: '🍓', collected: false, floatOffset: 2 }
+    // エリア1
+    { x: 220, y: 1200, type: '🍓', collected: false, floatOffset: 0 },
+    { x: 360, y: 1200, type: '🍬', collected: false, floatOffset: 1 },
+    { x: 550, y: 1140, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 730, y: 1070, type: '🍓', collected: false, floatOffset: 3 },
+    { x: 910, y: 990, type: '🍭', collected: false, floatOffset: 4 },
+
+    // エリア2
+    { x: 1110, y: 950, type: '⭐', collected: false, floatOffset: 1 },
+    { x: 1330, y: 890, type: '🍓', collected: false, floatOffset: 2 },
+    { x: 1510, y: 830, type: '🍬', collected: false, floatOffset: 3 },
+    { x: 1700, y: 770, type: '⭐', collected: false, floatOffset: 4 },
+    { x: 1940, y: 810, type: '🍭', collected: false, floatOffset: 0 },
+
+    // エリア3
+    { x: 2180, y: 750, type: '🍓', collected: false, floatOffset: 1 },
+    { x: 2370, y: 680, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 2560, y: 620, type: '🍬', collected: false, floatOffset: 3 },
+    { x: 2750, y: 560, type: '🍓', collected: false, floatOffset: 4 },
+    { x: 3020, y: 600, type: '💖', collected: false, floatOffset: 0 },
+
+    // エリア4
+    { x: 3280, y: 530, type: '🍭', collected: false, floatOffset: 1 },
+    { x: 3460, y: 460, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 3650, y: 390, type: '🍓', collected: false, floatOffset: 3 },
+    { x: 3850, y: 330, type: '🍬', collected: false, floatOffset: 4 },
+    { x: 4030, y: 270, type: '⭐', collected: false, floatOffset: 1 },
+
+    // エリア5（ゴール周辺のスイーツパラダイス）
+    { x: 4250, y: 260, type: '🍓', collected: false, floatOffset: 0 },
+    { x: 4320, y: 230, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 4380, y: 260, type: '🍭', collected: false, floatOffset: 3 },
+    { x: 4620, y: 260, type: '💖', collected: false, floatOffset: 4 }
   ];
 
-  // ゴール位置（大ケーキ）
+  // ゴール位置（天空の大ケーキ）
   goal = {
-    x: 2660,
-    y: 200,
-    width: 140,
+    x: 4420,
+    y: 180,
+    width: 150,
     height: 130
   };
 
@@ -477,10 +508,10 @@ function update() {
         player.y += p.vy;
       }
 
-      // 安全な復帰ポイントを更新（落下救済用）
-      if (p.type === 'cookie' || p.type === 'cake_ground') {
-        player.safeX = Math.max(40, player.x);
-        player.safeY = player.y;
+      // 安全な復帰ポイントを更新（落下救済用：クッキーやウエハースなど安定した足場）
+      if (p.type !== 'macaron') {
+        player.safeX = Math.max(40, p.x + p.width / 2 - player.width / 2);
+        player.safeY = p.y - player.height;
       }
     }
   });
@@ -505,12 +536,12 @@ function update() {
     }
   });
 
-  // 6. 穴に落ちたときの処理（やさしい復帰）
-  if (player.y > V_HEIGHT + 60) {
+  // 6. 穴に落ちたときの処理（やさしい復帰：直前の安全な足場へ戻す）
+  if (player.y > player.safeY + 340 || player.y > stageHeight + 40) {
     sounds.playFall();
-    createParticles(player.safeX + 20, player.safeY + 20, 'heart', 8);
+    createParticles(player.safeX + player.width / 2, player.safeY + player.height / 2, 'heart', 8);
     player.x = player.safeX;
-    player.y = player.safeY - 10;
+    player.y = player.safeY;
     player.vx = 0;
     player.vy = 0;
   }
@@ -524,11 +555,16 @@ function update() {
     reachGoal();
   }
 
-  // 8. カメラの追従
+  // 8. カメラの追従（左右・上下）
   const targetCamX = player.x - V_WIDTH * 0.35;
   camera.x += (targetCamX - camera.x) * 0.1;
   if (camera.x < 0) camera.x = 0;
   if (camera.x > stageWidth - V_WIDTH) camera.x = stageWidth - V_WIDTH;
+
+  const targetCamY = player.y - V_HEIGHT * 0.55;
+  camera.y += (targetCamY - camera.y) * 0.1;
+  if (camera.y < 0) camera.y = 0;
+  if (camera.y > stageHeight - V_HEIGHT) camera.y = stageHeight - V_HEIGHT;
 
   // まばたきアニメ
   player.blinkTimer++;
@@ -561,11 +597,11 @@ function updateParticles() {
 function render() {
   ctx.clearRect(0, 0, V_WIDTH, V_HEIGHT);
 
-  // 背景描画（パステルピンクの空とお菓子の雲）
+  // 背景描画（高度に応じたパステル空とお菓子の雲）
   drawBackground();
 
   ctx.save();
-  ctx.translate(-Math.floor(camera.x), 0);
+  ctx.translate(-Math.floor(camera.x), -Math.floor(camera.y));
 
   // 足場の描画
   platforms.forEach(drawPlatform);
@@ -585,23 +621,34 @@ function render() {
   ctx.restore();
 }
 
-// 背景とお菓子の雲
+// 背景とお菓子の雲（高度に応じた美しいグラデーション）
 function drawBackground() {
-  // パステルピンク空グラデーション
+  // カメラの高さに応じた空の色のブレンド（上に行くほど青空〜ラベンダー、地上はピンク〜ホイップ）
+  const heightRatio = Math.max(0, Math.min(1, camera.y / (stageHeight - V_HEIGHT)));
+  
   const grad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
-  grad.addColorStop(0, '#ffd9ec');
-  grad.addColorStop(0.6, '#fff0f7');
-  grad.addColorStop(1, '#fde2ff');
+  if (heightRatio < 0.4) {
+    // 天空エリア：ゆめかわラベンダーブルー〜パステルピンク
+    grad.addColorStop(0, '#c7e6ff');
+    grad.addColorStop(0.5, '#e0d4ff');
+    grad.addColorStop(1, '#ffd6eb');
+  } else {
+    // 地上〜中層エリア：あたたかいピンク〜ホイップホワイト
+    grad.addColorStop(0, '#ffd4ea');
+    grad.addColorStop(0.6, '#fff0f7');
+    grad.addColorStop(1, '#ffe3f1');
+  }
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
 
-  // ふわふわマシュマロの雲（パララックス背景）
-  const cloudOffset = (camera.x * 0.2) % 600;
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-  for (let i = -1; i < 3; i++) {
-    const cx = i * 400 - cloudOffset;
-    drawMarshmallowCloud(cx + 80, 70, 70);
-    drawMarshmallowCloud(cx + 280, 110, 50);
+  // ふわふわマシュマロの雲（カメラ移動に応じたパララックス）
+  const cloudOffsetX = (camera.x * 0.25) % 800;
+  const cloudOffsetY = (camera.y * 0.18) % 300;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+  for (let i = -1; i < 4; i++) {
+    const cx = i * 360 - cloudOffsetX;
+    drawMarshmallowCloud(cx + 60, 80 - cloudOffsetY + 50, 75);
+    drawMarshmallowCloud(cx + 240, 180 - cloudOffsetY + 50, 55);
   }
 }
 
@@ -812,12 +859,13 @@ function startGame() {
 
   initStage();
   player.x = 80;
-  player.y = 280;
+  player.y = 1180;
   player.vx = 0;
   player.vy = 0;
   player.safeX = 80;
-  player.safeY = 280;
+  player.safeY = 1180;
   camera.x = 0;
+  camera.y = stageHeight - V_HEIGHT;
 
   gameState = 'PLAYING';
 }
