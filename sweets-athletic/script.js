@@ -245,25 +245,45 @@ const DRESS_COLORS = {
   pink: { id: 'pink', name: '🍓 いちごピンク', price: 0, top: '#ff80bf', bottom: '#ff3388', apronLine: '#ff88bb', icon: '🍓' },
   blue: { id: 'blue', name: '🐬 ミントソーダ', price: 15, top: '#70e1ff', bottom: '#00a6e0', apronLine: '#50c8ff', icon: '🐬' },
   yellow: { id: 'yellow', name: '🍋 レモンシフォン', price: 25, top: '#ffe666', bottom: '#f5a623', apronLine: '#ffcc33', icon: '🍋' },
+  sakura: { id: 'sakura', name: '🌸 さくらプリンセス', price: 30, top: '#ffb3d9', bottom: '#ff6699', apronLine: '#ffd1dc', icon: '🌸' },
   purple: { id: 'purple', name: '🍇 ラベンダーベリー', price: 35, top: '#d48bff', bottom: '#9933ee', apronLine: '#bf70ff', icon: '🍇' },
   choco: { id: 'choco', name: '🍫 ショコラロリータ', price: 45, top: '#6a432d', bottom: '#3c2115', apronLine: '#c59b76', icon: '🍫' },
   white: { id: 'white', name: '🤍 マシュマロホワイト', price: 50, top: '#ffffff', bottom: '#d8e5f3', apronLine: '#ffb3d9', icon: '🤍' },
-  rainbow: { id: 'rainbow', name: '🌈 にじいろドリーム', price: 70, top: '#ff66aa', bottom: '#bb55ff', apronLine: '#ffffff', icon: '🌈', isRainbow: true }
+  galaxy: { id: 'galaxy', name: '🌌 ギャラクシードーム', price: 60, top: '#3b2d71', bottom: '#150936', apronLine: '#a78bfa', icon: '🌌', isGalaxy: true },
+  gothic: { id: 'gothic', name: '🖤 ゴシックベリー', price: 65, top: '#2c1c28', bottom: '#110712', apronLine: '#9b2242', icon: '🖤' },
+  rainbow: { id: 'rainbow', name: '🌈 にじいろドリーム', price: 70, top: '#ff66aa', bottom: '#bb55ff', apronLine: '#ffffff', icon: '🌈', isRainbow: true },
+  mermaid: { id: 'mermaid', name: '🧜‍♀️ アクアマリンマーメイド', price: 75, top: '#38ef7d', bottom: '#11998e', apronLine: '#70ffe0', icon: '🧜‍♀️' },
+  queen: { id: 'queen', name: '👑 ロイヤルクイーン', price: 85, top: '#ffe066', bottom: '#d48800', apronLine: '#ffffff', icon: '👑' }
 };
 
 const HEADWEAR_LIST = [
   { id: 'ribbon', name: '🎀 大きなリボン', price: 0, icon: '🎀' },
   { id: 'tiara', name: '👑 きらきらティアラ', price: 20, icon: '👑' },
   { id: 'beret', name: '🍓 いちごベレー帽', price: 25, icon: '🍓' },
+  { id: 'sakura_flower', name: '🌸 さくらの花かざり', price: 30, icon: '🌸' },
   { id: 'cat_ears', name: '🐱 ねこみみカチューシャ', price: 35, icon: '🐱' },
+  { id: 'witch_hat', name: '🧙‍♀️ まほうつかいの帽子', price: 40, icon: '🧙‍♀️' },
   { id: 'angel', name: '👼 エンジェルリング', price: 45, icon: '👼' },
+  { id: 'bear_ears', name: '🐻 くまみみカチューシャ', price: 50, icon: '🐻' },
   { id: 'bunny', name: '🐰 うさみみカチューシャ', price: 55, icon: '🐰' }
+];
+
+const BACK_ACC_LIST = [
+  { id: 'none', name: '✨ なし', price: 0, icon: '✨' },
+  { id: 'cat_tail', name: '🐱 ねこのしっぽ', price: 25, icon: '🐱' },
+  { id: 'bunny_tail', name: '🐰 まるいうさぎしっぽ', price: 30, icon: '🐰' },
+  { id: 'angel_wings', name: '👼 てんしのはね', price: 45, icon: '👼' },
+  { id: 'fairy_wings', name: '🧚 ようせいの羽', price: 50, icon: '🧚' },
+  { id: 'devil_set', name: '😈 こあくまの羽としっぽ', price: 65, icon: '😈' },
+  { id: 'rainbow_aura', name: '🌈 にじいろのオーラ', price: 80, icon: '🌈' }
 ];
 
 const DRESS_COLOR_KEY = 'sweets_athletic_dress_color';
 const HEADWEAR_KEY = 'sweets_athletic_headwear';
+const BACK_ACC_KEY = 'sweets_athletic_back_acc';
 const UNLOCKED_DRESSES_KEY = 'sweets_athletic_unlocked_dresses';
 const UNLOCKED_HEADWEAR_KEY = 'sweets_athletic_unlocked_headwear';
+const UNLOCKED_BACK_ACC_KEY = 'sweets_athletic_unlocked_back_acc';
 const NIGHT_MODE_KEY = 'sweets_athletic_night_mode';
 
 let isNightMode = false;
@@ -315,6 +335,22 @@ function setHeadwear(hw) {
   renderDressUpPreview();
 }
 
+function getBackAcc() {
+  try {
+    return localStorage.getItem(BACK_ACC_KEY) || 'none';
+  } catch (e) {
+    return 'none';
+  }
+}
+
+function setBackAcc(acc) {
+  try {
+    localStorage.setItem(BACK_ACC_KEY, acc);
+  } catch (e) {}
+  updateCharPreview(player ? player.candyColor : loadCandyColor());
+  renderDressUpPreview();
+}
+
 function getUnlockedDresses() {
   try {
     const saved = localStorage.getItem(UNLOCKED_DRESSES_KEY);
@@ -359,9 +395,32 @@ function unlockHeadwear(hwId) {
   }
 }
 
-function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'red', dressColor = null, headwear = null) {
+function getUnlockedBackAcc() {
+  try {
+    const saved = localStorage.getItem(UNLOCKED_BACK_ACC_KEY);
+    const list = saved ? JSON.parse(saved) : ['none'];
+    const current = getBackAcc();
+    if (current && !list.includes(current)) list.push(current);
+    return list;
+  } catch (e) {
+    return ['none'];
+  }
+}
+
+function unlockBackAcc(accId) {
+  const list = getUnlockedBackAcc();
+  if (!list.includes(accId)) {
+    list.push(accId);
+    try {
+      localStorage.setItem(UNLOCKED_BACK_ACC_KEY, JSON.stringify(list));
+    } catch (e) {}
+  }
+}
+
+function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'red', dressColor = null, headwear = null, backAcc = null) {
   dressColor = dressColor || getDressColor();
   headwear = headwear || getHeadwear();
+  backAcc = backAcc || getBackAcc();
 
   // キャンディの色定義
   let candyFill = '#ff2a6d';
@@ -417,6 +476,28 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
         <ellipse cx="0" cy="2" rx="1.2" ry="1.6" fill="#ffffff" />
       </g>
     `;
+  } else if (headwear === 'sakura_flower') {
+    headwearSvg = `
+      <g transform="translate(50, 24)">
+        <path d="M -14 5 Q 0 0 14 5" stroke="#ff88aa" stroke-width="1.5" fill="none" />
+        <g transform="translate(-14, 2) scale(0.9)">
+          <circle cx="-3" cy="-3" r="3.2" fill="#ffb7d5" />
+          <circle cx="3" cy="-3" r="3.2" fill="#ffb7d5" />
+          <circle cx="-4" cy="3" r="3.2" fill="#ffb7d5" />
+          <circle cx="4" cy="3" r="3.2" fill="#ffb7d5" />
+          <circle cx="0" cy="5" r="3.2" fill="#ffb7d5" />
+          <circle cx="0" cy="1" r="2" fill="#ffe066" />
+        </g>
+        <g transform="translate(14, 2) scale(0.9)">
+          <circle cx="-3" cy="-3" r="3.2" fill="#ffb7d5" />
+          <circle cx="3" cy="-3" r="3.2" fill="#ffb7d5" />
+          <circle cx="-4" cy="3" r="3.2" fill="#ffb7d5" />
+          <circle cx="4" cy="3" r="3.2" fill="#ffb7d5" />
+          <circle cx="0" cy="5" r="3.2" fill="#ffb7d5" />
+          <circle cx="0" cy="1" r="2" fill="#ffe066" />
+        </g>
+      </g>
+    `;
   } else if (headwear === 'cat_ears') {
     headwearSvg = `
       <g transform="translate(50, 24)">
@@ -427,6 +508,15 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
         <path d="M -14 3 Q 0 -3 14 3" stroke="#ff3377" stroke-width="2" fill="none" />
       </g>
     `;
+  } else if (headwear === 'witch_hat') {
+    headwearSvg = `
+      <g transform="translate(50, 20)">
+        <ellipse cx="0" cy="4" rx="21" ry="5" fill="#3a2254" stroke="#251238" stroke-width="1.2" />
+        <path d="M -13 3 C -10 -14, 6 -24, 15 -22 C 10 -16, 4 -12, 13 3 Z" fill="#4b2c6d" stroke="#251238" stroke-width="1.2" />
+        <path d="M -11 3 Q 0 1 11 3 L 11 0 Q 0 -2 -11 0 Z" fill="#ffaa00" />
+        <polygon points="0,0 1.5,-3 4,-3 2,-5 3,-8 0,-6 -3,-8 -2,-5 -4,-3 -1.5,-3" fill="#fffb88" />
+      </g>
+    `;
   } else if (headwear === 'angel') {
     headwearSvg = `
       <g transform="translate(50, 16)">
@@ -434,6 +524,16 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
         <ellipse cx="0" cy="0" rx="14" ry="4" fill="none" stroke="#ffffff" stroke-width="1" />
         <path d="M -12 4 C -18 2, -20 -3, -14 -1 C -17 3, -13 6, -9 5 Z" fill="#ffffff" opacity="0.9" />
         <path d="M 12 4 C 18 2, 21 -3, 15 -1 C 18 3, 14 6, 10 5 Z" fill="#ffffff" opacity="0.9" />
+      </g>
+    `;
+  } else if (headwear === 'bear_ears') {
+    headwearSvg = `
+      <g transform="translate(50, 24)">
+        <path d="M -15 3 Q 0 -4 15 3" stroke="#8b5a2b" stroke-width="2" fill="none" />
+        <circle cx="-13" cy="-3" r="6.5" fill="#9c6634" stroke="#683d16" stroke-width="1.2" />
+        <circle cx="-13" cy="-3" r="3.5" fill="#fce4d6" />
+        <circle cx="13" cy="-3" r="6.5" fill="#9c6634" stroke="#683d16" stroke-width="1.2" />
+        <circle cx="13" cy="-3" r="3.5" fill="#fce4d6" />
       </g>
     `;
   } else if (headwear === 'bunny') {
@@ -456,6 +556,87 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
         <polygon points="0,0 -14,-7 -12,7" fill="#ff3377" />
         <polygon points="0,0 14,-7 12,7" fill="#ff3377" />
         <circle cx="0" cy="0" r="4" fill="#ffe066" />
+      </g>
+    `;
+  }
+
+  // せなか・よこのアクセサリーSVG
+  let backAccSvg = '';
+  if (backAcc === 'angel_wings') {
+    backAccSvg = `
+      <!-- 天使の羽（両脇に大きく広がる） -->
+      <g transform="translate(30, 58)">
+        <path d="M 0 0 C -18 -10, -34 -4, -40 12 C -36 18, -26 22, -18 16 C -24 24, -18 28, -10 22 C -15 30, -8 32, 0 16 Z"
+              fill="#ffffff" stroke="#d5e4f7" stroke-width="1.5" filter="drop-shadow(0 2px 5px rgba(180,210,255,0.45))"/>
+        <path d="M -5 3 C -18 -1, -26 2, -30 10" stroke="#d5e4f7" stroke-width="1.2" fill="none" />
+      </g>
+      <g transform="translate(70, 58) scale(-1, 1)">
+        <path d="M 0 0 C -18 -10, -34 -4, -40 12 C -36 18, -26 22, -18 16 C -24 24, -18 28, -10 22 C -15 30, -8 32, 0 16 Z"
+              fill="#ffffff" stroke="#d5e4f7" stroke-width="1.5" filter="drop-shadow(0 2px 5px rgba(180,210,255,0.45))"/>
+        <path d="M -5 3 C -18 -1, -26 2, -30 10" stroke="#d5e4f7" stroke-width="1.2" fill="none" />
+      </g>
+    `;
+  } else if (backAcc === 'fairy_wings') {
+    backAccSvg = `
+      <!-- 妖精の羽（透き通るパステルバタフライ） -->
+      <g transform="translate(32, 60)">
+        <path d="M 0 0 C -22 -14, -36 2, -32 20 C -22 26, -14 20, 0 12 Z" fill="#b3f0ff" fill-opacity="0.82" stroke="#4dd2ff" stroke-width="1.4"/>
+        <path d="M 0 12 C -18 22, -26 34, -16 40 C -8 38, -4 28, 0 16 Z" fill="#ffbbf0" fill-opacity="0.82" stroke="#ff66cc" stroke-width="1.4"/>
+        <circle cx="-16" cy="8" r="3" fill="#ffffff" opacity="0.8" />
+        <circle cx="-10" cy="26" r="2.2" fill="#ffffff" opacity="0.8" />
+      </g>
+      <g transform="translate(68, 60) scale(-1, 1)">
+        <path d="M 0 0 C -22 -14, -36 2, -32 20 C -22 26, -14 20, 0 12 Z" fill="#b3f0ff" fill-opacity="0.82" stroke="#4dd2ff" stroke-width="1.4"/>
+        <path d="M 0 12 C -18 22, -26 34, -16 40 C -8 38, -4 28, 0 16 Z" fill="#ffbbf0" fill-opacity="0.82" stroke="#ff66cc" stroke-width="1.4"/>
+        <circle cx="-16" cy="8" r="3" fill="#ffffff" opacity="0.8" />
+        <circle cx="-10" cy="26" r="2.2" fill="#ffffff" opacity="0.8" />
+      </g>
+    `;
+  } else if (backAcc === 'cat_tail') {
+    backAccSvg = `
+      <!-- ねこのしっぽ -->
+      <g transform="translate(64, 76)">
+        <path d="M 0 0 C 14 2, 26 -6, 25 -22 C 24 -30, 16 -30, 15 -22 C 14 -14, 8 -4, 0 2 Z" fill="#ff77aa" stroke="#e0266e" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M 23 -18 C 24 -28, 16 -28, 16 -20 Z" fill="#ffffff"/>
+        <g transform="translate(21, -12)">
+          <polygon points="0,0 -4,-3 -3,3" fill="#ffe066" />
+          <polygon points="0,0 4,-3 3,3" fill="#ffe066" />
+          <circle cx="0" cy="0" r="1.5" fill="#ff3377" />
+        </g>
+      </g>
+    `;
+  } else if (backAcc === 'bunny_tail') {
+    backAccSvg = `
+      <!-- まるいうさぎしっぽ -->
+      <g transform="translate(66, 78)">
+        <circle cx="0" cy="0" r="8" fill="#ffffff" stroke="#ffccd9" stroke-width="1.5"/>
+        <circle cx="-2" cy="-2" r="6" fill="#fff5f8"/>
+        <circle cx="-2" cy="-3" r="2" fill="#ffffff"/>
+      </g>
+    `;
+  } else if (backAcc === 'devil_set') {
+    backAccSvg = `
+      <!-- 小悪魔の羽としっぽ -->
+      <g transform="translate(30, 60)">
+        <path d="M 0 0 L -14 -12 L -12 -2 L -22 -4 L -18 8 L -24 14 L -10 16 Z" fill="#4a184c" stroke="#260927" stroke-width="1.2"/>
+      </g>
+      <g transform="translate(70, 60) scale(-1, 1)">
+        <path d="M 0 0 L -14 -12 L -12 -2 L -22 -4 L -18 8 L -24 14 L -10 16 Z" fill="#4a184c" stroke="#260927" stroke-width="1.2"/>
+      </g>
+      <g transform="translate(64, 76)">
+        <path d="M 0 0 C 12 4, 22 -4, 24 -18" stroke="#4a184c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <polygon points="24,-24 20,-16 28,-16" fill="#ff2a6d" />
+      </g>
+    `;
+  } else if (backAcc === 'rainbow_aura') {
+    backAccSvg = `
+      <!-- にじいろのオーラ -->
+      <g>
+        <ellipse cx="26" cy="62" rx="16" ry="24" fill="none" stroke="url(#rainbowGrad)" stroke-width="2.5" opacity="0.85" stroke-dasharray="4,3"/>
+        <ellipse cx="74" cy="62" rx="16" ry="24" fill="none" stroke="url(#rainbowGrad)" stroke-width="2.5" opacity="0.85" stroke-dasharray="4,3"/>
+        <polygon points="14,46 16,50 20,52 16,54 14,58 12,54 8,52 12,50" fill="#fffb88" opacity="0.9"/>
+        <polygon points="84,46 86,50 90,52 86,54 84,58 82,54 78,52 82,50" fill="#fffb88" opacity="0.9"/>
+        <polygon points="86,70 87,73 90,74 87,75 86,78 85,75 82,74 85,73" fill="#ff99dd" opacity="0.9"/>
       </g>
     `;
   }
@@ -489,6 +670,11 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
           <stop offset="75%" stop-color="#33aaff" />
           <stop offset="100%" stop-color="#bb55ff" />
         </linearGradient>
+        <linearGradient id="galaxyDressGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#3d2066" />
+          <stop offset="60%" stop-color="#180b30" />
+          <stop offset="100%" stop-color="#090314" />
+        </linearGradient>
       </defs>
 
       <!-- 背中のキャンディ（リュック風・一番奥に描画） -->
@@ -502,6 +688,9 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
         <!-- ハイライト -->
         <ellipse cx="-4" cy="-5" rx="3.5" ry="2" fill="#ffffff" opacity="0.8" />
       </g>
+
+      <!-- せなか・よこのアクセサリー（羽・しっぽ・オーラ） -->
+      ${backAccSvg}
 
       <!-- 左ツインテール -->
       <g transform="rotate(${twirlAngle}, 30, 42)">
@@ -518,7 +707,16 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
       </g>
 
       <!-- ワンピース（体） -->
-      <path d="M 40 62 L 32 86 L 68 86 L 60 62 Z" fill="${dressInfo.isRainbow ? 'url(#rainbowDressGrad)' : 'url(#dressGrad)'}" />
+      <path d="M 40 62 L 32 86 L 68 86 L 60 62 Z" fill="${dressInfo.isRainbow ? 'url(#rainbowDressGrad)' : (dressInfo.isGalaxy ? 'url(#galaxyDressGrad)' : 'url(#dressGrad)')}" />
+      ${dressInfo.isGalaxy ? `
+        <!-- ギャラクシードレスの星くず -->
+        <circle cx="48" cy="74" r="1.1" fill="#ffffff" opacity="0.9"/>
+        <circle cx="56" cy="80" r="1.4" fill="#ffe066" opacity="0.9"/>
+        <circle cx="38" cy="82" r="0.9" fill="#70e1ff" opacity="0.8"/>
+        <circle cx="62" cy="76" r="0.9" fill="#ffffff" opacity="0.8"/>
+        <polygon points="50,68 51,70 53,70 51.5,71 52,73 50,72 48,73 48.5,71 47,70 49,70" fill="#ffffff" opacity="0.95"/>
+      ` : ''}
+
       <!-- レースのエプロン -->
       <path d="M 44 65 L 40 84 L 60 84 L 56 65 Z" fill="#ffffff" opacity="0.95" />
       <path d="M 47 70 L 53 70" stroke="${dressInfo.apronLine}" stroke-width="2" stroke-linecap="round" />
@@ -559,14 +757,15 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
 
 // 動的Imageオブジェクトキャッシュ
 const girlImageCache = new Map();
-function getGirlImage(candyColor = 'red', dressColor = null, headwear = null) {
+function getGirlImage(candyColor = 'red', dressColor = null, headwear = null, backAcc = null) {
   candyColor = candyColor || 'red';
   dressColor = dressColor || getDressColor();
   headwear = headwear || getHeadwear();
-  const key = `${candyColor}_${dressColor}_${headwear}`;
+  backAcc = backAcc || getBackAcc();
+  const key = `${candyColor}_${dressColor}_${headwear}_${backAcc}`;
   if (!girlImageCache.has(key)) {
     const img = new Image();
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(createGirlSvgString(false, 0, candyColor, dressColor, headwear));
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(createGirlSvgString(false, 0, candyColor, dressColor, headwear, backAcc));
     girlImageCache.set(key, img);
   }
   return girlImageCache.get(key);
@@ -602,7 +801,8 @@ function updateCharPreview(color) {
   if (preview) {
     const dressColor = getDressColor();
     const headwear = getHeadwear();
-    preview.innerHTML = createGirlSvgString(false, 8, color, dressColor, headwear);
+    const backAcc = getBackAcc();
+    preview.innerHTML = createGirlSvgString(false, 8, color, dressColor, headwear, backAcc);
     const svgEl = preview.querySelector('svg');
     if (svgEl) {
       svgEl.style.width = '110px';
@@ -803,8 +1003,10 @@ function renderCostumeShop() {
   if (!grid) return;
   const unlockedDresses = getUnlockedDresses();
   const unlockedHeadwear = getUnlockedHeadwear();
+  const unlockedBackAcc = getUnlockedBackAcc();
   const currentDress = getDressColor();
   const currentHeadwear = getHeadwear();
+  const currentBackAcc = getBackAcc();
   const totalSweets = getTotalSweets();
 
   updateSweetsUI();
@@ -866,6 +1068,34 @@ function renderCostumeShop() {
     `;
     grid.appendChild(card);
   });
+
+  // 3. せなか・よこのアクセサリー一覧 (なし以外)
+  BACK_ACC_LIST.filter(acc => acc.id !== 'none').forEach(acc => {
+    const isUnlocked = unlockedBackAcc.includes(acc.id);
+    const isSelected = currentBackAcc === acc.id;
+
+    const card = document.createElement('div');
+    card.className = `costume-card ${isSelected ? 'selected' : ''}`;
+
+    let buttonHtml = '';
+    if (isSelected) {
+      buttonHtml = `<button class="btn-costume-action btn-active" disabled>つけてる！💖</button>`;
+    } else if (isUnlocked) {
+      buttonHtml = `<button class="btn-costume-action btn-select" onclick="selectCostumeAction('back_acc', '${acc.id}')">つける ✨</button>`;
+    } else {
+      const canBuy = totalSweets >= acc.price;
+      buttonHtml = `<button class="btn-costume-action btn-buy" onclick="buyCostumeAction('back_acc', '${acc.id}')" ${!canBuy ? 'style="opacity:0.6;"' : ''}>購入 🍓${acc.price}</button>`;
+    }
+
+    card.innerHTML = `
+      <div class="costume-type-badge" style="background:#e8faff; border-color:#a5e6f8; color:#0088aa;">🪽 よこ・せなか</div>
+      <div class="costume-icon">${acc.icon || '🪽'}</div>
+      <div class="costume-name">${acc.name}</div>
+      <div class="costume-price">${isUnlocked ? 'ゲット済み ✨' : `🍓 ${acc.price}こ`}</div>
+      ${buttonHtml}
+    `;
+    grid.appendChild(card);
+  });
 }
 
 window.selectPetAction = function(petId) {
@@ -893,6 +1123,8 @@ window.selectCostumeAction = function(type, id) {
     setDressColor(id);
   } else if (type === 'headwear') {
     setHeadwear(id);
+  } else if (type === 'back_acc') {
+    setBackAcc(id);
   }
   sounds.playCollect();
   renderCostumeShop();
@@ -905,6 +1137,8 @@ window.buyCostumeAction = function(type, id) {
     item = DRESS_COLORS[id];
   } else if (type === 'headwear') {
     item = HEADWEAR_LIST.find(h => h.id === id);
+  } else if (type === 'back_acc') {
+    item = BACK_ACC_LIST.find(b => b.id === id);
   }
   if (!item) return;
 
@@ -916,6 +1150,9 @@ window.buyCostumeAction = function(type, id) {
     } else if (type === 'headwear') {
       unlockHeadwear(id);
       setHeadwear(id);
+    } else if (type === 'back_acc') {
+      unlockBackAcc(id);
+      setBackAcc(id);
     }
     sounds.playCandyLevelUp();
     showBanner(`🎉 ${item.name} をゲットしたよ！ ✨`);
@@ -929,8 +1166,10 @@ window.buyCostumeAction = function(type, id) {
 function renderDressUpModal() {
   const currentDress = getDressColor();
   const currentHeadwear = getHeadwear();
+  const currentBackAcc = getBackAcc();
   const unlockedDresses = getUnlockedDresses();
   const unlockedHeadwear = getUnlockedHeadwear();
+  const unlockedBackAcc = getUnlockedBackAcc();
   const totalSweets = getTotalSweets();
 
   const dressupBankEl = document.getElementById('dressup-sweets-val');
@@ -950,7 +1189,7 @@ function renderDressUpModal() {
 
       const dotBg = info.isRainbow
         ? 'linear-gradient(135deg, #ff6699, #ffbb33, #33dd88, #33aaff, #bb55ff)'
-        : info.top;
+        : (info.isGalaxy ? 'linear-gradient(135deg, #4b2c6d, #1c0f33)' : info.top);
 
       let badgeHtml = '';
       if (!isUnlocked) {
@@ -1029,6 +1268,50 @@ function renderDressUpModal() {
     });
   }
 
+  // せなか・よこのアクセサリーパレット
+  const backAccContainer = document.getElementById('back-acc-palette');
+  if (backAccContainer) {
+    backAccContainer.innerHTML = '';
+    BACK_ACC_LIST.forEach(acc => {
+      const isUnlocked = unlockedBackAcc.includes(acc.id);
+      const isSelected = currentBackAcc === acc.id;
+
+      const btn = document.createElement('button');
+      btn.className = 'swatch-btn' + (isSelected ? ' active' : '') + (!isUnlocked ? ' locked' : '');
+
+      let badgeHtml = '';
+      if (!isUnlocked) {
+        badgeHtml = `<span class="swatch-lock-badge">🔒 🍓${acc.price}</span>`;
+      }
+
+      btn.innerHTML = `<span>${acc.name}</span>${badgeHtml}`;
+
+      btn.addEventListener('click', () => {
+        if (isUnlocked) {
+          setBackAcc(acc.id);
+          renderDressUpModal();
+          sounds.playCollect();
+        } else {
+          // 購入確認モーダル
+          const nowTotal = getTotalSweets();
+          if (confirm(`${acc.name} を 🍓${acc.price} こで買いますか？\n(もっているスイーツ: ${nowTotal}こ)`)) {
+            if (nowTotal >= acc.price) {
+              addTotalSweets(-acc.price);
+              unlockBackAcc(acc.id);
+              setBackAcc(acc.id);
+              sounds.playCandyLevelUp();
+              showBanner(`🎉 ${acc.name} をゲットしたよ！ ✨`);
+              renderDressUpModal();
+            } else {
+              alert(`スイーツが足りないよ！あと ${acc.price - nowTotal} 個あつめてね 🍓`);
+            }
+          }
+        }
+      });
+      backAccContainer.appendChild(btn);
+    });
+  }
+
   renderDressUpPreview();
 }
 
@@ -1036,7 +1319,7 @@ function renderDressUpPreview() {
   const preview = document.getElementById('dressup-char-preview');
   if (preview) {
     const currentColor = (typeof player !== 'undefined' && player) ? player.candyColor : loadCandyColor();
-    preview.innerHTML = createGirlSvgString(false, 0, currentColor, getDressColor(), getHeadwear());
+    preview.innerHTML = createGirlSvgString(false, 0, currentColor, getDressColor(), getHeadwear(), getBackAcc());
     const svg = preview.querySelector('svg');
     if (svg) {
       svg.style.width = '88px';
@@ -2564,8 +2847,8 @@ function drawPlayer() {
     twirl = Math.sin(player.walkFrame) * 12;
   }
 
-  // キャンディ色・ドレス・髪飾りを反映した女の子の動的画像を取得して描画
-  const currentImg = getGirlImage(player.candyColor, getDressColor(), getHeadwear());
+  // キャンディ色・ドレス・髪飾り・アクセサリーを反映した女の子の動的画像を取得して描画
+  const currentImg = getGirlImage(player.candyColor, getDressColor(), getHeadwear(), getBackAcc());
   const w = 64;
   const h = 64;
   ctx.drawImage(currentImg, -w / 2, -h / 2 - 2, w, h);

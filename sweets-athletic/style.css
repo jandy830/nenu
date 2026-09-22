@@ -474,7 +474,8 @@ body {
 }
 
 .dress-palette,
-.headwear-palette {
+.headwear-palette,
+.back-acc-palette {
   display: flex;
   gap: 8px;
   justify-content: center;
