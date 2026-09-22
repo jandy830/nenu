@@ -81,6 +81,27 @@ class SoundSystem {
     } catch (e) {}
   }
 
+  // キャンディ進化！キラキラレベルアップ音
+  playCandyLevelUp() {
+    if (!this.soundEnabled || !this.ctx) return;
+    try {
+      const notes = [523.25, 659.25, 783.99, 987.77, 1046.50, 1318.51]; // C5, E5, G5, B5, C6, E6
+      notes.forEach((freq, idx) => {
+        const t = this.ctx.currentTime + idx * 0.06;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.17);
+      });
+    } catch (e) {}
+  }
+
   // ゴール！ファンファーレ
   playClear() {
     if (!this.soundEnabled || !this.ctx) return;
@@ -175,10 +196,37 @@ const sounds = new SoundSystem();
 
 
 // ==========================================
-// 2. 主人公キャラクター（ピンクツインテール女の子）SVG作成
+// 2. 主人公キャラクター（ピンクツインテール女の子 ＋ 背中のキャンディ）SVG作成
 // ==========================================
-function createGirlSvgString(isBlinking = false, twirlAngle = 0) {
-  // SVG文字列を生成（ツインテールの揺れと表情）
+function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'red') {
+  // キャンディの色定義
+  let candyFill = '#ff2a6d';
+  let candyStroke = '#d61552';
+  let candySpiral = `
+    <path d="M -8 0 A 8 8 0 0 1 8 0 A 5 5 0 0 1 -3 0" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round" />
+  `;
+
+  if (candyColor === 'yellow') {
+    candyFill = '#ffcc00';
+    candyStroke = '#d99b00';
+    candySpiral = `<path d="M -8 0 A 8 8 0 0 1 8 0 A 5 5 0 0 1 -3 0" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round" />`;
+  } else if (candyColor === 'black') {
+    candyFill = '#332222';
+    candyStroke = '#1c1212';
+    candySpiral = `<path d="M -8 0 A 8 8 0 0 1 8 0 A 5 5 0 0 1 -3 0" stroke="#885544" stroke-width="2.5" fill="none" stroke-linecap="round" />`;
+  } else if (candyColor === 'white') {
+    candyFill = '#ffffff';
+    candyStroke = '#c0d4ec';
+    candySpiral = `<path d="M -8 0 A 8 8 0 0 1 8 0 A 5 5 0 0 1 -3 0" stroke="#ffb3d9" stroke-width="2.5" fill="none" stroke-linecap="round" />`;
+  } else if (candyColor === 'rainbow') {
+    candyFill = 'url(#rainbowGrad)';
+    candyStroke = '#ffffff';
+    candySpiral = `
+      <circle cx="0" cy="0" r="8" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.9"/>
+      <circle cx="0" cy="0" r="3" fill="#ffffff"/>
+    `;
+  }
+
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
       <defs>
@@ -194,7 +242,26 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0) {
           <stop offset="0%" stop-color="#ff6bb5" />
           <stop offset="100%" stop-color="#ff3388" />
         </linearGradient>
+        <linearGradient id="rainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff3366" />
+          <stop offset="25%" stop-color="#ffbb00" />
+          <stop offset="50%" stop-color="#33cc66" />
+          <stop offset="75%" stop-color="#3399ff" />
+          <stop offset="100%" stop-color="#cc33ff" />
+        </linearGradient>
       </defs>
+
+      <!-- 背中のキャンディ（リュック風・一番奥に描画） -->
+      <g transform="translate(24, 60) rotate(-20)">
+        <!-- 棒 -->
+        <rect x="-2.5" y="0" width="5" height="28" rx="2.5" fill="#ffffff" stroke="#ffb8cf" stroke-width="1" />
+        <!-- まるいロリポップ玉 -->
+        <circle cx="0" cy="0" r="14" fill="${candyFill}" stroke="${candyStroke}" stroke-width="2.5" />
+        <!-- うずまき・模様 -->
+        ${candySpiral}
+        <!-- ハイライト -->
+        <ellipse cx="-4" cy="-5" rx="3.5" ry="2" fill="#ffffff" opacity="0.8" />
+      </g>
 
       <!-- 左ツインテール -->
       <g transform="rotate(${twirlAngle}, 30, 42)">
@@ -254,15 +321,19 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0) {
   `;
 }
 
-// SVG文字列をImageオブジェクトに変換
-const girlImg = new Image();
-girlImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(createGirlSvgString(false, 0));
+// キャンディ色ごとのImageオブジェクトキャッシュ
+const girlImages = {};
+['red', 'yellow', 'black', 'white', 'rainbow'].forEach(c => {
+  const img = new Image();
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(createGirlSvgString(false, 0, c));
+  girlImages[c] = img;
+});
 
 // スタート画面のプレビューにも表示
 document.addEventListener('DOMContentLoaded', () => {
   const preview = document.getElementById('char-preview');
   if (preview) {
-    preview.innerHTML = createGirlSvgString(false, 8);
+    preview.innerHTML = createGirlSvgString(false, 8, 'red');
     const svgEl = preview.querySelector('svg');
     if (svgEl) {
       svgEl.style.width = '110px';
@@ -300,7 +371,7 @@ const camera = {
 // プレイヤー
 const player = {
   x: 80,
-  y: 1180,
+  y: 2180,
   width: 46,
   height: 54,
   vx: 0,
@@ -311,7 +382,9 @@ const player = {
   facingRight: true,
   walkFrame: 0,
   safeX: 80,
-  safeY: 1180,
+  safeY: 2180,
+  candyColor: 'red', // 'red' | 'yellow' | 'black' | 'white' | 'rainbow'
+  currentTier: 1,    // 1: 赤, 2: 黄, 3: 黒, 4: 白, 5: レインボー
   blinkTimer: 0,
   isBlinking: false
 };
@@ -323,94 +396,144 @@ const keys = {
   jump: false
 };
 
-// ステージデータ（お菓子の世界）
+// 4色のチェックポイント（落下時の復帰場所＆キャンディの色）
+const checkpoints = {
+  1: { x: 80, y: 2180, color: 'red', name: 'あかステージ' },
+  2: { x: 1300, y: 1720, color: 'yellow', name: 'きいろステージ' },
+  3: { x: 2360, y: 1260, color: 'black', name: 'くろステージ' },
+  4: { x: 3450, y: 800, color: 'white', name: 'しろステージ' }
+};
+
+// キャンディUIの更新
+function updateCandyUI(color) {
+  const dot = document.getElementById('candy-dot');
+  const name = document.getElementById('candy-name');
+  if (!dot || !name) return;
+
+  const map = {
+    red: { icon: '🔴', text: 'あか' },
+    yellow: { icon: '🟡', text: 'きいろ' },
+    black: { icon: '⚫', text: 'くろ' },
+    white: { icon: '⚪', text: 'しろ' },
+    rainbow: { icon: '🌈', text: 'レインボー' }
+  };
+
+  const info = map[color] || map.red;
+  dot.textContent = info.icon;
+  name.textContent = info.text;
+
+  if (color === 'rainbow') {
+    name.classList.add('rainbow-text');
+  } else {
+    name.classList.remove('rainbow-text');
+  }
+}
+
+// ステージデータ（お菓子の世界：4つのカラーエリア）
 let platforms = [];
 let items = [];
-let goal = { x: 4420, y: 170, width: 150, height: 140 };
+let goal = { x: 4850, y: 220, width: 160, height: 140 };
 let particles = [];
-let stageWidth = 4800;
-let stageHeight = 1400;
+let stageWidth = 5200;
+let stageHeight = 2400;
 
 // ステージ初期化
 function initStage() {
-  stageWidth = 4800;
-  stageHeight = 1400;
+  stageWidth = 5200;
+  stageHeight = 2400;
 
   platforms = [
-    // --- エリア1: クッキースタート広場（地上 y: 1250〜1100） ---
-    { x: 0, y: 1250, width: 440, height: 160, type: 'cookie' },
-    { x: 490, y: 1190, width: 130, height: 32, type: 'wafer' },
-    { x: 670, y: 1120, width: 140, height: 32, type: 'wafer' },
-    { x: 860, y: 1050, width: 110, height: 30, type: 'macaron', color: '#ffb3d9', vy: 0.8, minY: 1010, maxY: 1090 },
+    // ========================================================
+    // エリア1: あか色ステージ 🍓（地上 y: 2250〜1850）
+    // ========================================================
+    { x: 0, y: 2250, width: 440, height: 180, type: 'cookie', tier: 1, colorTier: 'red' },
+    { x: 490, y: 2180, width: 130, height: 32, type: 'wafer', tier: 1, colorTier: 'red' },
+    { x: 680, y: 2100, width: 140, height: 32, type: 'wafer', tier: 1, colorTier: 'red' },
+    { x: 880, y: 2020, width: 110, height: 30, type: 'macaron', tier: 1, color: '#ff2a6d', vy: 0.8, minY: 1980, maxY: 2060, colorTier: 'red' },
+    { x: 1060, y: 1950, width: 150, height: 36, type: 'cookie', tier: 1, colorTier: 'red' },
 
-    // --- エリア2: マカロンとウエハースの坂道（y: 1050〜850） ---
-    { x: 1030, y: 1000, width: 180, height: 50, type: 'cookie' },
-    { x: 1270, y: 940, width: 130, height: 32, type: 'wafer' },
-    { x: 1460, y: 880, width: 120, height: 30, type: 'macaron', color: '#b3f0ff', vy: -0.9, minY: 840, maxY: 920 },
-    { x: 1640, y: 820, width: 140, height: 32, type: 'wafer' },
-    { x: 1840, y: 860, width: 220, height: 60, type: 'cookie' },
+    // ========================================================
+    // エリア2: きいろステージ 🍋（y: 1850〜1400）
+    // ========================================================
+    // きいろチェックポイント広場
+    { x: 1260, y: 1780, width: 220, height: 50, type: 'cookie', tier: 2, colorTier: 'yellow', isCheckPoint: true },
+    { x: 1530, y: 1700, width: 130, height: 32, type: 'wafer', tier: 2, colorTier: 'yellow' },
+    { x: 1720, y: 1620, width: 120, height: 30, type: 'macaron', tier: 2, color: '#ffdd00', vy: -0.9, minY: 1570, maxY: 1670, colorTier: 'yellow' },
+    { x: 1910, y: 1540, width: 140, height: 32, type: 'wafer', tier: 2, colorTier: 'yellow' },
+    { x: 2110, y: 1470, width: 180, height: 50, type: 'cookie', tier: 2, colorTier: 'yellow' },
 
-    // --- エリア3: スイーツタワーのぼり（y: 800〜580） ---
-    { x: 2120, y: 800, width: 130, height: 32, type: 'wafer' },
-    { x: 2310, y: 730, width: 140, height: 32, type: 'wafer' },
-    { x: 2510, y: 670, width: 120, height: 30, type: 'macaron', color: '#ffd9b3', vy: 0.9, minY: 630, maxY: 710 },
-    { x: 2690, y: 610, width: 150, height: 32, type: 'wafer' },
-    { x: 2900, y: 650, width: 260, height: 70, type: 'cookie' },
+    // ========================================================
+    // エリア3: くろ色ステージ 🍫（y: 1400〜950）
+    // ========================================================
+    // くろチェックポイント広場
+    { x: 2340, y: 1320, width: 220, height: 50, type: 'cookie', tier: 3, colorTier: 'black', isCheckPoint: true },
+    { x: 2610, y: 1240, width: 130, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
+    { x: 2800, y: 1160, width: 120, height: 30, type: 'macaron', tier: 3, color: '#2b1b17', vy: 0.9, minY: 1110, maxY: 1210, colorTier: 'black' },
+    { x: 2990, y: 1080, width: 140, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
+    { x: 3190, y: 1010, width: 200, height: 50, type: 'cookie', tier: 3, colorTier: 'black' },
 
-    // --- エリア4: 天空のふわふわロード（y: 580〜360） ---
-    { x: 3220, y: 580, width: 130, height: 32, type: 'wafer' },
-    { x: 3410, y: 510, width: 120, height: 30, type: 'macaron', color: '#ffcce6', vy: -0.8, minY: 470, maxY: 550 },
-    { x: 3590, y: 440, width: 140, height: 32, type: 'wafer' },
-    { x: 3790, y: 380, width: 130, height: 32, type: 'wafer' },
-    { x: 3980, y: 320, width: 120, height: 30, type: 'macaron', color: '#c2f0c2', vy: 0.7, minY: 280, maxY: 360 },
+    // ========================================================
+    // エリア4: しろ色ステージ ☁️（y: 950〜450）
+    // ========================================================
+    // しろチェックポイント広場
+    { x: 3430, y: 860, width: 220, height: 50, type: 'cookie', tier: 4, colorTier: 'white', isCheckPoint: true },
+    { x: 3700, y: 780, width: 130, height: 32, type: 'wafer', tier: 4, colorTier: 'white' },
+    { x: 3890, y: 700, width: 120, height: 30, type: 'macaron', tier: 4, color: '#ffffff', vy: -0.8, minY: 650, maxY: 750, colorTier: 'white' },
+    { x: 4080, y: 620, width: 140, height: 32, type: 'wafer', tier: 4, colorTier: 'white' },
+    { x: 4280, y: 550, width: 160, height: 40, type: 'cookie', tier: 4, colorTier: 'white' },
 
-    // --- エリア5: 天空のショートケーキ城 ゴール広場（y: 300） ---
-    { x: 4180, y: 310, width: 620, height: 180, type: 'cake_ground' }
+    // 天空への架け橋（虹のブリッジ）
+    { x: 4500, y: 460, width: 150, height: 32, type: 'wafer', tier: 4, colorTier: 'rainbow' },
+
+    // ========================================================
+    // エリア5: 天空のレインボーケーキ城 🏰🌈（y: 350）
+    // ========================================================
+    { x: 4720, y: 360, width: 500, height: 180, type: 'cake_ground', tier: 5, colorTier: 'rainbow' }
   ];
 
-  // あつめるスイーツアイテム（いちご・キャンディ・星など全24個！）
+  // あつめるスイーツアイテム（各エリアにたっぷり配置）
   items = [
-    // エリア1
-    { x: 220, y: 1200, type: '🍓', collected: false, floatOffset: 0 },
-    { x: 360, y: 1200, type: '🍬', collected: false, floatOffset: 1 },
-    { x: 550, y: 1140, type: '⭐', collected: false, floatOffset: 2 },
-    { x: 730, y: 1070, type: '🍓', collected: false, floatOffset: 3 },
-    { x: 910, y: 990, type: '🍭', collected: false, floatOffset: 4 },
+    // 赤エリア
+    { x: 220, y: 2200, type: '🍓', collected: false, floatOffset: 0 },
+    { x: 370, y: 2200, type: '🍒', collected: false, floatOffset: 1 },
+    { x: 550, y: 2130, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 740, y: 2050, type: '🍓', collected: false, floatOffset: 3 },
+    { x: 930, y: 1970, type: '🍭', collected: false, floatOffset: 4 },
 
-    // エリア2
-    { x: 1110, y: 950, type: '⭐', collected: false, floatOffset: 1 },
-    { x: 1330, y: 890, type: '🍓', collected: false, floatOffset: 2 },
-    { x: 1510, y: 830, type: '🍬', collected: false, floatOffset: 3 },
-    { x: 1700, y: 770, type: '⭐', collected: false, floatOffset: 4 },
-    { x: 1940, y: 810, type: '🍭', collected: false, floatOffset: 0 },
+    // 黄エリア
+    { x: 1360, y: 1730, type: '🍋', collected: false, floatOffset: 0 },
+    { x: 1590, y: 1650, type: '🍌', collected: false, floatOffset: 1 },
+    { x: 1770, y: 1570, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 1970, y: 1490, type: '🍯', collected: false, floatOffset: 3 },
+    { x: 2170, y: 1420, type: '💛', collected: false, floatOffset: 4 },
 
-    // エリア3
-    { x: 2180, y: 750, type: '🍓', collected: false, floatOffset: 1 },
-    { x: 2370, y: 680, type: '⭐', collected: false, floatOffset: 2 },
-    { x: 2560, y: 620, type: '🍬', collected: false, floatOffset: 3 },
-    { x: 2750, y: 560, type: '🍓', collected: false, floatOffset: 4 },
-    { x: 3020, y: 600, type: '💖', collected: false, floatOffset: 0 },
+    // 黒エリア
+    { x: 2440, y: 1270, type: '🍫', collected: false, floatOffset: 0 },
+    { x: 2670, y: 1190, type: '🍪', collected: false, floatOffset: 1 },
+    { x: 2850, y: 1110, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 3050, y: 1030, type: '☕', collected: false, floatOffset: 3 },
+    { x: 3260, y: 960, type: '🖤', collected: false, floatOffset: 4 },
 
-    // エリア4
-    { x: 3280, y: 530, type: '🍭', collected: false, floatOffset: 1 },
-    { x: 3460, y: 460, type: '⭐', collected: false, floatOffset: 2 },
-    { x: 3650, y: 390, type: '🍓', collected: false, floatOffset: 3 },
-    { x: 3850, y: 330, type: '🍬', collected: false, floatOffset: 4 },
-    { x: 4030, y: 270, type: '⭐', collected: false, floatOffset: 1 },
+    // 白エリア
+    { x: 3530, y: 810, type: '☁️', collected: false, floatOffset: 0 },
+    { x: 3760, y: 730, type: '🧁', collected: false, floatOffset: 1 },
+    { x: 3940, y: 650, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 4140, y: 570, type: '🍦', collected: false, floatOffset: 3 },
+    { x: 4340, y: 500, type: '🤍', collected: false, floatOffset: 4 },
 
-    // エリア5（ゴール周辺のスイーツパラダイス）
-    { x: 4250, y: 260, type: '🍓', collected: false, floatOffset: 0 },
-    { x: 4320, y: 230, type: '⭐', collected: false, floatOffset: 2 },
-    { x: 4380, y: 260, type: '🍭', collected: false, floatOffset: 3 },
-    { x: 4620, y: 260, type: '💖', collected: false, floatOffset: 4 }
+    // レインボー城
+    { x: 4560, y: 410, type: '🌈', collected: false, floatOffset: 1 },
+    { x: 4790, y: 310, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 4900, y: 310, type: '🎂', collected: false, floatOffset: 3 },
+    { x: 5010, y: 310, type: '💖', collected: false, floatOffset: 4 }
   ];
 
-  // ゴール位置（天空の大ケーキ）
+  // ゴール位置（特大レインボーケーキ城）
   goal = {
-    x: 4420,
-    y: 180,
-    width: 150,
-    height: 130
+    x: 4850,
+    y: 220,
+    width: 160,
+    height: 140
   };
 
   particles = [];
@@ -508,6 +631,16 @@ function update() {
         player.y += p.vy;
       }
 
+      // 足場のTier（赤1, 黄2, 黒3, 白4）をチェックして、より高いTierに到達したときに進化！
+      if (p.tier && p.tier > player.currentTier && p.tier <= 4) {
+        player.currentTier = p.tier;
+        const tierColorMap = { 1: 'red', 2: 'yellow', 3: 'black', 4: 'white' };
+        player.candyColor = tierColorMap[p.tier];
+        updateCandyUI(player.candyColor);
+        sounds.playCandyLevelUp();
+        createParticles(player.x + player.width / 2, player.y, 'star', 25);
+      }
+
       // 安全な復帰ポイントを更新（落下救済用：クッキーやウエハースなど安定した足場）
       if (p.type !== 'macaron') {
         player.safeX = Math.max(40, p.x + p.width / 2 - player.width / 2);
@@ -536,14 +669,27 @@ function update() {
     }
   });
 
-  // 6. 穴に落ちたときの処理（やさしい復帰：直前の安全な足場へ戻す）
-  if (player.y > player.safeY + 340 || player.y > stageHeight + 40) {
+  // 6. 穴に落ちたときの処理（ねぬちゃんのルール：1つ前のステージのチェックポイント＆その色のキャンディに戻る！）
+  if (player.y > player.safeY + 360 || player.y > stageHeight + 40) {
     sounds.playFall();
-    createParticles(player.safeX + player.width / 2, player.safeY + player.height / 2, 'heart', 8);
-    player.x = player.safeX;
-    player.y = player.safeY;
+
+    // 1つ前のステージ（tier）へ戻す（白なら黒、黒なら黄、黄なら赤、赤なら赤）
+    if (player.currentTier > 1) {
+      player.currentTier -= 1;
+    }
+    const tierColorMap = { 1: 'red', 2: 'yellow', 3: 'black', 4: 'white' };
+    player.candyColor = tierColorMap[player.currentTier];
+    updateCandyUI(player.candyColor);
+
+    const cp = checkpoints[player.currentTier] || checkpoints[1];
+    player.x = cp.x;
+    player.y = cp.y;
+    player.safeX = cp.x;
+    player.safeY = cp.y;
     player.vx = 0;
     player.vy = 0;
+
+    createParticles(player.x + player.width / 2, player.y + player.height / 2, 'heart', 12);
   }
 
   // 7. ゴール判定（大ケーキに到達）
@@ -621,22 +767,31 @@ function render() {
   ctx.restore();
 }
 
-// 背景とお菓子の雲（高度に応じた美しいグラデーション）
+// 背景とお菓子の雲（各エリアの高度に応じた美しいグラデーション）
 function drawBackground() {
-  // カメラの高さに応じた空の色のブレンド（上に行くほど青空〜ラベンダー、地上はピンク〜ホイップ）
   const heightRatio = Math.max(0, Math.min(1, camera.y / (stageHeight - V_HEIGHT)));
   
   const grad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
-  if (heightRatio < 0.4) {
-    // 天空エリア：ゆめかわラベンダーブルー〜パステルピンク
-    grad.addColorStop(0, '#c7e6ff');
-    grad.addColorStop(0.5, '#e0d4ff');
-    grad.addColorStop(1, '#ffd6eb');
+  if (heightRatio < 0.25) {
+    // 【白エリア〜天空レインボー城】ゆめかわパステルブルー＆ラベンダー
+    grad.addColorStop(0, '#cce6ff');
+    grad.addColorStop(0.5, '#e5d9ff');
+    grad.addColorStop(1, '#ffe6f4');
+  } else if (heightRatio < 0.5) {
+    // 【黒エリア：ショコラ】ビターチョコを想わせる落ち着いたラベンダーダスティピンク
+    grad.addColorStop(0, '#d9c2d6');
+    grad.addColorStop(0.6, '#ebd8e6');
+    grad.addColorStop(1, '#f5e8f0');
+  } else if (heightRatio < 0.75) {
+    // 【黄エリア：レモン＆バナナ】明るくハッピーなレモンイエロー＆ミルキーパステル
+    grad.addColorStop(0, '#fff4cc');
+    grad.addColorStop(0.6, '#fff9e6');
+    grad.addColorStop(1, '#ffeaf3');
   } else {
-    // 地上〜中層エリア：あたたかいピンク〜ホイップホワイト
-    grad.addColorStop(0, '#ffd4ea');
+    // 【赤エリア：ストロベリー】あたたかいストロベリーピンク＆ホイップホワイト
+    grad.addColorStop(0, '#ffd1e6');
     grad.addColorStop(0.6, '#fff0f7');
-    grad.addColorStop(1, '#ffe3f1');
+    grad.addColorStop(1, '#ffe6f2');
   }
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
@@ -662,28 +817,72 @@ function drawMarshmallowCloud(x, y, s) {
 
 // 足場の描画
 function drawPlatform(p) {
+  const colorTier = p.colorTier || 'red';
+
+  // カラーパレット設定
+  let mainColor = '#f6be79';
+  let strokeColor = '#e09e52';
+  let creamColor = '#ffffff';
+  let dotColor = '#7a4220';
+
+  if (colorTier === 'red') {
+    mainColor = '#ff6088';
+    strokeColor = '#d92655';
+    creamColor = '#ffffff';
+    dotColor = '#9e0d34';
+  } else if (colorTier === 'yellow') {
+    mainColor = '#ffcc00';
+    strokeColor = '#d49b00';
+    creamColor = '#ffffff';
+    dotColor = '#ff9900';
+  } else if (colorTier === 'black') {
+    mainColor = '#382521';
+    strokeColor = '#1f1310';
+    creamColor = '#ffffff';
+    dotColor = '#150906';
+  } else if (colorTier === 'white') {
+    mainColor = '#f6f9fc';
+    strokeColor = '#c4daf5';
+    creamColor = '#ffb3d9';
+    dotColor = '#80b3ff';
+  } else if (colorTier === 'rainbow') {
+    mainColor = 'rainbow';
+  }
+
   if (p.type === 'cookie' || p.type === 'cake_ground') {
     // クッキー（ビスケット）地面
-    ctx.fillStyle = '#f6be79'; // こんがりクッキー色
+    if (mainColor === 'rainbow') {
+      const rGrad = ctx.createLinearGradient(p.x, p.y, p.x + p.width, p.y);
+      rGrad.addColorStop(0, '#ff4785');
+      rGrad.addColorStop(0.25, '#ffbb00');
+      rGrad.addColorStop(0.5, '#33cc66');
+      rGrad.addColorStop(0.75, '#3399ff');
+      rGrad.addColorStop(1, '#bb44ff');
+      ctx.fillStyle = rGrad;
+      strokeColor = '#ffffff';
+    } else {
+      ctx.fillStyle = mainColor;
+    }
+
     ctx.beginPath();
     ctx.roundRect(p.x, p.y, p.width, p.height, [16, 16, 0, 0]);
     ctx.fill();
 
     // ビスケットの縁取り
-    ctx.strokeStyle = '#e09e52';
+    ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 4;
     ctx.stroke();
 
     // 生クリームのトッピング波
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = creamColor;
     ctx.beginPath();
     for (let x = p.x; x < p.x + p.width; x += 24) {
       ctx.arc(x + 12, p.y + 4, 8, 0, Math.PI);
     }
     ctx.fill();
 
-    // チョコチップ模様
-    ctx.fillStyle = '#7a4220';
+    // トッピング模様
+    ctx.fillStyle = dotColor;
     for (let x = p.x + 20; x < p.x + p.width - 15; x += 36) {
       ctx.beginPath();
       ctx.arc(x, p.y + 25, 3.5, 0, Math.PI * 2);
@@ -691,16 +890,27 @@ function drawPlatform(p) {
     }
   } else if (p.type === 'wafer') {
     // サクサクウエハース
-    ctx.fillStyle = '#f9cd94';
+    if (mainColor === 'rainbow') {
+      const rGrad = ctx.createLinearGradient(p.x, p.y, p.x + p.width, p.y);
+      rGrad.addColorStop(0, '#ff66aa');
+      rGrad.addColorStop(0.33, '#ffcc00');
+      rGrad.addColorStop(0.66, '#33cc99');
+      rGrad.addColorStop(1, '#9966ff');
+      ctx.fillStyle = rGrad;
+      strokeColor = '#ffffff';
+    } else {
+      ctx.fillStyle = mainColor;
+    }
+
     ctx.beginPath();
     ctx.roundRect(p.x, p.y, p.width, p.height, 10);
     ctx.fill();
-    ctx.strokeStyle = '#dca76a';
+    ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 3;
     ctx.stroke();
 
     // 格子模様
-    ctx.fillStyle = 'rgba(215, 155, 95, 0.4)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
     for (let x = p.x + 8; x < p.x + p.width - 6; x += 16) {
       ctx.fillRect(x, p.y + 4, 3, p.height - 8);
     }
@@ -719,6 +929,13 @@ function drawPlatform(p) {
     ctx.lineWidth = 2;
     ctx.stroke();
   }
+
+  // チェックポイントのフラッグ表示
+  if (p.isCheckPoint) {
+    ctx.font = '22px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🚩', p.x + 30, p.y - 10);
+  }
 }
 
 // アイテムの描画
@@ -731,43 +948,56 @@ function drawItem(it) {
   ctx.fillText(it.type, it.x + 12, floatY + 12);
 }
 
-// ゴール（大きないちごケーキ）
+// ゴール（特大レインボーケーキ城）
 function drawGoal() {
   const gx = goal.x;
   const gy = goal.y;
 
-  // ケーキ下段
-  ctx.fillStyle = '#fff4fa';
+  // ケーキ下段（レインボーグラデーション）
+  const cakeGrad = ctx.createLinearGradient(gx, gy, gx + goal.width, gy);
+  cakeGrad.addColorStop(0, '#ff99bb');
+  cakeGrad.addColorStop(0.25, '#ffe066');
+  cakeGrad.addColorStop(0.5, '#99ffbb');
+  cakeGrad.addColorStop(0.75, '#99ccff');
+  cakeGrad.addColorStop(1, '#e099ff');
+  ctx.fillStyle = cakeGrad;
+
   ctx.beginPath();
-  ctx.roundRect(gx, gy + 50, goal.width, 80, 16);
+  ctx.roundRect(gx, gy + 50, goal.width, 90, 18);
   ctx.fill();
-  ctx.strokeStyle = '#ff99c8';
+  ctx.strokeStyle = '#ffffff';
   ctx.lineWidth = 4;
   ctx.stroke();
 
-  // スポンジとイチゴジャムの層
-  ctx.fillStyle = '#ff5990';
-  ctx.fillRect(gx + 8, gy + 85, goal.width - 16, 6);
+  // 生クリームのホイップ波
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  for (let x = gx; x < gx + goal.width; x += 26) {
+    ctx.arc(x + 13, gy + 52, 9, 0, Math.PI);
+  }
+  ctx.fill();
 
   // ケーキ上段
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
-  ctx.roundRect(gx + 18, gy + 10, goal.width - 36, 45, 12);
+  ctx.roundRect(gx + 22, gy + 10, goal.width - 44, 45, 12);
   ctx.fill();
+  ctx.strokeStyle = '#ffb3d9';
+  ctx.lineWidth = 3;
   ctx.stroke();
 
-  // 上の大きないちごとお祝い旗
-  ctx.font = '34px "M PLUS Rounded 1c"';
+  // 上の虹色クラウン＆いちご
+  ctx.font = '36px "M PLUS Rounded 1c"';
   ctx.textAlign = 'center';
-  ctx.fillText('🍓', gx + goal.width / 2, gy + 5);
+  ctx.fillText('👑🍓', gx + goal.width / 2, gy + 6);
 
-  // GOALテキストフラッグ
-  ctx.fillStyle = '#ff2b75';
-  ctx.font = 'bold 18px "M PLUS Rounded 1c"';
-  ctx.fillText('GOAL!', gx + goal.width / 2, gy + 75);
+  // RAINBOW GOALフラッグ
+  ctx.fillStyle = '#ff1a75';
+  ctx.font = '900 18px "M PLUS Rounded 1c"';
+  ctx.fillText('🌈 RAINBOW GOAL! 🌈', gx + goal.width / 2, gy + 90);
 }
 
-// プレイヤー（ピンクツインテール女の子）の描画
+// プレイヤー（ピンクツインテール女の子 ＋ 背中のキャンディ）の描画
 function drawPlayer() {
   ctx.save();
   ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
@@ -790,11 +1020,11 @@ function drawPlayer() {
     twirl = Math.sin(player.walkFrame) * 12;
   }
 
-  // 女の子のSVGをCanvasに描画（動的ツインテール）
-  // 描画サイズを調整
+  // キャンディ色に応じた女の子の画像を取得して描画
+  const currentImg = girlImages[player.candyColor] || girlImages.red;
   const w = 64;
   const h = 64;
-  ctx.drawImage(girlImg, -w / 2, -h / 2 - 2, w, h);
+  ctx.drawImage(currentImg, -w / 2, -h / 2 - 2, w, h);
 
   ctx.restore();
 }
@@ -859,11 +1089,14 @@ function startGame() {
 
   initStage();
   player.x = 80;
-  player.y = 1180;
+  player.y = 2180;
   player.vx = 0;
   player.vy = 0;
   player.safeX = 80;
-  player.safeY = 1180;
+  player.safeY = 2180;
+  player.candyColor = 'red';
+  player.currentTier = 1;
+  updateCandyUI('red');
   camera.x = 0;
   camera.y = stageHeight - V_HEIGHT;
 
@@ -872,12 +1105,15 @@ function startGame() {
 
 function reachGoal() {
   gameState = 'CLEAR';
+  player.candyColor = 'rainbow';
+  player.currentTier = 5;
+  updateCandyUI('rainbow');
   sounds.playClear();
   if (timerInterval) clearInterval(timerInterval);
 
   // 大量の紙吹雪＆星パーティクル
-  createParticles(player.x, player.y - 20, 'star', 30);
-  createParticles(goal.x + goal.width / 2, goal.y, 'heart', 20);
+  createParticles(player.x, player.y - 20, 'star', 40);
+  createParticles(goal.x + goal.width / 2, goal.y, 'heart', 30);
 
   // クリア画面表示
   document.getElementById('clear-sweets').textContent = score;
@@ -885,8 +1121,8 @@ function reachGoal() {
   
   // 星評価（スイーツ数に応じて）
   let stars = '⭐⭐⭐';
-  if (score < 4) stars = '⭐';
-  else if (score < 8) stars = '⭐⭐';
+  if (score < 8) stars = '⭐';
+  else if (score < 16) stars = '⭐⭐';
   document.getElementById('clear-rank').textContent = stars;
 
   setTimeout(() => {

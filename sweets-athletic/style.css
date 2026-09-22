@@ -71,13 +71,36 @@ body {
   border: 2px solid #ffd6eb;
   border-radius: 16px;
   padding: 4px 12px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
   color: #ff4785;
   display: flex;
   align-items: center;
   gap: 6px;
   box-shadow: 0 2px 6px rgba(255, 140, 185, 0.15);
+}
+
+.candy-status {
+  border-color: #ff99c8;
+}
+
+.candy-dot {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.rainbow-text {
+  background: linear-gradient(90deg, #ff0055, #ff9900, #33cc33, #0099ff, #9900ff, #ff0055);
+  background-size: 200% auto;
+  color: transparent !important;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: rainbowAnim 2s linear infinite;
+}
+
+@keyframes rainbowAnim {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 .header-tools {
