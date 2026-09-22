@@ -162,6 +162,80 @@ class SoundManager {
     osc.start(now);
     osc.stop(now + 0.2);
   }
+
+  // もちもちスクイーズ音（むにゅ〜、ぷにっ）
+  playSquish() {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // 柔らかいむにゅっという変形音
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(140, now + 0.09);
+
+    // バンドパスで水分・粘り気のある質感に
+    const bpf = this.ctx.createBiquadFilter();
+    bpf.type = 'lowpass';
+    bpf.frequency.setValueAtTime(600, now);
+    bpf.frequency.exponentialRampToValueAtTime(250, now + 0.09);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.32, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+    osc.connect(bpf);
+    bpf.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  }
+
+  // 離したときの反発音（ぽよん！ぷるん！）
+  playPop() {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // ぽよんと跳ねるサイン波ピッチモジュレーション
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.exponentialRampToValueAtTime(360, now + 0.04);
+    osc.frequency.exponentialRampToValueAtTime(220, now + 0.14);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.24, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.16);
+  }
+
+  // むにゅむにゅモード突入ファンファーレ
+  playFanfare() {
+    this.init();
+    if (!this.ctx) return;
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+    notes.forEach((freq, idx) => {
+      const now = this.ctx.currentTime + idx * 0.08;
+      const osc = this.ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    });
+  }
 }
 
 const sound = new SoundManager();
@@ -197,16 +271,21 @@ const BUTTERS = {
 // ----- State -----
 let currentButter = null;
 let crackCount = 0;
-const MAX_CRACKS = 50; // この数に達したら「完全に割れた」
+const MAX_CRACKS = 35; // パキパキ割ってむにゅむにゅモードへ入る回数
+let isSquishMode = false;
+let isPressing = false;
 
 // ----- DOM -----
 const selectScreen = document.getElementById('select-screen');
 const playScreen = document.getElementById('play-screen');
 const butterLabel = document.getElementById('butter-label');
+const butterStage = document.getElementById('butter-stage');
 const butterSvg = document.getElementById('butter-svg');
 const butterArea = document.getElementById('butter-area');
+const waxShell = document.getElementById('wax-shell');
 const crackLayer = document.getElementById('crack-layer');
 const hintText = document.getElementById('hint-text');
+const squishBanner = document.getElementById('squish-banner');
 const completeButtons = document.getElementById('complete-buttons');
 const btnBack = document.getElementById('btn-back');
 const btnRetry = document.getElementById('btn-retry');
@@ -225,9 +304,6 @@ function goToPlay(butterKey) {
   const data = BUTTERS[butterKey];
 
   // バター色を適用
-  document.querySelectorAll('.butter-choco, .butter-ichigo, .butter-matcha').forEach(el => {
-    // body から既存のバタークラスを除去
-  });
   document.body.className = data.cssClass;
 
   // ラベル更新
@@ -248,11 +324,20 @@ function goToSelect() {
 
 function resetButter() {
   crackCount = 0;
-  crackLayer.innerHTML = '';
+  isSquishMode = false;
+  isPressing = false;
+  document.body.classList.remove('mode-squish');
+
+  if (crackLayer) crackLayer.innerHTML = '';
+  if (waxShell) waxShell.style.opacity = '1';
+  if (squishBanner) squishBanner.classList.add('hidden');
+  if (butterStage) {
+    butterStage.style.transform = '';
+    butterStage.classList.remove('rebound', 'is-squeezing');
+  }
+
+  hintText.textContent = 'おしてパキパキわろう！';
   hintText.style.display = '';
-  completeButtons.classList.add('hidden');
-  butterSvg.style.opacity = '1';
-  butterSvg.style.transform = '';
 
   // かけら・キラキラ・破片を除去
   butterArea.querySelectorAll('.fragment, .sparkle, .wax-chip').forEach(el => el.remove());
@@ -287,9 +372,47 @@ function getLocalPoint(svgEl, clientX, clientY) {
   return pt.matrixTransform(ctm);
 }
 
-// ヒビ線を追加
+// スクイーズ変形を適用
+function applySquish(screenX, screenY) {
+  if (!butterStage) return;
+  const rect = butterStage.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  // 中心からのオフセット比率 (-1.0 〜 1.0)
+  const dx = Math.max(-1, Math.min(1, (screenX - cx) / (rect.width / 2)));
+  const dy = Math.max(-1, Math.min(1, (screenY - cy) / (rect.height / 2)));
+
+  // 変形量（むにゅむにゅモードはより深く大きく変形）
+  const squishDepth = isSquishMode ? 0.32 : 0.18;
+  const scaleY = Math.max(0.65, 1 - squishDepth * (1 - Math.abs(dx) * 0.25));
+  const scaleX = Math.min(1.35, 1 + squishDepth * 0.85);
+  const translateY = (dy >= 0 ? 1 : -0.5) * (squishDepth * 28);
+  const skewX = -dx * 7;
+
+  butterStage.style.setProperty('--rebound-x', scaleX);
+  butterStage.style.setProperty('--rebound-y', scaleY);
+  butterStage.classList.remove('rebound');
+  butterStage.classList.add('is-squeezing');
+  butterStage.style.transform = `translateY(${translateY}px) scale(${scaleX}, ${scaleY}) skewX(${skewX}deg)`;
+}
+
+// 指を離したときの反発（ぽよよん！）
+function releaseSquish() {
+  if (!butterStage) return;
+  butterStage.classList.remove('is-squeezing');
+  butterStage.style.transform = '';
+  butterStage.classList.remove('rebound');
+  void butterStage.offsetWidth;
+  butterStage.classList.add('rebound');
+
+  // ぽよん音
+  sound.playPop();
+}
+
+// ヒビ線を追加（パキパキモード時）
 function addCrack(x, y, screenX, screenY) {
-  if (crackCount >= MAX_CRACKS) return;
+  if (isSquishMode || crackCount >= MAX_CRACKS) return;
 
   crackCount++;
 
@@ -302,6 +425,12 @@ function addCrack(x, y, screenX, screenY) {
   // タップ位置からワックス破片を弾けさせる
   if (screenX !== undefined && screenY !== undefined) {
     spawnTapChips(screenX, screenY);
+  }
+
+  // ワックスの不透明度を徐々に下げて、中身のもちもちバターを露出させる
+  if (waxShell) {
+    const remainingRatio = 1 - (crackCount / MAX_CRACKS);
+    waxShell.style.opacity = Math.max(0.2, remainingRatio * 0.95);
   }
 
   // ワックス風の鋭いヒビ線を生成
@@ -334,11 +463,6 @@ function addCrack(x, y, screenX, screenY) {
     inner.setAttribute('d', pathD);
     inner.setAttribute('class', 'crack-line-inner');
     crackLayer.appendChild(inner);
-  }
-
-  // ヒントを消す
-  if (crackCount >= 2) {
-    hintText.style.display = 'none';
   }
 
   // 完成チェック
@@ -380,7 +504,6 @@ function spawnTapChips(clientX, clientY) {
     const angle = Math.random() * Math.PI * 2;
     const dist = 25 + Math.random() * 45;
     const dx = Math.cos(angle) * dist;
-    // 少し上向きに飛び散る重力効果
     const dy = Math.sin(angle) * dist + 15;
     const rot = (Math.random() - 0.5) * 540;
 
@@ -399,70 +522,91 @@ function spawnTapChips(clientX, clientY) {
 }
 
 // ----- タッチ/マウスイベント -----
-let isSwiping = false;
 let lastSwipeX = 0;
 let lastSwipeY = 0;
+let lastSoundTime = 0;
 
 butterSvg.addEventListener('pointerdown', (e) => {
   e.preventDefault();
-  isSwiping = true;
+  isPressing = true;
   lastSwipeX = e.clientX;
   lastSwipeY = e.clientY;
-  const pt = getLocalPoint(butterSvg, e.clientX, e.clientY);
-  addCrack(pt.x, pt.y, e.clientX, e.clientY);
-});
 
-butterSvg.addEventListener('pointermove', (e) => {
-  if (!isSwiping) return;
-  e.preventDefault();
+  applySquish(e.clientX, e.clientY);
 
-  // スワイプ移動距離が一定以上のときだけ割れを追加（自然なクラック間隔）
-  const dist = Math.hypot(e.clientX - lastSwipeX, e.clientY - lastSwipeY);
-  if (dist > 18) {
-    lastSwipeX = e.clientX;
-    lastSwipeY = e.clientY;
+  if (!isSquishMode) {
     const pt = getLocalPoint(butterSvg, e.clientX, e.clientY);
     addCrack(pt.x, pt.y, e.clientX, e.clientY);
+  } else {
+    // むにゅむにゅモード：押すとむにゅっ音
+    sound.playSquish();
   }
 });
 
-butterSvg.addEventListener('pointerup', () => {
-  isSwiping = false;
+butterSvg.addEventListener('pointermove', (e) => {
+  if (!isPressing) return;
+  e.preventDefault();
+
+  applySquish(e.clientX, e.clientY);
+
+  if (!isSquishMode) {
+    const dist = Math.hypot(e.clientX - lastSwipeX, e.clientY - lastSwipeY);
+    if (dist > 18) {
+      lastSwipeX = e.clientX;
+      lastSwipeY = e.clientY;
+      const pt = getLocalPoint(butterSvg, e.clientX, e.clientY);
+      addCrack(pt.x, pt.y, e.clientX, e.clientY);
+    }
+  } else {
+    // むにゅむにゅモード中、ドラッグ中に定期的にむにゅ音
+    const now = Date.now();
+    if (now - lastSoundTime > 160) {
+      lastSoundTime = now;
+      sound.playSquish();
+    }
+  }
 });
 
-butterSvg.addEventListener('pointerleave', () => {
-  isSwiping = false;
-});
+function endPress() {
+  if (!isPressing) return;
+  isPressing = false;
+  releaseSquish();
+}
+
+butterSvg.addEventListener('pointerup', endPress);
+butterSvg.addEventListener('pointerleave', endPress);
+butterSvg.addEventListener('pointercancel', endPress);
+window.addEventListener('pointerup', endPress);
 
 // タッチスクロールを防止
 butterArea.addEventListener('touchmove', (e) => {
   e.preventDefault();
 }, { passive: false });
 
-// ----- 完成演出 -----
+// ----- 完成演出（ワックス全壊 → むにゅむにゅモードへ突入） -----
 function onComplete() {
-  // 割れた音を鳴らす
   sound.playBreak();
 
-  // バターが揺れる
-  butterSvg.style.transition = 'transform 0.3s ease, opacity 0.5s ease';
-  butterSvg.style.transform = 'scale(1.05)';
+  // ワックス破片が一気に飛び散る
+  spawnFragments();
+  spawnSparkles();
 
+  if (waxShell) waxShell.style.opacity = '0';
+  if (crackLayer) crackLayer.innerHTML = '';
+
+  // むにゅむにゅモードへステート移行
+  isSquishMode = true;
+  document.body.classList.add('mode-squish');
+  squishBanner.classList.remove('hidden');
+  hintText.textContent = 'ゆびでもみもみ・むにゅむにゅしてね♡';
+
+  // ファンファーレ
+  sound.playFanfare();
+
+  // ぽよんと大きく跳ねる
   setTimeout(() => {
-    butterSvg.style.transform = 'scale(0.95)';
-    butterSvg.style.opacity = '0.3';
-
-    // かけらを飛ばす
-    spawnFragments();
-
-    // キラキラ
-    spawnSparkles();
-
-    // ボタン表示
-    setTimeout(() => {
-      completeButtons.classList.remove('hidden');
-    }, 400);
-  }, 200);
+    releaseSquish();
+  }, 100);
 }
 
 // かけら生成

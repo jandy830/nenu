@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="robots" content="noindex, nofollow">
-  <title>🧈 バターASMR</title>
+  <title>🧈 パキパキバタースクイーズ</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧈</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,8 +16,8 @@
   <!-- ===== えらぶ画面 ===== -->
   <div id="select-screen" class="screen active">
     <header class="header">
-      <h1>🧈 バターASMR</h1>
-      <p class="sub">すきなバターをえらんでパキパキしよう！</p>
+      <h1>🧈 パキパキバタースクイーズ</h1>
+      <p class="sub">ワックスをパキパキわって、もちもちバターをむにゅむにゅしよう！</p>
     </header>
 
     <div class="cards">
@@ -57,74 +57,91 @@
     </header>
 
     <div id="butter-area" class="butter-area">
-      <!-- バターSVGがここに入る -->
-      <svg id="butter-svg" viewBox="0 0 300 200" class="butter-svg">
-        <!-- バター本体 -->
-        <defs>
-          <linearGradient id="butter-grad-top" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="var(--butter-light)" />
-            <stop offset="40%" stop-color="var(--butter-main)" />
-            <stop offset="100%" stop-color="var(--butter-light)" />
-          </linearGradient>
-          <linearGradient id="butter-grad-front" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--butter-main)" />
-            <stop offset="60%" stop-color="var(--butter-dark)" />
-            <stop offset="100%" stop-color="var(--butter-shadow)" />
-          </linearGradient>
-          <linearGradient id="butter-grad-side" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="var(--butter-dark)" />
-            <stop offset="100%" stop-color="var(--butter-shadow)" />
-          </linearGradient>
-          <!-- ツヤツヤの光沢 -->
-          <linearGradient id="gloss" x1="0" y1="0" x2="0.3" y2="1">
-            <stop offset="0%" stop-color="rgba(255,255,255,0.6)" />
-            <stop offset="40%" stop-color="rgba(255,255,255,0.15)" />
-            <stop offset="100%" stop-color="rgba(255,255,255,0)" />
-          </linearGradient>
-        </defs>
+      <!-- むにゅむにゅモード切り替えバナー -->
+      <div id="squish-banner" class="squish-banner hidden">✨ むにゅむにゅタイム！ ✨</div>
 
-        <!-- 上面 (平行四辺形) -->
-        <polygon id="butter-top" class="butter-face"
-          points="60,40 260,40 240,80 40,80"
-          fill="url(#butter-grad-top)" />
+      <!-- スクイーズ変形するバターコンテナ -->
+      <div id="butter-stage" class="butter-stage">
+        <svg id="butter-svg" viewBox="0 0 320 220" class="butter-svg">
+          <defs>
+            <!-- もちもちバター本体のグラデーション（ふっくら立体感） -->
+            <radialGradient id="squish-body-grad" cx="40%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="var(--butter-light)" />
+              <stop offset="65%" stop-color="var(--butter-main)" />
+              <stop offset="100%" stop-color="var(--butter-dark)" />
+            </radialGradient>
+            <!-- もちもちバター底の影 -->
+            <linearGradient id="squish-bottom-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--butter-main)" />
+              <stop offset="100%" stop-color="var(--butter-shadow)" />
+            </linearGradient>
 
-        <!-- 前面 -->
-        <rect id="butter-front" class="butter-face"
-          x="40" y="80" width="200" height="100" rx="4"
-          fill="url(#butter-grad-front)" />
+            <!-- 外側ワックスシェルのグラデーション（白っぽく硬いワックス質感） -->
+            <linearGradient id="wax-top-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="rgba(255, 255, 255, 0.95)" />
+              <stop offset="35%" stop-color="var(--butter-light)" />
+              <stop offset="85%" stop-color="var(--butter-main)" />
+              <stop offset="100%" stop-color="rgba(255, 255, 255, 0.85)" />
+            </linearGradient>
+            <linearGradient id="wax-front-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--butter-main)" />
+              <stop offset="50%" stop-color="var(--butter-dark)" />
+              <stop offset="100%" stop-color="var(--butter-shadow)" />
+            </linearGradient>
 
-        <!-- 右側面 (平行四辺形) -->
-        <polygon id="butter-side" class="butter-face"
-          points="240,80 260,40 260,140 240,180"
-          fill="url(#butter-grad-side)" />
+            <!-- ツヤツヤハイライト -->
+            <linearGradient id="gloss" x1="0" y1="0" x2="0.3" y2="1">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.7)" />
+              <stop offset="45%" stop-color="rgba(255,255,255,0.2)" />
+              <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+            </linearGradient>
 
-        <!-- ツヤツヤ光沢オーバーレイ（上面） -->
-        <polygon
-          points="60,40 260,40 240,80 40,80"
-          fill="url(#gloss)" />
+            <filter id="squish-shadow" x="-20%" y="-20%" width="140%" height="150%">
+              <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="rgba(120, 70, 30, 0.28)" />
+            </filter>
+          </defs>
 
-        <!-- ツヤツヤ光沢オーバーレイ（前面） -->
-        <rect x="40" y="80" width="200" height="100" rx="4"
-          fill="url(#gloss)" opacity="0.5" />
+          <!-- 影 -->
+          <ellipse cx="160" cy="188" rx="120" ry="18" fill="rgba(100, 60, 20, 0.18)" id="butter-drop-shadow" />
 
-        <!-- ハイライト線（エッジの光） -->
-        <line x1="62" y1="41" x2="258" y2="41"
-          stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round" />
-        <line x1="41" y1="82" x2="41" y2="178"
-          stroke="rgba(255,255,255,0.35)" stroke-width="2" stroke-linecap="round" />
-        <!-- 上面の反射スポット -->
-        <ellipse cx="150" cy="58" rx="60" ry="8"
-          fill="rgba(255,255,255,0.25)" />
+          <!-- 【層1: もちもちバター本体（内側）】 -->
+          <g id="butter-core" filter="url(#squish-shadow)">
+            <!-- ふっくら角丸のメインボディ -->
+            <path id="core-body" class="core-body"
+              d="M 60,75 C 60,50 90,42 160,42 C 230,42 260,50 260,75 C 260,95 264,135 258,162 C 254,178 220,182 160,182 C 100,182 66,178 62,162 C 56,135 60,95 60,75 Z"
+              fill="url(#squish-body-grad)" />
 
-        <!-- ヒビ用レイヤー -->
-        <g id="crack-layer"></g>
-      </svg>
+            <!-- もちもちの上部ハイライト（ぽってりツヤ） -->
+            <ellipse cx="140" cy="65" rx="75" ry="16" fill="rgba(255, 255, 255, 0.45)" class="core-shine" />
+            <ellipse cx="120" cy="62" rx="35" ry="7" fill="rgba(255, 255, 255, 0.7)" class="core-shine-bright" />
+          </g>
 
-      <p class="hint" id="hint-text">タップしてパキパキしよう！</p>
+          <!-- 【層2: 外側の薄いワックス膜（パキパキ割れて剥がれる殻）】 -->
+          <g id="wax-shell" class="wax-shell">
+            <!-- ワックス表面（上面・前面を覆うシェル） -->
+            <path id="wax-cover" class="wax-cover"
+              d="M 60,75 C 60,50 90,42 160,42 C 230,42 260,50 260,75 C 260,95 264,135 258,162 C 254,178 220,182 160,182 C 100,182 66,178 62,162 C 56,135 60,95 60,75 Z"
+              fill="url(#wax-top-grad)" opacity="0.95" />
+
+            <!-- ワックスの硬質ツヤとエッジ反射 -->
+            <path id="wax-gloss" class="wax-gloss"
+              d="M 65,72 C 65,52 92,45 160,45 C 228,45 255,52 255,72 C 255,88 230,95 160,95 C 90,95 65,88 65,72 Z"
+              fill="url(#gloss)" opacity="0.8" />
+            <path id="wax-rim" class="wax-rim"
+              d="M 68,60 C 95,48 135,46 160,46 C 200,46 240,50 252,62"
+              fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round" />
+          </g>
+
+          <!-- 【層3: ヒビ・穴あきレイヤー（割れた隙間から中身が見える）】 -->
+          <g id="crack-layer"></g>
+        </svg>
+      </div>
+
+      <p class="hint" id="hint-text">おしてパキパキわろう！</p>
     </div>
 
-    <!-- 完成時のボタン -->
-    <div id="complete-buttons" class="complete-buttons hidden">
+    <!-- アクションボタン（いつでも利用可能） -->
+    <div id="complete-buttons" class="complete-buttons">
       <button id="btn-retry" class="btn-action">🔄 もういっかい</button>
       <button id="btn-change" class="btn-action btn-secondary">🧈 べつのバター</button>
     </div>

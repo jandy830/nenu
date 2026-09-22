@@ -227,47 +227,111 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 16px;
+  padding: 12px 16px;
   position: relative;
+  touch-action: none;
+}
+
+/* むにゅむにゅモード切り替えバナー */
+.squish-banner {
+  background: linear-gradient(135deg, #ff85a2 0%, #ff5fa2 100%);
+  color: #fff;
+  font-size: clamp(16px, 4vw, 22px);
+  font-weight: 900;
+  padding: 8px 24px;
+  border-radius: 30px;
+  box-shadow: 0 6px 18px rgba(255, 95, 162, 0.4);
+  margin-bottom: 12px;
+  animation: banner-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+}
+
+.squish-banner.hidden {
+  display: none;
+}
+
+@keyframes banner-pop {
+  0% { transform: scale(0.3) rotate(-6deg); opacity: 0; }
+  70% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* スクイーズステージ（変形アニメーション） */
+.butter-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 420px;
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+/* 押している間の変形遷移 */
+.butter-stage.is-squeezing {
+  transition: transform 0.04s ease-out;
+}
+
+/* 離した瞬間の「ぽよよん！」反発アニメーション */
+.butter-stage.rebound {
+  animation: squeeze-rebound 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes squeeze-rebound {
+  0% { transform: scale(var(--rebound-x, 1.15), var(--rebound-y, 0.85)); }
+  25% { transform: scale(0.92, 1.08); }
+  50% { transform: scale(1.05, 0.96); }
+  75% { transform: scale(0.98, 1.02); }
+  100% { transform: scale(1, 1); }
 }
 
 .butter-svg {
-  width: 90%;
-  max-width: 400px;
+  width: 92%;
+  max-width: 380px;
   height: auto;
-  filter: drop-shadow(0 8px 20px rgba(140, 100, 60, 0.3));
   cursor: pointer;
+  overflow: visible;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.butter-face {
-  stroke: rgba(0, 0, 0, 0.08);
-  stroke-width: 0.5;
+/* もちもちバター本体 */
+.core-body {
+  transition: filter 0.2s;
+}
+
+/* むにゅむにゅモード中のプルプル感 */
+body.mode-squish .core-body {
+  filter: drop-shadow(0 4px 14px rgba(255, 180, 50, 0.4));
+}
+
+/* ワックス膜 */
+.wax-shell {
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .hint {
-  margin-top: 24px;
-  font-size: clamp(14px, 3vw, 18px);
-  font-weight: 700;
+  margin-top: 18px;
+  font-size: clamp(14px, 3.5vw, 18px);
+  font-weight: 900;
   color: var(--text-brown-light);
   animation: hint-bounce 2s ease-in-out infinite;
+  text-align: center;
 }
 
 @keyframes hint-bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-5px); }
 }
 
 /* ===== 完成ボタン ===== */
 .complete-buttons {
   display: flex;
   gap: 12px;
-  padding: 20px 16px 32px;
+  padding: 12px 16px 24px;
   width: 100%;
   max-width: 400px;
-}
-
-.complete-buttons.hidden {
-  display: none;
 }
 
 .btn-action {
