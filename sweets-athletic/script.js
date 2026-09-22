@@ -329,11 +329,35 @@ const girlImages = {};
   girlImages[c] = img;
 });
 
+// キャンディ色のセーブ＆ロード（localStorage）
+const CANDY_SAVE_KEY = 'sweets_athletic_saved_candy';
+const CANDY_RANK = { red: 1, yellow: 2, black: 3, white: 4, rainbow: 5 };
+
+function saveCandyColor(color) {
+  try {
+    const current = loadCandyColor();
+    const currentRank = CANDY_RANK[current] || 1;
+    const newRank = CANDY_RANK[color] || 1;
+    // より高いランクのキャンディを手に入れたら保存（虹色をとったらずっと虹色！）
+    if (newRank >= currentRank) {
+      localStorage.setItem(CANDY_SAVE_KEY, color);
+    }
+  } catch (e) {}
+}
+
+function loadCandyColor() {
+  try {
+    return localStorage.getItem(CANDY_SAVE_KEY) || 'red';
+  } catch (e) {
+    return 'red';
+  }
+}
+
 // スタート画面のプレビューにも表示
-document.addEventListener('DOMContentLoaded', () => {
+function updateCharPreview(color) {
   const preview = document.getElementById('char-preview');
   if (preview) {
-    preview.innerHTML = createGirlSvgString(false, 8, 'red');
+    preview.innerHTML = createGirlSvgString(false, 8, color);
     const svgEl = preview.querySelector('svg');
     if (svgEl) {
       svgEl.style.width = '110px';
@@ -341,6 +365,12 @@ document.addEventListener('DOMContentLoaded', () => {
       svgEl.style.filter = 'drop-shadow(0 6px 12px rgba(255, 100, 160, 0.3))';
     }
   }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const savedColor = loadCandyColor();
+  updateCharPreview(savedColor);
+  updateCandyUI(savedColor);
 });
 
 
@@ -391,7 +421,7 @@ const player = {
   walkFrame: 0,
   safeX: 80,
   safeY: 2180,
-  candyColor: 'red', // 'red' | 'yellow' | 'black' | 'white' | 'rainbow'
+  candyColor: loadCandyColor(), // 保存されたキャンディ色をロード
   currentTier: 1,    // 1: 赤, 2: 黄, 3: 黒, 4: 白, 5: レインボー
   checkpointTier: 1, // 到達した最新のチェックポイント（旗）
   blinkTimer: 0,
@@ -666,10 +696,15 @@ function update() {
       if (p.tier && p.tier > player.currentTier && p.tier <= 4) {
         player.currentTier = p.tier;
         const tierColorMap = { 1: 'red', 2: 'yellow', 3: 'black', 4: 'white' };
-        player.candyColor = tierColorMap[p.tier];
-        updateCandyUI(player.candyColor);
-        sounds.playCandyLevelUp();
-        createParticles(player.x + player.width / 2, player.y, 'star', 25);
+        const newColor = tierColorMap[p.tier];
+        // まだ持っていない上位のキャンディなら進化＆セーブ！
+        if (CANDY_RANK[newColor] > (CANDY_RANK[player.candyColor] || 1)) {
+          player.candyColor = newColor;
+          saveCandyColor(player.candyColor);
+          updateCandyUI(player.candyColor);
+          sounds.playCandyLevelUp();
+          createParticles(player.x + player.width / 2, player.y, 'star', 25);
+        }
       }
 
       // 安全な復帰ポイントを更新（落下救済用：クッキーやウエハースなど安定した足場）
@@ -700,15 +735,15 @@ function update() {
     }
   });
 
-  // 6. 穴に落ちたときの処理（取った最新のチェックポイントの旗から、その色のキャンディで復活！）
+  // 6. 穴に落ちたときの処理（取った最新のチェックポイントの旗から復活！キャンディの色はずっとキープ！）
   if (player.y > player.safeY + 360 || player.y > stageHeight + 40) {
     sounds.playFall();
 
     // 取った最新のチェックポイント（旗）から再開！
     const currentCpTier = player.checkpointTier || player.currentTier || 1;
     player.currentTier = currentCpTier;
-    const tierColorMap = { 1: 'red', 2: 'yellow', 3: 'black', 4: 'white' };
-    player.candyColor = tierColorMap[currentCpTier] || 'red';
+    // キャンディの色は手に入れた色をキープ！
+    player.candyColor = loadCandyColor();
     updateCandyUI(player.candyColor);
 
     const cp = checkpoints[currentCpTier] || checkpoints[1];
@@ -1150,10 +1185,11 @@ function startGame() {
   player.vy = 0;
   player.safeX = 80;
   player.safeY = 2180;
-  player.candyColor = 'red';
-  player.currentTier = 1;
+  player.candyColor = loadCandyColor(); // 保存されたキャンディの色を引き継ぐ！
+  player.currentTier = CANDY_RANK[player.candyColor] || 1;
   player.checkpointTier = 1;
-  updateCandyUI('red');
+  updateCandyUI(player.candyColor);
+  updateCharPreview(player.candyColor);
   camera.x = 0;
   camera.y = stageHeight - V_HEIGHT;
 
@@ -1164,7 +1200,9 @@ function reachGoal() {
   gameState = 'CLEAR';
   player.candyColor = 'rainbow';
   player.currentTier = 5;
+  saveCandyColor('rainbow'); // 虹色レインボーキャンディをセーブ！
   updateCandyUI('rainbow');
+  updateCharPreview('rainbow');
   sounds.playClear();
   if (timerInterval) clearInterval(timerInterval);
 
