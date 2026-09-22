@@ -362,6 +362,14 @@ let score = 0;
 let gameTime = 0;
 let timerInterval = null;
 
+// バナー通知（チェックポイント到達表示）
+let bannerText = '';
+let bannerTimer = 0;
+function showBanner(text) {
+  bannerText = text;
+  bannerTimer = 90; // 約1.5秒表示
+}
+
 // カメラ
 const camera = {
   x: 0,
@@ -385,6 +393,7 @@ const player = {
   safeY: 2180,
   candyColor: 'red', // 'red' | 'yellow' | 'black' | 'white' | 'rainbow'
   currentTier: 1,    // 1: 赤, 2: 黄, 3: 黒, 4: 白, 5: レインボー
+  checkpointTier: 1, // 到達した最新のチェックポイント（旗）
   blinkTimer: 0,
   isBlinking: false
 };
@@ -636,6 +645,17 @@ function update() {
         player.y += p.vy;
       }
 
+      // チェックポイント（旗）に乗ったら復帰地点を更新＆バナー表示！
+      if (p.isCheckPoint && p.tier) {
+        if (!player.checkpointTier || p.tier > player.checkpointTier) {
+          player.checkpointTier = p.tier;
+          const cpInfo = checkpoints[p.tier];
+          if (cpInfo) {
+            showBanner(`🚩 ${cpInfo.name} に到達！ ✨`);
+          }
+        }
+      }
+
       // 足場のTier（赤1, 黄2, 黒3, 白4）をチェックして、より高いTierに到達したときに進化！
       if (p.tier && p.tier > player.currentTier && p.tier <= 4) {
         player.currentTier = p.tier;
@@ -674,19 +694,18 @@ function update() {
     }
   });
 
-  // 6. 穴に落ちたときの処理（ねぬちゃんのルール：1つ前のステージのチェックポイント＆その色のキャンディに戻る！）
+  // 6. 穴に落ちたときの処理（取った最新のチェックポイントの旗から、その色のキャンディで復活！）
   if (player.y > player.safeY + 360 || player.y > stageHeight + 40) {
     sounds.playFall();
 
-    // 1つ前のステージ（tier）へ戻す（白なら黒、黒なら黄、黄なら赤、赤なら赤）
-    if (player.currentTier > 1) {
-      player.currentTier -= 1;
-    }
+    // 取った最新のチェックポイント（旗）から再開！
+    const currentCpTier = player.checkpointTier || player.currentTier || 1;
+    player.currentTier = currentCpTier;
     const tierColorMap = { 1: 'red', 2: 'yellow', 3: 'black', 4: 'white' };
-    player.candyColor = tierColorMap[player.currentTier];
+    player.candyColor = tierColorMap[currentCpTier] || 'red';
     updateCandyUI(player.candyColor);
 
-    const cp = checkpoints[player.currentTier] || checkpoints[1];
+    const cp = checkpoints[currentCpTier] || checkpoints[1];
     player.x = cp.x;
     player.y = cp.y;
     player.safeX = cp.x;
@@ -770,6 +789,27 @@ function render() {
   particles.forEach(drawParticle);
 
   ctx.restore();
+
+  // チェックポイント到達バナー表示（UI座標系）
+  if (bannerTimer > 0) {
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, bannerTimer / 20);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+    ctx.beginPath();
+    ctx.roundRect(V_WIDTH / 2 - 160, 20, 320, 42, 21);
+    ctx.fill();
+    ctx.strokeStyle = '#ff4785';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.font = 'bold 18px "M PLUS Rounded 1c", sans-serif';
+    ctx.fillStyle = '#ff2b75';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(bannerText, V_WIDTH / 2, 41);
+    ctx.restore();
+    bannerTimer--;
+  }
 }
 
 // 背景とお菓子の雲（各エリアの高度に応じた美しいグラデーション）
@@ -1101,6 +1141,7 @@ function startGame() {
   player.safeY = 2180;
   player.candyColor = 'red';
   player.currentTier = 1;
+  player.checkpointTier = 1;
   updateCandyUI('red');
   camera.x = 0;
   camera.y = stageHeight - V_HEIGHT;
