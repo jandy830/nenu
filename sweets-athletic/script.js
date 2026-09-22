@@ -130,6 +130,26 @@ class SoundSystem {
     } catch (e) {}
   }
 
+  // プリンのトランポリン！ボヨヨン音
+  playBoing() {
+    if (!this.soundEnabled || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, t);
+      osc.frequency.exponentialRampToValueAtTime(750, t + 0.18);
+      osc.frequency.exponentialRampToValueAtTime(320, t + 0.35);
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.linearRampToValueAtTime(0, t + 0.36);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.37);
+    } catch (e) {}
+  }
+
   // おちちゃった音（ポヨン）
   playFall() {
     if (!this.soundEnabled || !this.ctx) return;
@@ -367,10 +387,179 @@ function updateCharPreview(color) {
   }
 }
 
+// ==========================================
+// 2.5 ペットショップ＆スイーツ貯金システム 🐾🛍️
+// ==========================================
+const TOTAL_SWEETS_KEY = 'sweets_athletic_total_sweets';
+const UNLOCKED_PETS_KEY = 'sweets_athletic_unlocked_pets';
+const SELECTED_PET_KEY = 'sweets_athletic_selected_pet';
+
+const PET_LIST = [
+  // 動物たち
+  { id: 'cat', name: 'しろねこ', icon: '🐱', price: 0, isFlying: false },
+  { id: 'rabbit', name: 'いちごうさぎ', icon: '🐰', price: 10, isFlying: false },
+  { id: 'dog', name: 'プリンいぬ', icon: '🐶', price: 20, isFlying: false },
+  { id: 'bear', name: 'くまチョコ', icon: '🐻', price: 30, isFlying: false },
+  { id: 'hamster', name: 'マカロンハム', icon: '🐹', price: 40, isFlying: false },
+  { id: 'unicorn', name: 'にじユニコーン', icon: '🦄', price: 70, isFlying: false },
+  // ふわふわ＆お菓子の仲間たち
+  { id: 'heart_balloon', name: 'ハート風船', icon: '🎈', price: 15, isFlying: true },
+  { id: 'pudding_pet', name: 'ぷるるんプリン', icon: '🍮', price: 25, isFlying: false },
+  { id: 'marshmallow_cloud', name: 'マシュマロ雲', icon: '☁️', price: 35, isFlying: true },
+  { id: 'star_pet', name: 'きらきら星', icon: '⭐', price: 50, isFlying: true },
+  { id: 'ghost_pet', name: 'キャンディおばけ', icon: '🍬', price: 60, isFlying: true },
+  { id: 'rainbow_balloon', name: 'にじいろバルーン', icon: '🌈', price: 80, isFlying: true }
+];
+
+function getTotalSweets() {
+  try {
+    return parseInt(localStorage.getItem(TOTAL_SWEETS_KEY) || '0', 10);
+  } catch (e) {
+    return 0;
+  }
+}
+
+function addTotalSweets(amount = 1) {
+  try {
+    const current = getTotalSweets() + amount;
+    localStorage.setItem(TOTAL_SWEETS_KEY, current);
+    updateSweetsUI();
+    return current;
+  } catch (e) {
+    return 0;
+  }
+}
+
+function getUnlockedPets() {
+  try {
+    const saved = localStorage.getItem(UNLOCKED_PETS_KEY);
+    return saved ? JSON.parse(saved) : ['cat'];
+  } catch (e) {
+    return ['cat'];
+  }
+}
+
+function unlockPet(petId) {
+  const unlocked = getUnlockedPets();
+  if (!unlocked.includes(petId)) {
+    unlocked.push(petId);
+    try {
+      localStorage.setItem(UNLOCKED_PETS_KEY, JSON.stringify(unlocked));
+    } catch (e) {}
+  }
+}
+
+function getSelectedPet() {
+  try {
+    return localStorage.getItem(SELECTED_PET_KEY) || 'cat';
+  } catch (e) {
+    return 'cat';
+  }
+}
+
+function setSelectedPet(petId) {
+  try {
+    localStorage.setItem(SELECTED_PET_KEY, petId);
+  } catch (e) {}
+  renderPetShop();
+}
+
+function updateSweetsUI() {
+  const total = getTotalSweets();
+  const bankEl = document.getElementById('bank-sweets-val');
+  const shopBankEl = document.getElementById('shop-sweets-val');
+  if (bankEl) bankEl.textContent = total;
+  if (shopBankEl) shopBankEl.textContent = total;
+}
+
+function renderPetShop() {
+  const grid = document.getElementById('pet-grid');
+  if (!grid) return;
+  const unlocked = getUnlockedPets();
+  const selected = getSelectedPet();
+  const totalSweets = getTotalSweets();
+
+  updateSweetsUI();
+  grid.innerHTML = '';
+
+  PET_LIST.forEach(p => {
+    const isUnlocked = unlocked.includes(p.id);
+    const isSelected = selected === p.id;
+
+    const card = document.createElement('div');
+    card.className = `pet-card ${isSelected ? 'selected' : ''}`;
+
+    let buttonHtml = '';
+    if (isSelected) {
+      buttonHtml = `<button class="btn-pet-action btn-active" disabled>連れてる！💖</button>`;
+    } else if (isUnlocked) {
+      buttonHtml = `<button class="btn-pet-action btn-select" onclick="selectPetAction('${p.id}')">えらぶ ✨</button>`;
+    } else {
+      const canBuy = totalSweets >= p.price;
+      buttonHtml = `<button class="btn-pet-action btn-buy" onclick="buyPetAction('${p.id}')" ${!canBuy ? 'style="opacity:0.6;"' : ''}>お迎え 🍓${p.price}</button>`;
+    }
+
+    card.innerHTML = `
+      <div class="pet-icon">${p.icon}</div>
+      <div class="pet-name">${p.name}</div>
+      <div class="pet-price">${isUnlocked ? 'おともだち' : `🍓 ${p.price}こ`}</div>
+      ${buttonHtml}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+window.selectPetAction = function(petId) {
+  setSelectedPet(petId);
+  sounds.playCollect();
+};
+
+window.buyPetAction = function(petId) {
+  const petItem = PET_LIST.find(p => p.id === petId);
+  if (!petItem) return;
+  const totalSweets = getTotalSweets();
+  if (totalSweets >= petItem.price) {
+    addTotalSweets(-petItem.price);
+    unlockPet(petId);
+    setSelectedPet(petId);
+    sounds.playCandyLevelUp();
+    showBanner(`🎉 ${petItem.name} をお迎えしたよ！ ✨`);
+  } else {
+    alert(`スイーツが足りないよ！あと ${petItem.price - totalSweets} 個あつめてね 🍓`);
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   const savedColor = loadCandyColor();
   updateCharPreview(savedColor);
   updateCandyUI(savedColor);
+  updateSweetsUI();
+  renderPetShop();
+
+  // ショップ開閉
+  const btnOpenShop = document.getElementById('btn-open-shop');
+  const btnHeaderShop = document.getElementById('btn-header-shop');
+  const btnClearShop = document.getElementById('btn-clear-shop');
+  const btnFailShop = document.getElementById('btn-fail-shop');
+  const btnCloseShop = document.getElementById('btn-close-shop');
+  const shopScreen = document.getElementById('shop-screen');
+
+  function openShopModal() {
+    renderPetShop();
+    if (shopScreen) shopScreen.classList.add('active');
+    sounds.init();
+  }
+
+  if (btnOpenShop) btnOpenShop.addEventListener('click', openShopModal);
+  if (btnHeaderShop) btnHeaderShop.addEventListener('click', openShopModal);
+  if (btnClearShop) btnClearShop.addEventListener('click', openShopModal);
+  if (btnFailShop) btnFailShop.addEventListener('click', openShopModal);
+
+  if (btnCloseShop && shopScreen) {
+    btnCloseShop.addEventListener('click', () => {
+      shopScreen.classList.remove('active');
+    });
+  }
 });
 
 
@@ -424,8 +613,24 @@ const player = {
   candyColor: loadCandyColor(), // 保存されたキャンディ色をロード
   currentTier: 1,    // 1: 赤, 2: 黄, 3: 黒, 4: 白, 5: レインボー
   checkpointTier: 1, // 到達した最新のチェックポイント（旗）
+  canDoubleJump: true,
+  hasDoubleJumped: false,
+  isParachuting: false,
+  jumpHeldLastFrame: false,
   blinkTimer: 0,
   isBlinking: false
+};
+
+// ペット（女の子についてくるおともだち）
+const pet = {
+  x: 40,
+  y: 2180,
+  vx: 0,
+  vy: 0,
+  facingRight: true,
+  walkFrame: 0,
+  floatTimer: 0,
+  isGrounded: true
 };
 
 // 入力状態
@@ -486,6 +691,8 @@ function initStage() {
     // エリア1: あか色ステージ 🍓（地上 y: 2250〜1850）
     // ========================================================
     { x: 0, y: 2250, width: 440, height: 180, type: 'cookie', tier: 1, colorTier: 'red' },
+    // 🍮 プリンのトランポリン（ボヨヨン大ジャンプ！）
+    { x: 330, y: 2220, width: 75, height: 30, type: 'pudding', tier: 1, colorTier: 'red' },
     { x: 490, y: 2180, width: 130, height: 32, type: 'wafer', tier: 1, colorTier: 'red' },
     { x: 680, y: 2100, width: 140, height: 32, type: 'wafer', tier: 1, colorTier: 'red' },
     { x: 880, y: 2020, width: 110, height: 30, type: 'macaron', tier: 1, color: '#ff2a6d', vy: 0.8, minY: 1980, maxY: 2060, colorTier: 'red' },
@@ -500,6 +707,8 @@ function initStage() {
     // きいろチェックポイント広場（コンパクト）
     { x: 1380, y: 1790, width: 130, height: 38, type: 'cookie', tier: 2, colorTier: 'yellow', isCheckPoint: true },
     { x: 1560, y: 1710, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
+    // 🍮 プリンのトランポリン
+    { x: 1640, y: 1760, width: 75, height: 28, type: 'pudding', tier: 2, colorTier: 'yellow' },
     { x: 1710, y: 1630, width: 85, height: 24, type: 'macaron', tier: 2, color: '#ffdd00', vy: -0.8, minY: 1590, maxY: 1670, colorTier: 'yellow' },
     { x: 1850, y: 1550, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
     { x: 2000, y: 1470, width: 110, height: 36, type: 'cookie', tier: 2, colorTier: 'yellow' },
@@ -512,6 +721,8 @@ function initStage() {
     // くろチェックポイント広場
     { x: 2310, y: 1320, width: 200, height: 48, type: 'cookie', tier: 3, colorTier: 'black', isCheckPoint: true },
     { x: 2580, y: 1240, width: 130, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
+    // 🍮 プリンのトランポリン
+    { x: 2690, y: 1280, width: 75, height: 28, type: 'pudding', tier: 3, colorTier: 'black' },
     { x: 2770, y: 1160, width: 120, height: 30, type: 'macaron', tier: 3, color: '#2b1b17', vy: 0.9, minY: 1110, maxY: 1210, colorTier: 'black' },
     { x: 2960, y: 1080, width: 140, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
     { x: 3160, y: 1010, width: 160, height: 45, type: 'cookie', tier: 3, colorTier: 'black' },
@@ -525,6 +736,8 @@ function initStage() {
     { x: 3480, y: 860, width: 200, height: 50, type: 'cookie', tier: 4, colorTier: 'white', isCheckPoint: true },
     { x: 3720, y: 780, width: 130, height: 32, type: 'wafer', tier: 4, colorTier: 'white' },
     { x: 3890, y: 700, width: 120, height: 30, type: 'macaron', tier: 4, color: '#ffffff', vy: -0.8, minY: 650, maxY: 750, colorTier: 'white' },
+    // 🍮 プリンのトランポリン
+    { x: 4000, y: 740, width: 75, height: 28, type: 'pudding', tier: 4, colorTier: 'white' },
     { x: 4080, y: 620, width: 140, height: 32, type: 'wafer', tier: 4, colorTier: 'white' },
     { x: 4280, y: 550, width: 160, height: 40, type: 'cookie', tier: 4, colorTier: 'white' },
 
@@ -615,13 +828,19 @@ function update() {
     return;
   }
 
-  // 1. プレイヤーの移動
+  // 1. プレイヤーの移動（きいろ以上のキャンディでダッシュ！）
+  const candyRank = CANDY_RANK[player.candyColor] || 1;
+  let currentSpeed = player.speed;
+  if (candyRank >= 2) {
+    currentSpeed = 6.2; // きいろキャンディのスピードアップ！
+  }
+
   if (keys.left) {
-    player.vx = -player.speed;
+    player.vx = -currentSpeed;
     player.facingRight = false;
     player.walkFrame += 0.2;
   } else if (keys.right) {
-    player.vx = player.speed;
+    player.vx = currentSpeed;
     player.facingRight = true;
     player.walkFrame += 0.2;
   } else {
@@ -629,12 +848,59 @@ function update() {
     if (Math.abs(player.vx) < 0.2) player.vx = 0;
   }
 
-  // 2. ジャンプ
-  if (keys.jump && player.isGrounded) {
+  // きいろキャンディの足元キラキラスパーク
+  if (candyRank >= 2 && Math.abs(player.vx) > 1 && player.isGrounded && Math.random() < 0.35) {
+    particles.push({
+      x: player.x + (player.facingRight ? 4 : player.width - 4),
+      y: player.y + player.height - 4,
+      vx: (player.facingRight ? -1 : 1) * (Math.random() * 2 + 1),
+      vy: -(Math.random() * 1.5),
+      size: Math.random() * 5 + 3,
+      color: player.candyColor === 'yellow' ? '#ffe600' : (player.candyColor === 'rainbow' ? '#ff66dd' : '#ffd700'),
+      alpha: 0.85,
+      type: 'sparkle',
+      rot: 0,
+      vRot: 0
+    });
+  }
+
+  // 2. ジャンプ＆2段ジャンプ（レインボーキャンディ）
+  const justPressedJump = keys.jump && !player.jumpHeldLastFrame;
+
+  if (justPressedJump && player.isGrounded) {
     player.vy = player.jumpPower;
     player.isGrounded = false;
     sounds.playJump();
     createParticles(player.x + player.width / 2, player.y + player.height, 'dust', 4);
+  } else if (justPressedJump && !player.isGrounded && player.canDoubleJump && candyRank >= 5) {
+    // レインボーキャンディ：空中2段ジャンプ！
+    player.vy = player.jumpPower * 0.92;
+    player.canDoubleJump = false;
+    sounds.playJump();
+    createParticles(player.x + player.width / 2, player.y + player.height / 2, 'star', 16);
+    showBanner('✨ 2だんジャンプ！ 🌈');
+  }
+
+  // しろキャンディ＆レインボー：ふわふわパラシュート（空中でジャンプ長押しでゆっくり降下）
+  if (keys.jump && player.vy > 0 && !player.isGrounded && candyRank >= 4) {
+    player.isParachuting = true;
+    player.vy = Math.min(player.vy, 2.2); // 落下速度をゆっくり制限
+    if (Math.random() < 0.25) {
+      particles.push({
+        x: player.x + player.width / 2 + (Math.random() - 0.5) * 20,
+        y: player.y - 8,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: -0.5,
+        size: Math.random() * 5 + 3,
+        color: '#ffffff',
+        alpha: 0.85,
+        type: 'sparkle',
+        rot: 0,
+        vRot: 0
+      });
+    }
+  } else {
+    player.isParachuting = false;
   }
 
   // 重力
@@ -668,9 +934,22 @@ function update() {
       prevY + player.height <= p.y + 10 &&
       player.y + player.height >= p.y
     ) {
+      // 🍮 プリンのトランポリン！
+      if (p.type === 'pudding') {
+        player.y = p.y - player.height;
+        player.vy = -16.8; // ボヨヨン大ジャンプ！
+        player.isGrounded = false;
+        player.canDoubleJump = true; // 2段ジャンプ可能に
+        sounds.playBoing();
+        createParticles(player.x + player.width / 2, p.y, 'star', 12);
+        p.squash = 12;
+        return;
+      }
+
       player.y = p.y - player.height;
       player.vy = 0;
       player.isGrounded = true;
+      player.canDoubleJump = true; // 着地で2段ジャンプ復活
 
       // 足場が動いている場合、プレイヤーも連動
       if (p.type === 'macaron' && p.vy) {
@@ -729,6 +1008,7 @@ function update() {
         it.collected = true;
         score += 1;
         document.getElementById('score-val').textContent = score;
+        addTotalSweets(1); // スイーツ貯金に+1貯金！
         sounds.playCollect();
         createParticles(itX + 10, itY + 10, 'sparkle', 10);
       }
@@ -754,6 +1034,14 @@ function update() {
     player.vx = 0;
     player.vy = 0;
     player.isGrounded = true; // しっかり接地状態で復活！
+    player.canDoubleJump = true;
+    player.isParachuting = false;
+
+    // ペットもチェックポイントのプレイヤーの横に移動
+    pet.x = cp.x - 30;
+    pet.y = cp.y + player.height - 30;
+    pet.vx = 0;
+    pet.vy = 0;
 
     // カメラもチェックポイントへ瞬時に合わせる
     camera.x = Math.max(0, Math.min(stageWidth - V_WIDTH, player.x - V_WIDTH * 0.35));
@@ -781,6 +1069,12 @@ function update() {
   camera.y += (targetCamY - camera.y) * 0.1;
   if (camera.y < 0) camera.y = 0;
   if (camera.y > stageHeight - V_HEIGHT) camera.y = stageHeight - V_HEIGHT;
+
+  // ペットの追従更新
+  updatePet();
+
+  // キー押下履歴（2段ジャンプ単発押し検出用）
+  player.jumpHeldLastFrame = keys.jump;
 
   // まばたきアニメ
   player.blinkTimer++;
@@ -827,6 +1121,9 @@ function render() {
 
   // ゴールの描画（ケーキタワー）
   drawGoal();
+
+  // ペットの描画（おともだちと一緒！）
+  drawPet();
 
   // プレイヤーの描画
   drawPlayer();
@@ -1019,6 +1316,54 @@ function drawPlatform(p) {
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.lineWidth = 2;
     ctx.stroke();
+  } else if (p.type === 'pudding') {
+    // 🍮 ぷるるんプリンのトランポリン
+    const squash = p.squash || 0;
+    if (p.squash > 0) p.squash *= 0.84;
+    if (p.squash < 0.1) p.squash = 0;
+
+    const pw = p.width + squash * 1.5;
+    const ph = Math.max(12, p.height - squash);
+    const px = p.x - (pw - p.width) / 2;
+    const py = p.y + (p.height - ph);
+
+    ctx.save();
+    // カスタードプリン本体
+    ctx.fillStyle = '#ffea6c';
+    ctx.beginPath();
+    ctx.roundRect(px, py, pw, ph, [14, 14, 6, 6]);
+    ctx.fill();
+
+    // とろ〜りカラメルソース（上部）
+    ctx.fillStyle = '#6b3208';
+    ctx.beginPath();
+    ctx.roundRect(px, py, pw, ph * 0.4, [14, 14, 2, 2]);
+    ctx.fill();
+
+    // カラメルのしずく波
+    ctx.beginPath();
+    for (let x = px + 6; x < px + pw - 6; x += 15) {
+      ctx.arc(x + 7.5, py + ph * 0.4, 4.5, 0, Math.PI);
+    }
+    ctx.fill();
+
+    // つやハイライト
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.beginPath();
+    ctx.ellipse(px + 14, py + 7, 6, 2.5, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 輪郭
+    ctx.strokeStyle = '#d48800';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // てっぺんのさくらんぼ 🍒
+    ctx.font = '18px "M PLUS Rounded 1c", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🍒', p.x + p.width / 2, py - 3);
+
+    ctx.restore();
   }
 
   // チェックポイントのフラッグ表示
@@ -1117,6 +1462,142 @@ function drawPlayer() {
   const h = 64;
   ctx.drawImage(currentImg, -w / 2, -h / 2 - 2, w, h);
 
+  // しろキャンディ：ふわふわパラシュート描画 ☂️☁️
+  if (player.isParachuting) {
+    ctx.save();
+    // パラシュート傘（マシュマロ風ドーム）
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(0, -36, 26, Math.PI, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#ff99cc';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // 傘のスカラップレース
+    ctx.fillStyle = '#ffe0ef';
+    ctx.beginPath();
+    for (let x = -26; x < 26; x += 10.4) {
+      ctx.arc(x + 5.2, -36, 5.2, 0, Math.PI);
+    }
+    ctx.fill();
+
+    // 傘のひも
+    ctx.strokeStyle = '#ffb3d9';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-22, -36);
+    ctx.lineTo(-4, -14);
+    ctx.moveTo(22, -36);
+    ctx.lineTo(4, -14);
+    ctx.stroke();
+
+    // てっぺんのリボン
+    ctx.font = '16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🎀', 0, -36);
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+// ペットの追従ロジック
+function updatePet() {
+  const petId = getSelectedPet();
+  const petInfo = PET_LIST.find(p => p.id === petId) || PET_LIST[0];
+
+  if (petInfo.isFlying) {
+    pet.floatTimer += 0.05;
+    // 浮遊ペット（風船・雲・星など）：プレイヤーの後ろ斜め上をふわふわ飛ぶ
+    const targetX = player.facingRight ? player.x - 36 : player.x + player.width + 12;
+    const targetY = player.y - 20 + Math.sin(pet.floatTimer) * 8;
+
+    pet.x += (targetX - pet.x) * 0.08;
+    pet.y += (targetY - pet.y) * 0.08;
+    pet.facingRight = player.facingRight;
+
+    // ワープ（距離が離れすぎた時）
+    if (Math.hypot(pet.x - player.x, pet.y - player.y) > 450) {
+      pet.x = targetX;
+      pet.y = targetY;
+    }
+  } else {
+    // 歩行ペット（ねこ・うさぎ・いぬなど）：プレイヤーの後ろをトコトコ走る＆ジャンプ
+    const targetX = player.facingRight ? player.x - 34 : player.x + player.width + 10;
+    const dx = targetX - pet.x;
+
+    if (Math.abs(dx) > 6) {
+      pet.vx = dx * 0.14;
+      pet.walkFrame += 0.22;
+      pet.facingRight = dx > 0;
+    } else {
+      pet.vx *= 0.6;
+    }
+    pet.x += pet.vx;
+
+    // 重力と垂直移動
+    pet.vy += 0.52;
+    pet.y += pet.vy;
+
+    const groundY = player.y + player.height - 30;
+    if (pet.y >= groundY) {
+      pet.y = groundY;
+      pet.vy = 0;
+      pet.isGrounded = true;
+    }
+
+    // プレイヤーがジャンプしたらペットもピョンと跳ぶ！
+    if (!player.isGrounded && player.vy < -4 && pet.isGrounded) {
+      pet.vy = player.vy * 0.82;
+      pet.isGrounded = false;
+    }
+
+    // ワープ（距離が離れすぎた時）
+    if (Math.hypot(pet.x - player.x, pet.y - player.y) > 450) {
+      pet.x = targetX;
+      pet.y = groundY;
+      pet.vx = 0;
+      pet.vy = 0;
+      pet.isGrounded = true;
+    }
+  }
+}
+
+// ペットの描画
+function drawPet() {
+  const petId = getSelectedPet();
+  const petInfo = PET_LIST.find(p => p.id === petId) || PET_LIST[0];
+
+  ctx.save();
+  ctx.translate(pet.x + 15, pet.y + 15);
+
+  if (!pet.facingRight) {
+    ctx.scale(-1, 1);
+  }
+
+  // 歩行時のピョコピョコ跳ね
+  let hopY = 0;
+  if (!petInfo.isFlying && Math.abs(pet.vx) > 0.4) {
+    hopY = -Math.abs(Math.sin(pet.walkFrame * 2)) * 6;
+  }
+
+  // 風船ペットのひもを描画
+  if (petInfo.id.includes('balloon')) {
+    ctx.strokeStyle = '#ff99bb';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, 12);
+    ctx.quadraticCurveTo(pet.facingRight ? -4 : 4, 22, 0, 30);
+    ctx.stroke();
+  }
+
+  ctx.font = '28px "M PLUS Rounded 1c", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(petInfo.icon, 0, hopY);
+
   ctx.restore();
 }
 
@@ -1192,6 +1673,16 @@ function startGame() {
   updateCharPreview(player.candyColor);
   camera.x = 0;
   camera.y = stageHeight - V_HEIGHT;
+
+  player.canDoubleJump = true;
+  player.isParachuting = false;
+  player.jumpHeldLastFrame = false;
+
+  pet.x = 40;
+  pet.y = 2180 + player.height - 30;
+  pet.vx = 0;
+  pet.vy = 0;
+  pet.isGrounded = true;
 
   gameState = 'PLAYING';
 }

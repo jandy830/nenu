@@ -34,6 +34,7 @@
         </div>
       </div>
       <div class="header-tools">
+        <button id="btn-header-shop" class="icon-btn" title="ペットショップ">🛍️</button>
         <button id="btn-sound" class="icon-btn" title="おとのきりかえ">🎵</button>
         <button id="btn-restart" class="icon-btn" title="さいしょから">🔄</button>
       </div>
@@ -49,8 +50,32 @@
           <div class="badge-title">✨ スイーツ・アクション ✨</div>
           <h1 class="title">お菓子の国の<br>アスレチック 🍰🎀</h1>
           <div class="character-preview" id="char-preview"></div>
-          <p class="guide-text">いちごやキャンディをあつめて<br>ケーキのゴールをめざそう！</p>
-          <button id="btn-start" class="btn-play">💖 あそぶ 💖</button>
+          <div class="start-sweets-bank">
+            貯めたスイーツ: <span class="highlight" id="bank-sweets-val">0</span> 🍓
+          </div>
+          <p class="guide-text">いちごをあつめてペットをお迎えしよう！<br>ケーキのゴールをめざしてね 🎂</p>
+          <div class="start-buttons">
+            <button id="btn-start" class="btn-play">💖 あそぶ 💖</button>
+            <button id="btn-open-shop" class="btn-shop">🛍️ ペットショップ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ペットショップ画面 -->
+      <div id="shop-screen" class="overlay-screen">
+        <div class="overlay-card shop-card">
+          <div class="shop-header">
+            <h2 class="title-shop">🛍️ ペットショップ 🐾</h2>
+            <div class="shop-bank">
+              もっている: <span class="highlight" id="shop-sweets-val">0</span> 🍓
+            </div>
+          </div>
+          <p class="shop-subtitle">すきなおともだちをえらんで一緒にあそぼう！</p>
+          
+          <!-- ペット一覧グリッド -->
+          <div class="pet-grid" id="pet-grid"></div>
+
+          <button id="btn-close-shop" class="btn-close">❌ とじる</button>
         </div>
       </div>
 
@@ -65,7 +90,10 @@
             <p>タイム: <span class="highlight" id="clear-time">0</span> びょう ⏱️</p>
           </div>
           <div class="clear-rank" id="clear-rank">⭐⭐⭐</div>
-          <button id="btn-clear-retry" class="btn-play">🔁 もう１かいあそぶ</button>
+          <div class="start-buttons">
+            <button id="btn-clear-retry" class="btn-play">🔁 もう１かいあそぶ</button>
+            <button id="btn-clear-shop" class="btn-shop">🛍️ ペットショップ</button>
+          </div>
         </div>
       </div>
 
@@ -75,7 +103,10 @@
           <div class="celebrate-emoji">🥺🍰💦</div>
           <h2 class="title-fail">どんまい！おちちゃった！</h2>
           <p class="guide-text">もういっかいちょうせんしよう！</p>
-          <button id="btn-fail-retry" class="btn-play">🔁 もう１かい！</button>
+          <div class="start-buttons">
+            <button id="btn-fail-retry" class="btn-play">🔁 もう１かい！</button>
+            <button id="btn-fail-shop" class="btn-shop">🛍️ ペットショップ</button>
+          </div>
         </div>
       </div>
 
