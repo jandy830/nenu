@@ -1329,6 +1329,41 @@ function renderDressUpPreview() {
   }
 }
 
+// ランダムで着せ替え（おまかせコーデ）
+function randomizeDressUp() {
+  sounds.init();
+  const dresses = getUnlockedDresses();
+  const headwears = getUnlockedHeadwear();
+  const backs = getUnlockedBackAcc();
+
+  if (dresses.length > 0) {
+    const randomDress = dresses[Math.floor(Math.random() * dresses.length)];
+    setDressColor(randomDress);
+  }
+  if (headwears.length > 0) {
+    const randomHeadwear = headwears[Math.floor(Math.random() * headwears.length)];
+    setHeadwear(randomHeadwear);
+  }
+  if (backs.length > 0) {
+    const randomBack = backs[Math.floor(Math.random() * backs.length)];
+    setBackAcc(randomBack);
+  }
+
+  // 選択枠などを再描画
+  renderDressUpModal();
+
+  // プレビューのポップアニメーション
+  const preview = document.getElementById('dressup-char-preview');
+  if (preview) {
+    preview.classList.remove('spin-pop');
+    void preview.offsetWidth; // リフローを発生させてアニメーションを再実行
+    preview.classList.add('spin-pop');
+  }
+
+  sounds.playCandyLevelUp();
+  showBanner('🎲 おまかせコーデに変身したよ！ ✨');
+}
+
 // ペットのおへや（なかよし広場）
 let petRoomPets = [];
 let petRoomInterval = null;
@@ -1578,6 +1613,12 @@ function setupModalEvents() {
       openShop();
     });
   }
+
+  // ランダム着せ替えボタン（プレビュー横 & 下部バー）
+  const btnQuickRandom = document.getElementById('btn-quick-random');
+  const btnDressupRandom = document.getElementById('btn-dressup-random');
+  if (btnQuickRandom) btnQuickRandom.addEventListener('click', randomizeDressUp);
+  if (btnDressupRandom) btnDressupRandom.addEventListener('click', randomizeDressUp);
 
   if (btnDressup) btnDressup.addEventListener('click', openDressup);
   if (btnOpenDressup) btnOpenDressup.addEventListener('click', openDressup);
