@@ -407,10 +407,10 @@ const keys = {
 
 // 4色のチェックポイント（落下時の復帰場所＆キャンディの色）
 const checkpoints = {
-  1: { x: 80, y: 2180, color: 'red', name: 'あかステージ' },
-  2: { x: 1400, y: 1750, color: 'yellow', name: 'きいろステージ' },
-  3: { x: 2360, y: 1260, color: 'black', name: 'くろステージ' },
-  4: { x: 3450, y: 800, color: 'white', name: 'しろステージ' }
+  1: { x: 80, y: 2196, color: 'red', name: 'あかステージ' },
+  2: { x: 1422, y: 1736, color: 'yellow', name: 'きいろステージ' },
+  3: { x: 2387, y: 1266, color: 'black', name: 'くろステージ' },
+  4: { x: 3517, y: 806, color: 'white', name: 'しろステージ' }
 };
 
 // キャンディUIの更新
@@ -647,6 +647,10 @@ function update() {
 
       // チェックポイント（旗）に乗ったら復帰地点を更新＆バナー表示！
       if (p.isCheckPoint && p.tier) {
+        // 足場の中央・真上を安全なチェックポイント位置として保存
+        checkpoints[p.tier].x = Math.round(p.x + p.width / 2 - player.width / 2);
+        checkpoints[p.tier].y = p.y - player.height;
+
         if (!player.checkpointTier || p.tier > player.checkpointTier) {
           player.checkpointTier = p.tier;
           const cpInfo = checkpoints[p.tier];
@@ -712,6 +716,11 @@ function update() {
     player.safeY = cp.y;
     player.vx = 0;
     player.vy = 0;
+    player.isGrounded = true; // しっかり接地状態で復活！
+
+    // カメラもチェックポイントへ瞬時に合わせる
+    camera.x = Math.max(0, Math.min(stageWidth - V_WIDTH, player.x - V_WIDTH * 0.35));
+    camera.y = Math.max(0, Math.min(stageHeight - V_HEIGHT, player.y - V_HEIGHT * 0.55));
 
     createParticles(player.x + player.width / 2, player.y + player.height / 2, 'heart', 12);
   }
