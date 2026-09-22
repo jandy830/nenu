@@ -527,14 +527,15 @@ function goToPlay(butterKey) {
   const isKeyboard = data.type === 'keyboard';
 
   if (isKeyboard) {
-    // キーボード画面を表示
+    // キーボード画面を表示（余計なボタンを排してキーボードに集中）
     butterArea.classList.add('hidden');
     keyboardArea.classList.remove('hidden');
-    btnRetry.classList.add('hidden');
+    completeButtons.classList.add('hidden');
   } else {
     // スクイーズ画面を表示
     keyboardArea.classList.add('hidden');
     butterArea.classList.remove('hidden');
+    completeButtons.classList.remove('hidden');
     btnRetry.classList.remove('hidden');
 
     // バター vs 肉まんの形状切り替え
@@ -616,35 +617,63 @@ btnRetry.addEventListener('click', () => {
 // ----- べつのASMR -----
 btnChange.addEventListener('click', goToSelect);
 
-// ----- キーボード打鍵イベント -----
-document.querySelectorAll('.key-cap').forEach(keyEl => {
+// ----- キーボード打鍵イベント（超高速ポチポチ連打＆スライド対応） -----
+const keyboardGrid = document.getElementById('keyboard-grid');
+let activeSwipingKey = null;
+
+function triggerKey(keyEl) {
+  if (!keyEl) return;
   const keyIdx = parseInt(keyEl.dataset.key, 10) || 0;
 
-  function pressKey(e) {
-    e.preventDefault();
-    keyEl.classList.add('pressed');
+  // キーを即座に押し込む
+  keyEl.classList.remove('pressed');
+  void keyEl.offsetWidth; // アニメーション再トリガー
+  keyEl.classList.add('pressed');
 
-    // 現在のテーマに応じた音を鳴らす
-    if (currentButter && BUTTERS[currentButter]) {
-      const soundType = BUTTERS[currentButter].soundType;
-      // keyIdx (0〜11) に応じたピッチ変化（半音階ライクで心地よい音律）
-      const pitch = (keyIdx % 6) * 1.5;
-      if (soundType === 'creamy') sound.playCreamyKey(pitch);
-      else if (soundType === 'clacky') sound.playClackyKey(pitch);
-      else if (soundType === 'jelly') sound.playJellyKey(pitch);
-      else if (soundType === 'glass') sound.playGlassKey(pitch);
-    }
+  // 即座に音を鳴らす（低遅延）
+  if (currentButter && BUTTERS[currentButter]) {
+    const soundType = BUTTERS[currentButter].soundType;
+    const pitch = (keyIdx % 6) * 1.5;
+    if (soundType === 'creamy') sound.playCreamyKey(pitch);
+    else if (soundType === 'clacky') sound.playClackyKey(pitch);
+    else if (soundType === 'jelly') sound.playJellyKey(pitch);
+    else if (soundType === 'glass') sound.playGlassKey(pitch);
   }
 
-  function releaseKey(e) {
+  // 短時間で沈み込みを解除（超高速連打でも毎打鍵確実にカチャッと動く）
+  setTimeout(() => {
     keyEl.classList.remove('pressed');
-  }
+  }, 75);
+}
 
-  keyEl.addEventListener('pointerdown', pressKey);
-  keyEl.addEventListener('pointerup', releaseKey);
-  keyEl.addEventListener('pointerleave', releaseKey);
-  keyEl.addEventListener('pointercancel', releaseKey);
+// 各キーのポインターダウン
+document.querySelectorAll('.key-cap').forEach(keyEl => {
+  keyEl.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    activeSwipingKey = keyEl;
+    triggerKey(keyEl);
+  });
 });
+
+// 指でキーボードの上をなぞった（スライドした）ときも連打できる
+if (keyboardGrid) {
+  keyboardGrid.addEventListener('pointermove', (e) => {
+    if (e.buttons === 0 && e.pointerType === 'mouse') return;
+    const target = document.elementFromPoint(e.clientX, e.clientY);
+    const key = target ? target.closest('.key-cap') : null;
+    if (key && key !== activeSwipingKey) {
+      activeSwipingKey = key;
+      triggerKey(key);
+    }
+  });
+
+  window.addEventListener('pointerup', () => {
+    activeSwipingKey = null;
+  });
+  window.addEventListener('pointercancel', () => {
+    activeSwipingKey = null;
+  });
+}
 
 // ----- タップ/スワイプでヒビ -----
 // SVG座標への変換
