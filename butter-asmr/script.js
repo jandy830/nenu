@@ -236,6 +236,146 @@ class SoundManager {
       osc.stop(now + 0.3);
     });
   }
+
+  // 1. クリーミー打鍵音（コトコト・トコトコ）
+  playCreamyKey(pitch = 0) {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const baseFreq = 260 * Math.pow(1.06, pitch);
+
+    const osc = this.ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(baseFreq * 1.5, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, now + 0.05);
+
+    const lpf = this.ctx.createBiquadFilter();
+    lpf.type = 'lowpass';
+    lpf.frequency.setValueAtTime(550, now);
+    lpf.Q.value = 3.5;
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.45, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+    osc.connect(lpf);
+    lpf.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.08);
+
+    // 底打ち感
+    const thud = this.ctx.createOscillator();
+    thud.type = 'sine';
+    thud.frequency.setValueAtTime(120, now);
+    thud.frequency.exponentialRampToValueAtTime(40, now + 0.04);
+    const thudGain = this.ctx.createGain();
+    thudGain.gain.setValueAtTime(0.3, now);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    thud.connect(thudGain);
+    thudGain.connect(this.ctx.destination);
+    thud.start(now);
+    thud.stop(now + 0.05);
+  }
+
+  // 2. クラッキー打鍵音（カチカチッ！ パチッ！）
+  playClackyKey(pitch = 0) {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const baseFreq = 1800 * Math.pow(1.05, pitch);
+
+    // 高音スナップ
+    const osc = this.ctx.createOscillator();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(baseFreq * 1.8, now);
+    osc.frequency.exponentialRampToValueAtTime(320, now + 0.02);
+
+    const bpf = this.ctx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.frequency.setValueAtTime(baseFreq, now);
+    bpf.Q.value = 4.0;
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.45, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+
+    osc.connect(bpf);
+    bpf.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.04);
+
+    // カチッというクリックノイズ
+    const clickSize = Math.floor(this.ctx.sampleRate * 0.008);
+    const clickBuf = this.ctx.createBuffer(1, clickSize, this.ctx.sampleRate);
+    const data = clickBuf.getChannelData(0);
+    for (let i = 0; i < clickSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / clickSize, 3);
+    }
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = clickBuf;
+    const noiseGain = this.ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.4, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.01);
+    noise.connect(noiseGain);
+    noiseGain.connect(this.ctx.destination);
+    noise.start(now);
+  }
+
+  // 3. ゼリー打鍵音（ぽこぽこ・ぷちゅっ）
+  playJellyKey(pitch = 0) {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const baseFreq = 420 * Math.pow(1.06, pitch);
+
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(baseFreq * 1.4, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.08);
+
+    const bpf = this.ctx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.frequency.setValueAtTime(baseFreq, now);
+    bpf.Q.value = 5.0;
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.45, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+    osc.connect(bpf);
+    bpf.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  }
+
+  // 4. ガラス打鍵音（カラン・チリン・キーン）
+  playGlassKey(pitch = 0) {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const baseFreq = 1200 * Math.pow(1.07, pitch);
+
+    // 澄んだガラスのベル倍音
+    [1.0, 2.76, 5.4].forEach((ratio, idx) => {
+      const osc = this.ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq * ratio, now);
+
+      const gain = this.ctx.createGain();
+      const vol = 0.3 / (idx + 1);
+      const decay = 0.14 / (idx * 0.5 + 1);
+      gain.gain.setValueAtTime(vol, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + decay);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + decay);
+    });
+  }
 }
 
 const sound = new SoundManager();
@@ -301,6 +441,40 @@ const BUTTERS = {
     labelColor: '#5b8a3c',
     type: 'nikuman'
   },
+
+  // キーボードASMR
+  kb_creamy: {
+    name: 'クリーミーキーボード',
+    emoji: '🍦',
+    cssClass: 'kb-theme-creamy',
+    labelColor: '#7a5020',
+    type: 'keyboard',
+    soundType: 'creamy'
+  },
+  kb_clacky: {
+    name: 'クラッキーキーボード',
+    emoji: '⚡',
+    cssClass: 'kb-theme-clacky',
+    labelColor: '#2a7050',
+    type: 'keyboard',
+    soundType: 'clacky'
+  },
+  kb_jelly: {
+    name: 'ゼリーキーボード',
+    emoji: '🍮',
+    cssClass: 'kb-theme-jelly',
+    labelColor: '#d64d85',
+    type: 'keyboard',
+    soundType: 'jelly'
+  },
+  kb_glass: {
+    name: 'ガラスキーボード',
+    emoji: '💎',
+    cssClass: 'kb-theme-glass',
+    labelColor: '#257095',
+    type: 'keyboard',
+    soundType: 'glass'
+  },
 };
 
 // 形状パス（バター用 ＆ 肉まん用）
@@ -321,6 +495,7 @@ const butterLabel = document.getElementById('butter-label');
 const butterStage = document.getElementById('butter-stage');
 const butterSvg = document.getElementById('butter-svg');
 const butterArea = document.getElementById('butter-area');
+const keyboardArea = document.getElementById('keyboard-area');
 const waxShell = document.getElementById('wax-shell');
 const crackLayer = document.getElementById('crack-layer');
 const hintText = document.getElementById('hint-text');
@@ -349,34 +524,48 @@ function goToPlay(butterKey) {
   butterLabel.textContent = data.emoji + ' ' + data.name;
   butterLabel.style.color = data.labelColor;
 
-  // バター vs 肉まんの形状切り替え
-  const isNikuman = data.type === 'nikuman';
-  const nikumanPleats = document.getElementById('nikuman-pleats');
-  const nikumanPaper = document.getElementById('nikuman-paper');
-  const nikumanFace = document.getElementById('nikuman-face');
-  const faceNormal = document.getElementById('face-normal');
-  const faceSquish = document.getElementById('face-squish');
-  const coreBody = document.getElementById('core-body');
-  const waxCover = document.getElementById('wax-cover');
+  const isKeyboard = data.type === 'keyboard';
 
-  if (isNikuman) {
-    if (nikumanPleats) nikumanPleats.classList.remove('hidden');
-    if (nikumanPaper) nikumanPaper.classList.remove('hidden');
-    if (nikumanFace) nikumanFace.classList.remove('hidden');
-    if (faceNormal) faceNormal.classList.remove('hidden');
-    if (faceSquish) faceSquish.classList.add('hidden');
-    if (coreBody) coreBody.setAttribute('d', PATH_NIKUMAN);
-    if (waxCover) waxCover.setAttribute('d', PATH_NIKUMAN);
+  if (isKeyboard) {
+    // キーボード画面を表示
+    butterArea.classList.add('hidden');
+    keyboardArea.classList.remove('hidden');
+    btnRetry.classList.add('hidden');
   } else {
-    if (nikumanPleats) nikumanPleats.classList.add('hidden');
-    if (nikumanPaper) nikumanPaper.classList.add('hidden');
-    if (nikumanFace) nikumanFace.classList.add('hidden');
-    if (coreBody) coreBody.setAttribute('d', PATH_BUTTER);
-    if (waxCover) waxCover.setAttribute('d', PATH_BUTTER);
-  }
+    // スクイーズ画面を表示
+    keyboardArea.classList.add('hidden');
+    butterArea.classList.remove('hidden');
+    btnRetry.classList.remove('hidden');
 
-  // リセット
-  resetButter();
+    // バター vs 肉まんの形状切り替え
+    const isNikuman = data.type === 'nikuman';
+    const nikumanPleats = document.getElementById('nikuman-pleats');
+    const nikumanPaper = document.getElementById('nikuman-paper');
+    const nikumanFace = document.getElementById('nikuman-face');
+    const faceNormal = document.getElementById('face-normal');
+    const faceSquish = document.getElementById('face-squish');
+    const coreBody = document.getElementById('core-body');
+    const waxCover = document.getElementById('wax-cover');
+
+    if (isNikuman) {
+      if (nikumanPleats) nikumanPleats.classList.remove('hidden');
+      if (nikumanPaper) nikumanPaper.classList.remove('hidden');
+      if (nikumanFace) nikumanFace.classList.remove('hidden');
+      if (faceNormal) faceNormal.classList.remove('hidden');
+      if (faceSquish) faceSquish.classList.add('hidden');
+      if (coreBody) coreBody.setAttribute('d', PATH_NIKUMAN);
+      if (waxCover) waxCover.setAttribute('d', PATH_NIKUMAN);
+    } else {
+      if (nikumanPleats) nikumanPleats.classList.add('hidden');
+      if (nikumanPaper) nikumanPaper.classList.add('hidden');
+      if (nikumanFace) nikumanFace.classList.add('hidden');
+      if (coreBody) coreBody.setAttribute('d', PATH_BUTTER);
+      if (waxCover) waxCover.setAttribute('d', PATH_BUTTER);
+    }
+
+    // リセット
+    resetButter();
+  }
 
   // 画面切り替え
   showScreen(playScreen);
@@ -424,8 +613,38 @@ btnRetry.addEventListener('click', () => {
   resetButter();
 });
 
-// ----- べつのバター -----
+// ----- べつのASMR -----
 btnChange.addEventListener('click', goToSelect);
+
+// ----- キーボード打鍵イベント -----
+document.querySelectorAll('.key-cap').forEach(keyEl => {
+  const keyIdx = parseInt(keyEl.dataset.key, 10) || 0;
+
+  function pressKey(e) {
+    e.preventDefault();
+    keyEl.classList.add('pressed');
+
+    // 現在のテーマに応じた音を鳴らす
+    if (currentButter && BUTTERS[currentButter]) {
+      const soundType = BUTTERS[currentButter].soundType;
+      // keyIdx (0〜11) に応じたピッチ変化（半音階ライクで心地よい音律）
+      const pitch = (keyIdx % 6) * 1.5;
+      if (soundType === 'creamy') sound.playCreamyKey(pitch);
+      else if (soundType === 'clacky') sound.playClackyKey(pitch);
+      else if (soundType === 'jelly') sound.playJellyKey(pitch);
+      else if (soundType === 'glass') sound.playGlassKey(pitch);
+    }
+  }
+
+  function releaseKey(e) {
+    keyEl.classList.remove('pressed');
+  }
+
+  keyEl.addEventListener('pointerdown', pressKey);
+  keyEl.addEventListener('pointerup', releaseKey);
+  keyEl.addEventListener('pointerleave', releaseKey);
+  keyEl.addEventListener('pointercancel', releaseKey);
+});
 
 // ----- タップ/スワイプでヒビ -----
 // SVG座標への変換
