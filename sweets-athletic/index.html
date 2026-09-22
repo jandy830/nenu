@@ -74,7 +74,12 @@
       <div id="dressup-screen" class="overlay-screen modal-overlay">
         <div class="overlay-card modal-card dressup-card">
           <button id="btn-dressup-close-corner" class="modal-close-corner" title="とじる">✖</button>
-          <h2 class="modal-title">👗 女の子のきせかえ 🎀</h2>
+          <div class="shop-header">
+            <h2 class="modal-title">👗 女の子のきせかえ 🎀</h2>
+            <div class="shop-bank">
+              もっている: <span class="highlight" id="dressup-sweets-val">0</span> 🍓
+            </div>
+          </div>
           <p class="modal-subtitle">すきなドレスとあたまのアクセサリーをえらんでね！</p>
           
           <div class="dressup-preview-wrap">
@@ -87,7 +92,10 @@
           <div class="dressup-section-title">✨ あたまのかざり</div>
           <div class="headwear-palette" id="headwear-palette"></div>
 
-          <button id="btn-close-dressup" class="btn-confirm-action">💖 このコーデであそぶ！ 🎮</button>
+          <div class="dressup-buttons">
+            <button id="btn-dressup-to-shop" class="btn-sub-action">🛍️ ショップで増やす</button>
+            <button id="btn-close-dressup" class="btn-confirm-action">💖 このコーデであそぶ！ 🎮</button>
+          </div>
         </div>
       </div>
 
@@ -112,20 +120,30 @@
         </div>
       </div>
 
-      <!-- ペットショップ画面（画面全体にきれいに表示） -->
+      <!-- ショップ画面（ペット＆衣装が買える） -->
       <div id="shop-screen" class="overlay-screen shop-overlay modal-overlay">
         <div class="overlay-card shop-card modal-card">
           <button id="btn-shop-close-corner" class="shop-close-corner modal-close-corner" title="とじる">✖</button>
           <div class="shop-header">
-            <h2 class="title-shop modal-title">🛍️ ペットショップ 🐾</h2>
+            <h2 class="title-shop modal-title">🛍️ スイーツ・ショップ ✨</h2>
             <div class="shop-bank">
               もっている: <span class="highlight" id="shop-sweets-val">0</span> 🍓
             </div>
           </div>
-          <p class="shop-subtitle">すきなおともだちをえらんで一緒にあそぼう！</p>
+          
+          <!-- ショップのタブ切り替え（ペット / 衣装） -->
+          <div class="shop-tabs">
+            <button id="tab-shop-pets" class="shop-tab active">🐾 ペット</button>
+            <button id="tab-shop-costumes" class="shop-tab">👗 いしょう</button>
+          </div>
+
+          <p class="shop-subtitle" id="shop-subtitle">すきなおともだちをえらんで一緒にあそぼう！</p>
           
           <!-- ペット一覧グリッド -->
           <div class="pet-grid" id="pet-grid"></div>
+
+          <!-- 衣装一覧グリッド -->
+          <div class="costume-grid" id="costume-grid" style="display: none;"></div>
 
           <button id="btn-close-shop" class="btn-play-with-pet btn-confirm-action">💖 このペットとあそぶ！ 🎮</button>
         </div>

@@ -519,6 +519,30 @@ body {
   border: 1.5px solid rgba(0,0,0,0.15);
 }
 
+.swatch-btn.locked {
+  opacity: 0.82;
+  background: #fff8f8;
+  border-style: dashed;
+}
+
+.swatch-lock-badge {
+  font-size: 10px;
+  font-weight: 900;
+  color: #e65c00;
+  background: #fff3e6;
+  border: 1px solid #ffcc99;
+  border-radius: 8px;
+  padding: 1px 5px;
+}
+
+.dressup-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 /* ペットのおへや */
 .petroom-card {
   max-width: 580px;
@@ -710,6 +734,38 @@ body.night-mode .ctrl-btn {
   white-space: nowrap;
 }
 
+/* ショップのタブ切り替え */
+.shop-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 8px;
+  justify-content: center;
+}
+
+.shop-tab {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 900;
+  background: #fff0f7;
+  border: 2px solid #ffccd9;
+  border-radius: 20px;
+  padding: 6px 18px;
+  color: #7b5971;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.1s ease, border-color 0.1s ease;
+}
+
+.shop-tab:hover {
+  transform: translateY(-2px);
+}
+
+.shop-tab.active {
+  background: linear-gradient(135deg, #ff66aa 0%, #ff3377 100%);
+  color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(255, 51, 119, 0.35);
+}
+
 .shop-subtitle {
   font-size: 13px;
   font-weight: 700;
@@ -717,6 +773,72 @@ body.night-mode .ctrl-btn {
   margin-bottom: 8px;
   text-align: left;
   padding-left: 4px;
+}
+
+.costume-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+  gap: 8px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px;
+  flex: 1 1 auto;
+  max-height: 52vh;
+  margin-bottom: 12px;
+}
+
+.costume-card {
+  background: #ffffff;
+  border: 3px solid #ffccd9;
+  border-radius: 18px;
+  padding: 10px 4px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(255, 140, 180, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.1s ease;
+}
+
+.costume-card.selected {
+  border-color: #ff3377;
+  background: #fff4fa;
+  box-shadow: 0 4px 14px rgba(255, 51, 119, 0.3);
+}
+
+.costume-icon {
+  font-size: 32px;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+}
+
+.costume-name {
+  font-size: 12px;
+  font-weight: 900;
+  color: #553344;
+  margin-bottom: 3px;
+}
+
+.costume-type-badge {
+  font-size: 10px;
+  font-weight: 900;
+  color: #a040b0;
+  background: #f7e6ff;
+  border: 1.5px solid #d9b3ff;
+  border-radius: 12px;
+  padding: 1px 6px;
+  margin-bottom: 4px;
+}
+
+.costume-price {
+  font-size: 12px;
+  font-weight: 900;
+  color: #ff4088;
+  margin-bottom: 6px;
 }
 
 .pet-grid {
@@ -781,7 +903,8 @@ body.night-mode .ctrl-btn {
   margin-bottom: 6px;
 }
 
-.btn-pet-action {
+.btn-pet-action,
+.btn-costume-action {
   font-family: inherit;
   font-size: 12px;
   font-weight: 900;
@@ -793,18 +916,21 @@ body.night-mode .ctrl-btn {
   width: 92%;
 }
 
-.btn-pet-action.btn-buy {
+.btn-pet-action.btn-buy,
+.btn-costume-action.btn-buy {
   background: #ff7722;
   color: #ffffff;
 }
 
-.btn-pet-action.btn-select {
+.btn-pet-action.btn-select,
+.btn-costume-action.btn-select {
   background: #ffffff;
   border-color: #ff60a5;
   color: #ff4088;
 }
 
-.btn-pet-action.btn-active {
+.btn-pet-action.btn-active,
+.btn-costume-action.btn-active {
   background: #ff3377;
   color: #ffffff;
 }

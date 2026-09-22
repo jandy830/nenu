@@ -242,22 +242,28 @@ const sounds = new SoundSystem();
 // ==========================================
 
 const DRESS_COLORS = {
-  pink: { name: '🍓 いちごピンク', top: '#ff80bf', bottom: '#ff3388', apronLine: '#ff88bb' },
-  blue: { name: '🐬 ミントソーダ', top: '#70e1ff', bottom: '#00a6e0', apronLine: '#50c8ff' },
-  purple: { name: '🍇 ラベンダーベリー', top: '#d48bff', bottom: '#9933ee', apronLine: '#bf70ff' },
-  yellow: { name: '🍋 レモンシフォン', top: '#ffe666', bottom: '#f5a623', apronLine: '#ffcc33' },
-  white: { name: '🤍 マシュマロホワイト', top: '#ffffff', bottom: '#e0ecf8', apronLine: '#ffb3d9' }
+  pink: { id: 'pink', name: '🍓 いちごピンク', price: 0, top: '#ff80bf', bottom: '#ff3388', apronLine: '#ff88bb', icon: '🍓' },
+  blue: { id: 'blue', name: '🐬 ミントソーダ', price: 15, top: '#70e1ff', bottom: '#00a6e0', apronLine: '#50c8ff', icon: '🐬' },
+  yellow: { id: 'yellow', name: '🍋 レモンシフォン', price: 25, top: '#ffe666', bottom: '#f5a623', apronLine: '#ffcc33', icon: '🍋' },
+  purple: { id: 'purple', name: '🍇 ラベンダーベリー', price: 35, top: '#d48bff', bottom: '#9933ee', apronLine: '#bf70ff', icon: '🍇' },
+  choco: { id: 'choco', name: '🍫 ショコラロリータ', price: 45, top: '#6a432d', bottom: '#3c2115', apronLine: '#c59b76', icon: '🍫' },
+  white: { id: 'white', name: '🤍 マシュマロホワイト', price: 50, top: '#ffffff', bottom: '#d8e5f3', apronLine: '#ffb3d9', icon: '🤍' },
+  rainbow: { id: 'rainbow', name: '🌈 にじいろドリーム', price: 70, top: '#ff66aa', bottom: '#bb55ff', apronLine: '#ffffff', icon: '🌈', isRainbow: true }
 };
 
 const HEADWEAR_LIST = [
-  { id: 'ribbon', name: '🎀 大きなリボン' },
-  { id: 'tiara', name: '👑 きらきらティアラ' },
-  { id: 'beret', name: '🍓 いちごベレー帽' },
-  { id: 'cat_ears', name: '🐱 ねこみみカチューシャ' }
+  { id: 'ribbon', name: '🎀 大きなリボン', price: 0, icon: '🎀' },
+  { id: 'tiara', name: '👑 きらきらティアラ', price: 20, icon: '👑' },
+  { id: 'beret', name: '🍓 いちごベレー帽', price: 25, icon: '🍓' },
+  { id: 'cat_ears', name: '🐱 ねこみみカチューシャ', price: 35, icon: '🐱' },
+  { id: 'angel', name: '👼 エンジェルリング', price: 45, icon: '👼' },
+  { id: 'bunny', name: '🐰 うさみみカチューシャ', price: 55, icon: '🐰' }
 ];
 
 const DRESS_COLOR_KEY = 'sweets_athletic_dress_color';
 const HEADWEAR_KEY = 'sweets_athletic_headwear';
+const UNLOCKED_DRESSES_KEY = 'sweets_athletic_unlocked_dresses';
+const UNLOCKED_HEADWEAR_KEY = 'sweets_athletic_unlocked_headwear';
 const NIGHT_MODE_KEY = 'sweets_athletic_night_mode';
 
 let isNightMode = false;
@@ -307,6 +313,50 @@ function setHeadwear(hw) {
   } catch (e) {}
   updateCharPreview(player ? player.candyColor : loadCandyColor());
   renderDressUpPreview();
+}
+
+function getUnlockedDresses() {
+  try {
+    const saved = localStorage.getItem(UNLOCKED_DRESSES_KEY);
+    const list = saved ? JSON.parse(saved) : ['pink'];
+    const current = getDressColor();
+    if (current && !list.includes(current)) list.push(current);
+    return list;
+  } catch (e) {
+    return ['pink'];
+  }
+}
+
+function unlockDress(colorKey) {
+  const list = getUnlockedDresses();
+  if (!list.includes(colorKey)) {
+    list.push(colorKey);
+    try {
+      localStorage.setItem(UNLOCKED_DRESSES_KEY, JSON.stringify(list));
+    } catch (e) {}
+  }
+}
+
+function getUnlockedHeadwear() {
+  try {
+    const saved = localStorage.getItem(UNLOCKED_HEADWEAR_KEY);
+    const list = saved ? JSON.parse(saved) : ['ribbon'];
+    const current = getHeadwear();
+    if (current && !list.includes(current)) list.push(current);
+    return list;
+  } catch (e) {
+    return ['ribbon'];
+  }
+}
+
+function unlockHeadwear(hwId) {
+  const list = getUnlockedHeadwear();
+  if (!list.includes(hwId)) {
+    list.push(hwId);
+    try {
+      localStorage.setItem(UNLOCKED_HEADWEAR_KEY, JSON.stringify(list));
+    } catch (e) {}
+  }
 }
 
 function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'red', dressColor = null, headwear = null) {
@@ -377,6 +427,28 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
         <path d="M -14 3 Q 0 -3 14 3" stroke="#ff3377" stroke-width="2" fill="none" />
       </g>
     `;
+  } else if (headwear === 'angel') {
+    headwearSvg = `
+      <g transform="translate(50, 16)">
+        <ellipse cx="0" cy="0" rx="14" ry="4" fill="none" stroke="#ffe066" stroke-width="2.6" />
+        <ellipse cx="0" cy="0" rx="14" ry="4" fill="none" stroke="#ffffff" stroke-width="1" />
+        <path d="M -12 4 C -18 2, -20 -3, -14 -1 C -17 3, -13 6, -9 5 Z" fill="#ffffff" opacity="0.9" />
+        <path d="M 12 4 C 18 2, 21 -3, 15 -1 C 18 3, 14 6, 10 5 Z" fill="#ffffff" opacity="0.9" />
+      </g>
+    `;
+  } else if (headwear === 'bunny') {
+    headwearSvg = `
+      <g transform="translate(50, 24)">
+        <path d="M -15 3 Q 0 -5 15 3" stroke="#ff77aa" stroke-width="2" fill="none" />
+        <path d="M -10 2 C -17 -16, -7 -22, -6 -2 Z" fill="#ffffff" stroke="#ff88bb" stroke-width="1.2"/>
+        <path d="M -9 1 C -14 -13, -8 -17, -7 -1 Z" fill="#ffb6d5" />
+        <path d="M 10 2 C 17 -16, 7 -22, 6 -2 Z" fill="#ffffff" stroke="#ff88bb" stroke-width="1.2"/>
+        <path d="M 9 1 C 14 -13, 8 -17, 7 -1 Z" fill="#ffb6d5" />
+        <polygon points="0,0 -4,-3 -3,3" fill="#ff3388" />
+        <polygon points="0,0 4,-3 3,3" fill="#ff3388" />
+        <circle cx="0" cy="0" r="1.5" fill="#ffe066" />
+      </g>
+    `;
   } else {
     // default: 大きなリボン
     headwearSvg = `
@@ -410,6 +482,13 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
           <stop offset="75%" stop-color="#3399ff" />
           <stop offset="100%" stop-color="#cc33ff" />
         </linearGradient>
+        <linearGradient id="rainbowDressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff66aa" />
+          <stop offset="25%" stop-color="#ffbb33" />
+          <stop offset="50%" stop-color="#33dd88" />
+          <stop offset="75%" stop-color="#33aaff" />
+          <stop offset="100%" stop-color="#bb55ff" />
+        </linearGradient>
       </defs>
 
       <!-- 背中のキャンディ（リュック風・一番奥に描画） -->
@@ -439,7 +518,7 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
       </g>
 
       <!-- ワンピース（体） -->
-      <path d="M 40 62 L 32 86 L 68 86 L 60 62 Z" fill="url(#dressGrad)" />
+      <path d="M 40 62 L 32 86 L 68 86 L 60 62 Z" fill="${dressInfo.isRainbow ? 'url(#rainbowDressGrad)' : 'url(#dressGrad)'}" />
       <!-- レースのエプロン -->
       <path d="M 44 65 L 40 84 L 60 84 L 56 65 Z" fill="#ffffff" opacity="0.95" />
       <path d="M 47 70 L 53 70" stroke="${dressInfo.apronLine}" stroke-width="2" stroke-linecap="round" />
@@ -615,8 +694,10 @@ function updateSweetsUI() {
   const total = getTotalSweets();
   const bankEl = document.getElementById('bank-sweets-val');
   const shopBankEl = document.getElementById('shop-sweets-val');
+  const dressupBankEl = document.getElementById('dressup-sweets-val');
   if (bankEl) bankEl.textContent = total;
   if (shopBankEl) shopBankEl.textContent = total;
+  if (dressupBankEl) dressupBankEl.textContent = total;
 
   const currentPetId = getSelectedPet();
   const currentPet = PET_LIST.find(p => p.id === currentPetId) || PET_LIST[0];
@@ -629,6 +710,41 @@ function updateSweetsUI() {
   if (petNameEl) petNameEl.textContent = `${currentPet.icon} ${currentPet.name}`;
   if (petBonusEl) petBonusEl.textContent = `🍓 +${petPower}コイン`;
   if (coinBadgeEl) coinBadgeEl.textContent = `+${petPower}`;
+}
+
+let shopActiveTab = 'pets';
+
+function setShopActiveTab(tab) {
+  shopActiveTab = tab;
+  const tabPets = document.getElementById('tab-shop-pets');
+  const tabCostumes = document.getElementById('tab-shop-costumes');
+  const petGrid = document.getElementById('pet-grid');
+  const costumeGrid = document.getElementById('costume-grid');
+  const subtitle = document.getElementById('shop-subtitle');
+  const btnClose = document.getElementById('btn-close-shop');
+
+  if (tab === 'costumes') {
+    if (tabPets) tabPets.classList.remove('active');
+    if (tabCostumes) tabCostumes.classList.add('active');
+    if (petGrid) petGrid.style.display = 'none';
+    if (costumeGrid) costumeGrid.style.display = 'grid';
+    if (subtitle) subtitle.textContent = 'かわいいドレスやあたまのかざりを集めよう！👗✨';
+    renderCostumeShop();
+    if (btnClose) {
+      if (gameState === 'PLAYING') {
+        btnClose.textContent = '🎮 このコーデでつづきをあそぶ！ 💖';
+      } else {
+        btnClose.textContent = '💖 このコーデであそぶ！ 🎮';
+      }
+    }
+  } else {
+    if (tabPets) tabPets.classList.add('active');
+    if (tabCostumes) tabCostumes.classList.remove('active');
+    if (petGrid) petGrid.style.display = 'grid';
+    if (costumeGrid) costumeGrid.style.display = 'none';
+    if (subtitle) subtitle.textContent = 'すきなおともだちをえらんで一緒にあそぼう！';
+    renderPetShop();
+  }
 }
 
 function renderPetShop() {
@@ -668,16 +784,88 @@ function renderPetShop() {
     grid.appendChild(card);
   });
 
-  // 選択中のペットに合わせて「あそぶ」ボタンを更新
-  const currentPetItem = PET_LIST.find(p => p.id === selected) || PET_LIST[0];
-  const btnClose = document.getElementById('btn-close-shop');
-  if (btnClose) {
-    if (gameState === 'PLAYING') {
-      btnClose.textContent = `🎮 ${currentPetItem.name} とつづきをあそぶ！ (🍓+${currentPetItem.coinPower}) 💖`;
-    } else {
-      btnClose.textContent = `💖 ${currentPetItem.name} とあそぶ！ (🍓+${currentPetItem.coinPower}) 🎮`;
+  // 選択中のペットに合わせて「あそぶ」ボタンを更新（ペットタブ表示時）
+  if (shopActiveTab === 'pets') {
+    const currentPetItem = PET_LIST.find(p => p.id === selected) || PET_LIST[0];
+    const btnClose = document.getElementById('btn-close-shop');
+    if (btnClose) {
+      if (gameState === 'PLAYING') {
+        btnClose.textContent = `🎮 ${currentPetItem.name} とつづきをあそぶ！ (🍓+${currentPetItem.coinPower}) 💖`;
+      } else {
+        btnClose.textContent = `💖 ${currentPetItem.name} とあそぶ！ (🍓+${currentPetItem.coinPower}) 🎮`;
+      }
     }
   }
+}
+
+function renderCostumeShop() {
+  const grid = document.getElementById('costume-grid');
+  if (!grid) return;
+  const unlockedDresses = getUnlockedDresses();
+  const unlockedHeadwear = getUnlockedHeadwear();
+  const currentDress = getDressColor();
+  const currentHeadwear = getHeadwear();
+  const totalSweets = getTotalSweets();
+
+  updateSweetsUI();
+  grid.innerHTML = '';
+
+  // 1. ドレス一覧
+  Object.keys(DRESS_COLORS).forEach(key => {
+    const d = DRESS_COLORS[key];
+    const isUnlocked = unlockedDresses.includes(key);
+    const isSelected = currentDress === key;
+
+    const card = document.createElement('div');
+    card.className = `costume-card ${isSelected ? 'selected' : ''}`;
+
+    let buttonHtml = '';
+    if (isSelected) {
+      buttonHtml = `<button class="btn-costume-action btn-active" disabled>着てるよ！💖</button>`;
+    } else if (isUnlocked) {
+      buttonHtml = `<button class="btn-costume-action btn-select" onclick="selectCostumeAction('dress', '${key}')">きがえる ✨</button>`;
+    } else {
+      const canBuy = totalSweets >= d.price;
+      buttonHtml = `<button class="btn-costume-action btn-buy" onclick="buyCostumeAction('dress', '${key}')" ${!canBuy ? 'style="opacity:0.6;"' : ''}>購入 🍓${d.price}</button>`;
+    }
+
+    card.innerHTML = `
+      <div class="costume-type-badge">👗 ドレス</div>
+      <div class="costume-icon">${d.icon || '👗'}</div>
+      <div class="costume-name">${d.name}</div>
+      <div class="costume-price">${isUnlocked ? 'ゲット済み ✨' : `🍓 ${d.price}こ`}</div>
+      ${buttonHtml}
+    `;
+    grid.appendChild(card);
+  });
+
+  // 2. あたまのかざり一覧
+  HEADWEAR_LIST.forEach(hw => {
+    const isUnlocked = unlockedHeadwear.includes(hw.id);
+    const isSelected = currentHeadwear === hw.id;
+
+    const card = document.createElement('div');
+    card.className = `costume-card ${isSelected ? 'selected' : ''}`;
+
+    let buttonHtml = '';
+    if (isSelected) {
+      buttonHtml = `<button class="btn-costume-action btn-active" disabled>つけてる！💖</button>`;
+    } else if (isUnlocked) {
+      buttonHtml = `<button class="btn-costume-action btn-select" onclick="selectCostumeAction('headwear', '${hw.id}')">つける ✨</button>`;
+    } else {
+      const canBuy = totalSweets >= hw.price;
+      buttonHtml = `<button class="btn-costume-action btn-buy" onclick="buyCostumeAction('headwear', '${hw.id}')" ${!canBuy ? 'style="opacity:0.6;"' : ''}>購入 🍓${hw.price}</button>`;
+    }
+
+    card.innerHTML = `
+      <div class="costume-type-badge" style="background:#fff0f5; border-color:#ffccd9; color:#d62860;">🎀 かざり</div>
+      <div class="costume-icon">${hw.icon || '🎀'}</div>
+      <div class="costume-name">${hw.name}</div>
+      <div class="costume-price">${isUnlocked ? 'ゲット済み ✨' : `🍓 ${hw.price}こ`}</div>
+      ${buttonHtml}
+    `;
+    grid.appendChild(card);
+  });
 }
 
 window.selectPetAction = function(petId) {
@@ -700,10 +888,53 @@ window.buyPetAction = function(petId) {
   }
 };
 
+window.selectCostumeAction = function(type, id) {
+  if (type === 'dress') {
+    setDressColor(id);
+  } else if (type === 'headwear') {
+    setHeadwear(id);
+  }
+  sounds.playCollect();
+  renderCostumeShop();
+};
+
+window.buyCostumeAction = function(type, id) {
+  const totalSweets = getTotalSweets();
+  let item = null;
+  if (type === 'dress') {
+    item = DRESS_COLORS[id];
+  } else if (type === 'headwear') {
+    item = HEADWEAR_LIST.find(h => h.id === id);
+  }
+  if (!item) return;
+
+  if (totalSweets >= item.price) {
+    addTotalSweets(-item.price);
+    if (type === 'dress') {
+      unlockDress(id);
+      setDressColor(id);
+    } else if (type === 'headwear') {
+      unlockHeadwear(id);
+      setHeadwear(id);
+    }
+    sounds.playCandyLevelUp();
+    showBanner(`🎉 ${item.name} をゲットしたよ！ ✨`);
+    renderCostumeShop();
+  } else {
+    alert(`スイーツが足りないよ！あと ${item.price - totalSweets} 個あつめてね 🍓`);
+  }
+};
+
 // きせかえ画面のレンダリング＆プレビュー
 function renderDressUpModal() {
   const currentDress = getDressColor();
   const currentHeadwear = getHeadwear();
+  const unlockedDresses = getUnlockedDresses();
+  const unlockedHeadwear = getUnlockedHeadwear();
+  const totalSweets = getTotalSweets();
+
+  const dressupBankEl = document.getElementById('dressup-sweets-val');
+  if (dressupBankEl) dressupBankEl.textContent = totalSweets;
 
   // ドレスの選択パレット
   const dressContainer = document.getElementById('dress-palette');
@@ -711,13 +942,44 @@ function renderDressUpModal() {
     dressContainer.innerHTML = '';
     Object.keys(DRESS_COLORS).forEach(colorKey => {
       const info = DRESS_COLORS[colorKey];
+      const isUnlocked = unlockedDresses.includes(colorKey);
+      const isSelected = currentDress === colorKey;
+
       const btn = document.createElement('button');
-      btn.className = 'swatch-btn' + (currentDress === colorKey ? ' active' : '');
-      btn.innerHTML = `<span class="swatch-color-dot" style="background: ${info.top}"></span><span>${info.name}</span>`;
+      btn.className = 'swatch-btn' + (isSelected ? ' active' : '') + (!isUnlocked ? ' locked' : '');
+
+      const dotBg = info.isRainbow
+        ? 'linear-gradient(135deg, #ff6699, #ffbb33, #33dd88, #33aaff, #bb55ff)'
+        : info.top;
+
+      let badgeHtml = '';
+      if (!isUnlocked) {
+        badgeHtml = `<span class="swatch-lock-badge">🔒 🍓${info.price}</span>`;
+      }
+
+      btn.innerHTML = `<span class="swatch-color-dot" style="background: ${dotBg}"></span><span>${info.name}</span>${badgeHtml}`;
+
       btn.addEventListener('click', () => {
-        setDressColor(colorKey);
-        renderDressUpModal();
-        sounds.playCollect();
+        if (isUnlocked) {
+          setDressColor(colorKey);
+          renderDressUpModal();
+          sounds.playCollect();
+        } else {
+          // 購入確認モーダル
+          const nowTotal = getTotalSweets();
+          if (confirm(`${info.name} を 🍓${info.price} こで買いますか？\n(もっているスイーツ: ${nowTotal}こ)`)) {
+            if (nowTotal >= info.price) {
+              addTotalSweets(-info.price);
+              unlockDress(colorKey);
+              setDressColor(colorKey);
+              sounds.playCandyLevelUp();
+              showBanner(`🎉 ${info.name} をゲットしたよ！ ✨`);
+              renderDressUpModal();
+            } else {
+              alert(`スイーツが足りないよ！あと ${info.price - nowTotal} 個あつめてね 🍓`);
+            }
+          }
+        }
       });
       dressContainer.appendChild(btn);
     });
@@ -728,13 +990,40 @@ function renderDressUpModal() {
   if (headwearContainer) {
     headwearContainer.innerHTML = '';
     HEADWEAR_LIST.forEach(hw => {
+      const isUnlocked = unlockedHeadwear.includes(hw.id);
+      const isSelected = currentHeadwear === hw.id;
+
       const btn = document.createElement('button');
-      btn.className = 'swatch-btn' + (currentHeadwear === hw.id ? ' active' : '');
-      btn.innerHTML = `<span>${hw.name}</span>`;
+      btn.className = 'swatch-btn' + (isSelected ? ' active' : '') + (!isUnlocked ? ' locked' : '');
+
+      let badgeHtml = '';
+      if (!isUnlocked) {
+        badgeHtml = `<span class="swatch-lock-badge">🔒 🍓${hw.price}</span>`;
+      }
+
+      btn.innerHTML = `<span>${hw.name}</span>${badgeHtml}`;
+
       btn.addEventListener('click', () => {
-        setHeadwear(hw.id);
-        renderDressUpModal();
-        sounds.playCollect();
+        if (isUnlocked) {
+          setHeadwear(hw.id);
+          renderDressUpModal();
+          sounds.playCollect();
+        } else {
+          // 購入確認モーダル
+          const nowTotal = getTotalSweets();
+          if (confirm(`${hw.name} を 🍓${hw.price} こで買いますか？\n(もっているスイーツ: ${nowTotal}こ)`)) {
+            if (nowTotal >= hw.price) {
+              addTotalSweets(-hw.price);
+              unlockHeadwear(hw.id);
+              setHeadwear(hw.id);
+              sounds.playCandyLevelUp();
+              showBanner(`🎉 ${hw.name} をゲットしたよ！ ✨`);
+              renderDressUpModal();
+            } else {
+              alert(`スイーツが足りないよ！あと ${hw.price - nowTotal} 個あつめてね 🍓`);
+            }
+          }
+        }
       });
       headwearContainer.appendChild(btn);
     });
@@ -907,7 +1196,7 @@ function setupModalEvents() {
 
   // ショップ開閉
   function openShop() {
-    renderPetShop();
+    setShopActiveTab(shopActiveTab);
     if (shopScreen) shopScreen.classList.add('active');
     sounds.init();
   }
@@ -922,6 +1211,22 @@ function setupModalEvents() {
   function closeShop() {
     if (shopScreen) shopScreen.classList.remove('active');
     sounds.init();
+  }
+
+  // ショップタブ切り替え
+  const tabShopPets = document.getElementById('tab-shop-pets');
+  const tabShopCostumes = document.getElementById('tab-shop-costumes');
+  if (tabShopPets) {
+    tabShopPets.addEventListener('click', () => {
+      setShopActiveTab('pets');
+      sounds.playCollect();
+    });
+  }
+  if (tabShopCostumes) {
+    tabShopCostumes.addEventListener('click', () => {
+      setShopActiveTab('costumes');
+      sounds.playCollect();
+    });
   }
 
   if (btnOpenShop) btnOpenShop.addEventListener('click', openShop);
@@ -953,6 +1258,15 @@ function setupModalEvents() {
   function closeDressup() {
     if (dressupScreen) dressupScreen.classList.remove('active');
     sounds.init();
+  }
+
+  const btnDressupToShop = document.getElementById('btn-dressup-to-shop');
+  if (btnDressupToShop) {
+    btnDressupToShop.addEventListener('click', () => {
+      closeDressup();
+      setShopActiveTab('costumes');
+      openShop();
+    });
   }
 
   if (btnDressup) btnDressup.addEventListener('click', openDressup);
