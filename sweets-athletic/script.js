@@ -169,6 +169,27 @@ class SoundSystem {
     } catch (e) {}
   }
 
+  // まほうのワープ音（キラキラーンと上昇）
+  playWarp() {
+    if (!this.soundEnabled || !this.ctx) return;
+    try {
+      const notes = [440, 554.37, 659.25, 880, 1108.73, 1318.51];
+      notes.forEach((freq, idx) => {
+        const t = this.ctx.currentTime + idx * 0.04;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.18, t);
+        gain.gain.linearRampToValueAtTime(0, t + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.16);
+      });
+    } catch (e) {}
+  }
+
   // お菓子の国のはずむBGM
   startBgm() {
     if (!this.soundEnabled) return;
@@ -216,9 +237,82 @@ const sounds = new SoundSystem();
 
 
 // ==========================================
-// 2. 主人公キャラクター（ピンクツインテール女の子 ＋ 背中のキャンディ）SVG作成
 // ==========================================
-function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'red') {
+// 2. 主人公キャラクター（ピンクツインテール女の子 ＋ 背中のキャンディ）SVG作成 ＆ きせかえ
+// ==========================================
+
+const DRESS_COLORS = {
+  pink: { name: '🍓 いちごピンク', top: '#ff80bf', bottom: '#ff3388', apronLine: '#ff88bb' },
+  blue: { name: '🐬 ミントソーダ', top: '#70e1ff', bottom: '#00a6e0', apronLine: '#50c8ff' },
+  purple: { name: '🍇 ラベンダーベリー', top: '#d48bff', bottom: '#9933ee', apronLine: '#bf70ff' },
+  yellow: { name: '🍋 レモンシフォン', top: '#ffe666', bottom: '#f5a623', apronLine: '#ffcc33' },
+  white: { name: '🤍 マシュマロホワイト', top: '#ffffff', bottom: '#e0ecf8', apronLine: '#ffb3d9' }
+};
+
+const HEADWEAR_LIST = [
+  { id: 'ribbon', name: '🎀 大きなリボン' },
+  { id: 'tiara', name: '👑 きらきらティアラ' },
+  { id: 'beret', name: '🍓 いちごベレー帽' },
+  { id: 'cat_ears', name: '🐱 ねこみみカチューシャ' }
+];
+
+const DRESS_COLOR_KEY = 'sweets_athletic_dress_color';
+const HEADWEAR_KEY = 'sweets_athletic_headwear';
+const NIGHT_MODE_KEY = 'sweets_athletic_night_mode';
+
+let isNightMode = false;
+try {
+  isNightMode = localStorage.getItem(NIGHT_MODE_KEY) === 'true';
+} catch (e) {}
+
+// よるのキラキラ星（45個の星）
+const NIGHT_STARS = [];
+for (let i = 0; i < 45; i++) {
+  NIGHT_STARS.push({
+    x: Math.random() * 800,
+    y: Math.random() * 320,
+    size: Math.random() * 2.5 + 1.2,
+    phase: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.003 + 0.002
+  });
+}
+
+function getDressColor() {
+  try {
+    return localStorage.getItem(DRESS_COLOR_KEY) || 'pink';
+  } catch (e) {
+    return 'pink';
+  }
+}
+
+function setDressColor(color) {
+  try {
+    localStorage.setItem(DRESS_COLOR_KEY, color);
+  } catch (e) {}
+  updateCharPreview(player ? player.candyColor : loadCandyColor());
+  renderDressUpPreview();
+}
+
+function getHeadwear() {
+  try {
+    return localStorage.getItem(HEADWEAR_KEY) || 'ribbon';
+  } catch (e) {
+    return 'ribbon';
+  }
+}
+
+function setHeadwear(hw) {
+  try {
+    localStorage.setItem(HEADWEAR_KEY, hw);
+  } catch (e) {}
+  updateCharPreview(player ? player.candyColor : loadCandyColor());
+  renderDressUpPreview();
+}
+
+function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'red', dressColor = null, headwear = null) {
+  dressColor = dressColor || getDressColor();
+  headwear = headwear || getHeadwear();
+
   // キャンディの色定義
   let candyFill = '#ff2a6d';
   let candyStroke = '#d61552';
@@ -247,6 +341,53 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
     `;
   }
 
+  // ドレスの色設定
+  const dressInfo = DRESS_COLORS[dressColor] || DRESS_COLORS.pink;
+
+  // あたまのかざりSVG
+  let headwearSvg = '';
+  if (headwear === 'tiara') {
+    headwearSvg = `
+      <g transform="translate(50, 24)">
+        <path d="M -14 2 L -12 -8 L -4 -3 L 0 -11 L 4 -3 L 12 -8 L 14 2 Z" fill="#ffe066" stroke="#d49b00" stroke-width="1.2" />
+        <circle cx="0" cy="-11" r="2.5" fill="#ff3388" />
+        <circle cx="-12" cy="-8" r="2" fill="#00d4ff" />
+        <circle cx="12" cy="-8" r="2" fill="#00d4ff" />
+        <circle cx="-4" cy="-3" r="1.5" fill="#ff66b2" />
+        <circle cx="4" cy="-3" r="1.5" fill="#ff66b2" />
+      </g>
+    `;
+  } else if (headwear === 'beret') {
+    headwearSvg = `
+      <g transform="translate(50, 24)">
+        <path d="M -17 4 C -16 -12, 16 -12, 17 4 C 10 7, -10 7, -17 4 Z" fill="#ff3355" stroke="#cc1133" stroke-width="1.2" />
+        <circle cx="0" cy="-8" r="2.5" fill="#33cc55" />
+        <ellipse cx="-7" cy="-1" rx="1.2" ry="1.6" fill="#ffffff" />
+        <ellipse cx="6" cy="-1" rx="1.2" ry="1.6" fill="#ffffff" />
+        <ellipse cx="0" cy="2" rx="1.2" ry="1.6" fill="#ffffff" />
+      </g>
+    `;
+  } else if (headwear === 'cat_ears') {
+    headwearSvg = `
+      <g transform="translate(50, 24)">
+        <polygon points="-16,4 -15,-9 -7,0" fill="#ff77aa" stroke="#e0266e" stroke-width="1.2"/>
+        <polygon points="-14,2 -13,-6 -9,0" fill="#ffffff"/>
+        <polygon points="16,4 15,-9 7,0" fill="#ff77aa" stroke="#e0266e" stroke-width="1.2"/>
+        <polygon points="14,2 13,-6 9,0" fill="#ffffff"/>
+        <path d="M -14 3 Q 0 -3 14 3" stroke="#ff3377" stroke-width="2" fill="none" />
+      </g>
+    `;
+  } else {
+    // default: 大きなリボン
+    headwearSvg = `
+      <g transform="translate(50, 24)">
+        <polygon points="0,0 -14,-7 -12,7" fill="#ff3377" />
+        <polygon points="0,0 14,-7 12,7" fill="#ff3377" />
+        <circle cx="0" cy="0" r="4" fill="#ffe066" />
+      </g>
+    `;
+  }
+
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
       <defs>
@@ -259,8 +400,8 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
           <stop offset="100%" stop-color="#ff5292" />
         </linearGradient>
         <linearGradient id="dressGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#ff6bb5" />
-          <stop offset="100%" stop-color="#ff3388" />
+          <stop offset="0%" stop-color="${dressInfo.top}" />
+          <stop offset="100%" stop-color="${dressInfo.bottom}" />
         </linearGradient>
         <linearGradient id="rainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#ff3366" />
@@ -301,7 +442,7 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
       <path d="M 40 62 L 32 86 L 68 86 L 60 62 Z" fill="url(#dressGrad)" />
       <!-- レースのエプロン -->
       <path d="M 44 65 L 40 84 L 60 84 L 56 65 Z" fill="#ffffff" opacity="0.95" />
-      <path d="M 47 70 L 53 70" stroke="#ff88bb" stroke-width="2" stroke-linecap="round" />
+      <path d="M 47 70 L 53 70" stroke="${dressInfo.apronLine}" stroke-width="2" stroke-linecap="round" />
 
       <!-- 顔 -->
       <circle cx="50" cy="46" r="22" fill="url(#faceGrad)" />
@@ -331,23 +472,26 @@ function createGirlSvgString(isBlinking = false, twirlAngle = 0, candyColor = 'r
       <!-- おくち -->
       <path d="M 47 55 Q 50 59 53 55" stroke="#ff4785" stroke-width="2" fill="none" stroke-linecap="round" />
 
-      <!-- 頭のリボン -->
-      <g transform="translate(50, 24)">
-        <polygon points="0,0 -14,-7 -12,7" fill="#ff3377" />
-        <polygon points="0,0 14,-7 12,7" fill="#ff3377" />
-        <circle cx="0" cy="0" r="4" fill="#ffe066" />
-      </g>
+      <!-- あたまのかざり -->
+      ${headwearSvg}
     </svg>
   `;
 }
 
-// キャンディ色ごとのImageオブジェクトキャッシュ
-const girlImages = {};
-['red', 'yellow', 'black', 'white', 'rainbow'].forEach(c => {
-  const img = new Image();
-  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(createGirlSvgString(false, 0, c));
-  girlImages[c] = img;
-});
+// 動的Imageオブジェクトキャッシュ
+const girlImageCache = new Map();
+function getGirlImage(candyColor = 'red', dressColor = null, headwear = null) {
+  candyColor = candyColor || 'red';
+  dressColor = dressColor || getDressColor();
+  headwear = headwear || getHeadwear();
+  const key = `${candyColor}_${dressColor}_${headwear}`;
+  if (!girlImageCache.has(key)) {
+    const img = new Image();
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(createGirlSvgString(false, 0, candyColor, dressColor, headwear));
+    girlImageCache.set(key, img);
+  }
+  return girlImageCache.get(key);
+}
 
 // キャンディ色のセーブ＆ロード（localStorage）
 const CANDY_SAVE_KEY = 'sweets_athletic_saved_candy';
@@ -377,7 +521,9 @@ function loadCandyColor() {
 function updateCharPreview(color) {
   const preview = document.getElementById('char-preview');
   if (preview) {
-    preview.innerHTML = createGirlSvgString(false, 8, color);
+    const dressColor = getDressColor();
+    const headwear = getHeadwear();
+    preview.innerHTML = createGirlSvgString(false, 8, color, dressColor, headwear);
     const svgEl = preview.querySelector('svg');
     if (svgEl) {
       svgEl.style.width = '110px';
@@ -554,52 +700,305 @@ window.buyPetAction = function(petId) {
   }
 };
 
-function setupShopEvents() {
+// きせかえ画面のレンダリング＆プレビュー
+function renderDressUpModal() {
+  const currentDress = getDressColor();
+  const currentHeadwear = getHeadwear();
+
+  // ドレスの選択パレット
+  const dressContainer = document.getElementById('dress-palette');
+  if (dressContainer) {
+    dressContainer.innerHTML = '';
+    Object.keys(DRESS_COLORS).forEach(colorKey => {
+      const info = DRESS_COLORS[colorKey];
+      const btn = document.createElement('button');
+      btn.className = 'swatch-btn' + (currentDress === colorKey ? ' active' : '');
+      btn.innerHTML = `<span class="swatch-color-dot" style="background: ${info.top}"></span><span>${info.name}</span>`;
+      btn.addEventListener('click', () => {
+        setDressColor(colorKey);
+        renderDressUpModal();
+        sounds.playCollect();
+      });
+      dressContainer.appendChild(btn);
+    });
+  }
+
+  // あたまのかざりパレット
+  const headwearContainer = document.getElementById('headwear-palette');
+  if (headwearContainer) {
+    headwearContainer.innerHTML = '';
+    HEADWEAR_LIST.forEach(hw => {
+      const btn = document.createElement('button');
+      btn.className = 'swatch-btn' + (currentHeadwear === hw.id ? ' active' : '');
+      btn.innerHTML = `<span>${hw.name}</span>`;
+      btn.addEventListener('click', () => {
+        setHeadwear(hw.id);
+        renderDressUpModal();
+        sounds.playCollect();
+      });
+      headwearContainer.appendChild(btn);
+    });
+  }
+
+  renderDressUpPreview();
+}
+
+function renderDressUpPreview() {
+  const preview = document.getElementById('dressup-char-preview');
+  if (preview) {
+    const currentColor = (typeof player !== 'undefined' && player) ? player.candyColor : loadCandyColor();
+    preview.innerHTML = createGirlSvgString(false, 0, currentColor, getDressColor(), getHeadwear());
+    const svg = preview.querySelector('svg');
+    if (svg) {
+      svg.style.width = '88px';
+      svg.style.height = '88px';
+      svg.style.filter = 'drop-shadow(0 4px 10px rgba(255, 120, 180, 0.3))';
+    }
+  }
+}
+
+// ペットのおへや（なかよし広場）
+let petRoomPets = [];
+let petRoomInterval = null;
+
+function renderPetRoomModal() {
+  const unlocked = getUnlockedPets();
+  const activeId = getSelectedPet();
+  const activePetInfo = PET_LIST.find(p => p.id === activeId) || PET_LIST[0];
+
+  const badge = document.getElementById('petroom-active-badge');
+  if (badge) {
+    badge.textContent = `いっしょ: ${activePetInfo.icon} ${activePetInfo.name} (+${activePetInfo.coinPower}🍓)`;
+  }
+
+  const playArea = document.getElementById('petroom-playarea');
+  if (!playArea) return;
+  playArea.innerHTML = '';
+
+  // おへやのペットたちデータ
+  petRoomPets = unlocked.map((id, index) => {
+    const info = PET_LIST.find(p => p.id === id) || PET_LIST[0];
+    return {
+      id: info.id,
+      name: info.name,
+      icon: info.icon,
+      coinPower: info.coinPower,
+      x: 30 + (index % 5) * 85 + (Math.random() * 20),
+      y: 65 + Math.floor(index / 5) * 65 + (Math.random() * 20),
+      vx: (Math.random() - 0.5) * 1.2,
+      vy: (Math.random() - 0.5) * 0.8,
+      bubble: ['❤️', '✨', '🍓', '🎶', '💤'][Math.floor(Math.random() * 5)],
+      timer: Math.random() * 100
+    };
+  });
+
+  petRoomPets.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'petroom-pet' + (p.id === activeId ? ' active-equipped' : '');
+    el.id = `petroom-pet-${p.id}`;
+    el.style.left = `${Math.round(p.x)}px`;
+    el.style.top = `${Math.round(p.y)}px`;
+    el.innerHTML = `
+      <div class="petroom-pet-bubble">${p.bubble}</div>
+      <div class="petroom-pet-icon">${p.icon}</div>
+      <div class="petroom-pet-label">${p.name}</div>
+    `;
+
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setSelectedPet(p.id);
+      sounds.playCandyLevelUp();
+      p.bubble = '💖 だいすき！';
+      renderPetRoomModal();
+      showBanner(`💖 ${p.name} と一緒におでかけ！ ✨`);
+    });
+
+    playArea.appendChild(el);
+  });
+
+  if (petRoomInterval) clearInterval(petRoomInterval);
+  petRoomInterval = setInterval(() => {
+    const area = document.getElementById('petroom-playarea');
+    const roomScreen = document.getElementById('petroom-screen');
+    if (!area || !roomScreen || !roomScreen.classList.contains('active')) {
+      clearInterval(petRoomInterval);
+      return;
+    }
+    const boundsW = area.clientWidth || 500;
+    const boundsH = area.clientHeight || 220;
+
+    petRoomPets.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 15) { p.x = 15; p.vx = Math.abs(p.vx); }
+      if (p.x > boundsW - 60) { p.x = boundsW - 60; p.vx = -Math.abs(p.vx); }
+      if (p.y < 35) { p.y = 35; p.vy = Math.abs(p.vy); }
+      if (p.y > boundsH - 60) { p.y = boundsH - 60; p.vy = -Math.abs(p.vy); }
+      p.timer++;
+      if (p.timer > 80) {
+        p.timer = 0;
+        p.bubble = ['❤️', '✨', '🍓', '🎶', '😋', '🐾', '🎀'][Math.floor(Math.random() * 7)];
+        p.vx = (Math.random() - 0.5) * 1.5;
+        p.vy = (Math.random() - 0.5) * 0.9;
+      }
+      const el = document.getElementById(`petroom-pet-${p.id}`);
+      if (el) {
+        el.style.left = `${Math.round(p.x)}px`;
+        el.style.top = `${Math.round(p.y)}px`;
+        const bubble = el.querySelector('.petroom-pet-bubble');
+        if (bubble) bubble.textContent = p.bubble;
+      }
+    });
+  }, 100);
+}
+
+function updateNightModeUI() {
+  const btnNight = document.getElementById('btn-night');
+  if (btnNight) {
+    btnNight.textContent = isNightMode ? '🌙' : '☀️';
+  }
+  if (isNightMode) {
+    document.body.classList.add('night-mode');
+  } else {
+    document.body.classList.remove('night-mode');
+  }
+}
+
+function toggleNightMode() {
+  isNightMode = !isNightMode;
+  try {
+    localStorage.setItem(NIGHT_MODE_KEY, isNightMode);
+  } catch (e) {}
+  updateNightModeUI();
+  sounds.playCollect();
+  showBanner(isNightMode ? '🌙 よるのお菓子の国になったよ！ ✨' : '☀️ あさのお菓子の国になったよ！ 🍓');
+}
+
+function setupModalEvents() {
+  // ショップモーダル要素
+  const shopScreen = document.getElementById('shop-screen');
   const btnOpenShop = document.getElementById('btn-open-shop');
   const btnHeaderShop = document.getElementById('btn-header-shop');
   const btnClearShop = document.getElementById('btn-clear-shop');
   const btnFailShop = document.getElementById('btn-fail-shop');
   const btnCloseShop = document.getElementById('btn-close-shop');
   const btnShopCloseCorner = document.getElementById('btn-shop-close-corner');
-  const shopScreen = document.getElementById('shop-screen');
 
-  function openShopModal() {
+  // きせかえモーダル要素
+  const dressupScreen = document.getElementById('dressup-screen');
+  const btnDressup = document.getElementById('btn-dressup');
+  const btnOpenDressup = document.getElementById('btn-open-dressup');
+  const btnClearDressup = document.getElementById('btn-clear-dressup');
+  const btnFailDressup = document.getElementById('btn-fail-dressup');
+  const btnCloseDressup = document.getElementById('btn-close-dressup');
+  const btnDressupCloseCorner = document.getElementById('btn-dressup-close-corner');
+
+  // ペットのおへやモーダル要素
+  const petroomScreen = document.getElementById('petroom-screen');
+  const btnPetroom = document.getElementById('btn-petroom');
+  const btnOpenPetroom = document.getElementById('btn-open-petroom');
+  const btnClosePetroom = document.getElementById('btn-close-petroom');
+  const btnPetroomCloseCorner = document.getElementById('btn-petroom-close-corner');
+  const btnPetroomToShop = document.getElementById('btn-petroom-to-shop');
+
+  // 夜モードボタン
+  const btnNight = document.getElementById('btn-night');
+  if (btnNight) btnNight.addEventListener('click', toggleNightMode);
+
+  // ショップ開閉
+  function openShop() {
     renderPetShop();
     if (shopScreen) shopScreen.classList.add('active');
     sounds.init();
   }
-
-  // 「このペットとあそぶ！」ボタン：ゲームへ戻る＆開始！
-  function closeShopAndResumeGame() {
+  function closeShopAndResume() {
     if (shopScreen) shopScreen.classList.remove('active');
     sounds.init();
     sounds.playJump();
-
-    // まだスタートしていない・またはクリア/失敗画面ならゲームをスタート！
     if (gameState === 'START' || gameState === 'CLEAR' || gameState === 'FAIL') {
       startGame();
     }
   }
-
-  function closeShopOnly() {
+  function closeShop() {
     if (shopScreen) shopScreen.classList.remove('active');
     sounds.init();
   }
 
-  if (btnOpenShop) btnOpenShop.addEventListener('click', openShopModal);
-  if (btnHeaderShop) btnHeaderShop.addEventListener('click', openShopModal);
-  if (btnClearShop) btnClearShop.addEventListener('click', openShopModal);
-  if (btnFailShop) btnFailShop.addEventListener('click', openShopModal);
-
-  if (btnCloseShop) btnCloseShop.addEventListener('click', closeShopAndResumeGame);
-  if (btnShopCloseCorner) btnShopCloseCorner.addEventListener('click', closeShopOnly);
-
-  // モーダルの外側（背景）タップでも安全にとじる
+  if (btnOpenShop) btnOpenShop.addEventListener('click', openShop);
+  if (btnHeaderShop) btnHeaderShop.addEventListener('click', openShop);
+  if (btnClearShop) btnClearShop.addEventListener('click', openShop);
+  if (btnFailShop) btnFailShop.addEventListener('click', openShop);
+  if (btnCloseShop) btnCloseShop.addEventListener('click', closeShopAndResume);
+  if (btnShopCloseCorner) btnShopCloseCorner.addEventListener('click', closeShop);
   if (shopScreen) {
     shopScreen.addEventListener('click', (e) => {
-      if (e.target === shopScreen) {
-        closeShopOnly();
-      }
+      if (e.target === shopScreen) closeShop();
+    });
+  }
+
+  // きせかえ開閉
+  function openDressup() {
+    renderDressUpModal();
+    if (dressupScreen) dressupScreen.classList.add('active');
+    sounds.init();
+  }
+  function closeDressupAndResume() {
+    if (dressupScreen) dressupScreen.classList.remove('active');
+    sounds.init();
+    sounds.playJump();
+    if (gameState === 'START' || gameState === 'CLEAR' || gameState === 'FAIL') {
+      startGame();
+    }
+  }
+  function closeDressup() {
+    if (dressupScreen) dressupScreen.classList.remove('active');
+    sounds.init();
+  }
+
+  if (btnDressup) btnDressup.addEventListener('click', openDressup);
+  if (btnOpenDressup) btnOpenDressup.addEventListener('click', openDressup);
+  if (btnClearDressup) btnClearDressup.addEventListener('click', openDressup);
+  if (btnFailDressup) btnFailDressup.addEventListener('click', openDressup);
+  if (btnCloseDressup) btnCloseDressup.addEventListener('click', closeDressupAndResume);
+  if (btnDressupCloseCorner) btnDressupCloseCorner.addEventListener('click', closeDressup);
+  if (dressupScreen) {
+    dressupScreen.addEventListener('click', (e) => {
+      if (e.target === dressupScreen) closeDressup();
+    });
+  }
+
+  // ペットのおへや開閉
+  function openPetroom() {
+    renderPetRoomModal();
+    if (petroomScreen) petroomScreen.classList.add('active');
+    sounds.init();
+  }
+  function closePetroomAndResume() {
+    if (petroomScreen) petroomScreen.classList.remove('active');
+    if (petRoomInterval) clearInterval(petRoomInterval);
+    sounds.init();
+    sounds.playJump();
+    if (gameState === 'START' || gameState === 'CLEAR' || gameState === 'FAIL') {
+      startGame();
+    }
+  }
+  function closePetroom() {
+    if (petroomScreen) petroomScreen.classList.remove('active');
+    if (petRoomInterval) clearInterval(petRoomInterval);
+    sounds.init();
+  }
+
+  if (btnPetroom) btnPetroom.addEventListener('click', openPetroom);
+  if (btnOpenPetroom) btnOpenPetroom.addEventListener('click', openPetroom);
+  if (btnClosePetroom) btnClosePetroom.addEventListener('click', closePetroomAndResume);
+  if (btnPetroomCloseCorner) btnPetroomCloseCorner.addEventListener('click', closePetroom);
+  if (btnPetroomToShop) btnPetroomToShop.addEventListener('click', () => {
+    closePetroom();
+    openShop();
+  });
+  if (petroomScreen) {
+    petroomScreen.addEventListener('click', (e) => {
+      if (e.target === petroomScreen) closePetroom();
     });
   }
 }
@@ -609,8 +1008,9 @@ function initApp() {
   updateCharPreview(savedColor);
   updateCandyUI(savedColor);
   updateSweetsUI();
+  updateNightModeUI();
   renderPetShop();
-  setupShopEvents();
+  setupModalEvents();
 }
 
 if (document.readyState === 'loading') {
@@ -735,6 +1135,9 @@ let platforms = [];
 let items = [];
 let goal = { x: 4850, y: 220, width: 160, height: 140 };
 let particles = [];
+let updrafts = [];
+let donuts = [];
+let warpCandies = [];
 let stageWidth = 5200;
 let stageHeight = 2400;
 
@@ -759,7 +1162,6 @@ function initStage() {
 
     // ========================================================
     // エリア2: きいろステージ 🍋（y: 1850〜1400）
-    // （ねぬちゃんの要望：サイズを小さくコンパクトに！）
     // ========================================================
     // きいろチェックポイント広場（コンパクト）
     { x: 1380, y: 1790, width: 130, height: 38, type: 'cookie', tier: 2, colorTier: 'yellow', isCheckPoint: true },
@@ -768,9 +1170,11 @@ function initStage() {
     { x: 1640, y: 1760, width: 75, height: 28, type: 'pudding', tier: 2, colorTier: 'yellow' },
     { x: 1710, y: 1630, width: 85, height: 24, type: 'macaron', tier: 2, color: '#ffdd00', vy: -0.8, minY: 1590, maxY: 1670, colorTier: 'yellow' },
     { x: 1850, y: 1550, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
-    { x: 2000, y: 1470, width: 110, height: 36, type: 'cookie', tier: 2, colorTier: 'yellow' },
+    // 🍫 とけるチョコの足場（きいろエリア）
+    { x: 1950, y: 1510, width: 90, height: 28, type: 'melting_choco', tier: 2, colorTier: 'yellow', initialY: 1510, meltTimer: 0, isMelted: false, respawnTimer: 0, isStepped: false, shake: 0 },
+    { x: 2050, y: 1470, width: 110, height: 36, type: 'cookie', tier: 2, colorTier: 'yellow' },
     // 黄色から黒へ届くステップ
-    { x: 2160, y: 1395, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
+    { x: 2180, y: 1395, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
 
     // ========================================================
     // エリア3: くろ色ステージ 🍫（y: 1400〜950）
@@ -781,9 +1185,11 @@ function initStage() {
     // 🍮 プリンのトランポリン
     { x: 2690, y: 1280, width: 75, height: 28, type: 'pudding', tier: 3, colorTier: 'black' },
     { x: 2770, y: 1160, width: 120, height: 30, type: 'macaron', tier: 3, color: '#2b1b17', vy: 0.9, minY: 1110, maxY: 1210, colorTier: 'black' },
-    { x: 2960, y: 1080, width: 140, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
+    // 🍫 とけるチョコの足場（くろエリア）
+    { x: 2880, y: 1120, width: 95, height: 28, type: 'melting_choco', tier: 3, colorTier: 'black', initialY: 1120, meltTimer: 0, isMelted: false, respawnTimer: 0, isStepped: false, shake: 0 },
+    { x: 2990, y: 1080, width: 140, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
     { x: 3160, y: 1010, width: 160, height: 45, type: 'cookie', tier: 3, colorTier: 'black' },
-    // 黒から白へ届く中継ステップ！（段差を75pxに分割）
+    // 黒から白へ届く中継ステップ
     { x: 3340, y: 935, width: 110, height: 28, type: 'wafer', tier: 3, colorTier: 'black' },
 
     // ========================================================
@@ -796,6 +1202,8 @@ function initStage() {
     // 🍮 プリンのトランポリン
     { x: 4000, y: 740, width: 75, height: 28, type: 'pudding', tier: 4, colorTier: 'white' },
     { x: 4080, y: 620, width: 140, height: 32, type: 'wafer', tier: 4, colorTier: 'white' },
+    // 🍫 とけるチョコの足場（しろエリア）
+    { x: 4180, y: 585, width: 95, height: 28, type: 'melting_choco', tier: 4, colorTier: 'white', initialY: 585, meltTimer: 0, isMelted: false, respawnTimer: 0, isStepped: false, shake: 0 },
     { x: 4280, y: 550, width: 160, height: 40, type: 'cookie', tier: 4, colorTier: 'white' },
 
     // 天空への架け橋（虹のブリッジ）
@@ -805,6 +1213,27 @@ function initStage() {
     // エリア5: 天空のレインボーケーキ城 🏰🌈（y: 350）
     // ========================================================
     { x: 4720, y: 360, width: 500, height: 180, type: 'cake_ground', tier: 5, colorTier: 'rainbow' }
+  ];
+
+  // 🍭 ふわふわキャンディの風（上昇気流）
+  updrafts = [
+    { x: 1130, y: 1780, width: 85, height: 260 },
+    { x: 3260, y: 850, width: 85, height: 260 }
+  ];
+
+  // 🍩 ころがるトッピングドーナツ
+  donuts = [
+    { x: 220, y: 2232, radius: 18, vx: 1.5, minX: 80, maxX: 420, rotation: 0, dough: '#f6be79', frosting: '#ff6088', sprinkles: true },
+    { x: 2420, y: 1302, radius: 18, vx: -1.7, minX: 2330, maxX: 2490, rotation: 0, dough: '#4a2818', frosting: '#ffffff', sprinkles: true },
+    { x: 3580, y: 842, radius: 18, vx: 1.9, minX: 3500, maxX: 3660, rotation: 0, dough: '#f6e4cc', frosting: '#ff80bb', sprinkles: true }
+  ];
+
+  // 🍬 ワープキャンディ（まほうの扉）
+  warpCandies = [
+    { id: 'w1a', x: 740, y: 2040, targetX: 1440, targetY: 1720, targetTier: 2, color: '#ff2a6d', cooldown: 0 },
+    { id: 'w1b', x: 1440, y: 1720, targetX: 740, targetY: 2040, targetTier: 1, color: '#ffcc00', cooldown: 0 },
+    { id: 'w2a', x: 2640, y: 1180, targetX: 3540, targetY: 800, targetTier: 4, color: '#382521', cooldown: 0 },
+    { id: 'w2b', x: 3540, y: 800, targetX: 2640, targetY: 1180, targetTier: 3, color: '#ffffff', cooldown: 0 }
   ];
 
   // あつめるスイーツアイテム（各エリアにたっぷり配置）
@@ -990,6 +1419,55 @@ function update() {
     }
   });
 
+  // 🍫 とけるチョコの足場の更新
+  platforms.forEach(p => {
+    if (p.type === 'melting_choco') {
+      if (p.isMelted) {
+        p.respawnTimer--;
+        if (p.respawnTimer <= 0) {
+          p.isMelted = false;
+          p.meltTimer = 0;
+          p.y = p.initialY;
+          p.shake = 0;
+          createParticles(p.x + p.width / 2, p.y + p.height / 2, 'sparkle', 8);
+        }
+      } else if (p.isStepped) {
+        p.meltTimer++;
+        p.shake = Math.sin(p.meltTimer * 0.9) * 3.5;
+        p.y = p.initialY + (p.meltTimer / 45) * 14;
+        if (Math.random() < 0.3) {
+          particles.push({
+            x: p.x + Math.random() * p.width,
+            y: p.y + p.height,
+            vx: 0,
+            vy: Math.random() * 2 + 1,
+            size: 4,
+            color: p.colorTier === 'black' ? '#331a0e' : (p.colorTier === 'white' ? '#f0e6dd' : '#7c3f1d'),
+            alpha: 0.85,
+            type: 'dust',
+            rot: 0,
+            vRot: 0
+          });
+        }
+        if (p.meltTimer > 45) {
+          p.isMelted = true;
+          p.respawnTimer = 150; // 2.5秒で復活
+          p.isStepped = false;
+          p.shake = 0;
+          createParticles(p.x + p.width / 2, p.y + p.height / 2, 'dust', 10);
+        }
+      } else {
+        // 乗っていないときはゆっくり元の高さに戻る
+        if (p.meltTimer > 0) {
+          p.meltTimer = Math.max(0, p.meltTimer - 0.5);
+          p.y = p.initialY + (p.meltTimer / 45) * 14;
+          p.shake = 0;
+        }
+      }
+      p.isStepped = false; // 足場チェックで再設定
+    }
+  });
+
   // 3. 水平方向の移動と衝突判定
   player.x += player.vx;
   if (player.x < 0) player.x = 0;
@@ -999,6 +1477,11 @@ function update() {
   player.isGrounded = false;
 
   platforms.forEach(p => {
+    // とけて消えているチョコ足場はすり抜ける
+    if (p.type === 'melting_choco' && p.isMelted) {
+      return;
+    }
+
     // 上から足場に乗ったかどうかの判定（ワンウェイ足場）
     const prevY = player.y - player.vy;
     if (
@@ -1017,6 +1500,11 @@ function update() {
         createParticles(player.x + player.width / 2, p.y, 'star', 12);
         p.squash = 12;
         return;
+      }
+
+      // 🍫 とけるチョコの足場
+      if (p.type === 'melting_choco') {
+        p.isStepped = true;
       }
 
       player.y = p.y - player.height;
@@ -1060,10 +1548,96 @@ function update() {
       }
 
       // 安全な復帰ポイントを更新（落下救済用：クッキーやウエハースなど安定した足場）
-      if (p.type !== 'macaron') {
+      if (p.type !== 'macaron' && p.type !== 'melting_choco') {
         player.safeX = Math.max(40, p.x + p.width / 2 - player.width / 2);
         player.safeY = p.y - player.height;
       }
+    }
+  });
+
+  // 🍭 ふわふわキャンディの風（上昇気流）
+  updrafts.forEach(u => {
+    if (
+      player.x + player.width > u.x &&
+      player.x < u.x + u.width &&
+      player.y + player.height > u.y &&
+      player.y < u.y + u.height
+    ) {
+      player.vy = Math.max(-6.5, player.vy - 0.95);
+      player.canDoubleJump = true;
+      if (Math.random() < 0.35) {
+        particles.push({
+          x: u.x + Math.random() * u.width,
+          y: u.y + u.height - 10 - Math.random() * 30,
+          vx: (Math.random() - 0.5) * 1,
+          vy: -(Math.random() * 3.5 + 2.5),
+          size: Math.random() * 5 + 3,
+          color: isNightMode ? '#bb88ff' : '#ff99dd',
+          alpha: 0.85,
+          type: 'sparkle',
+          rot: 0,
+          vRot: 0
+        });
+      }
+    }
+  });
+
+  // 🍩 ころがるトッピングドーナツの移動と衝突
+  donuts.forEach(d => {
+    d.x += d.vx;
+    d.rotation += d.vx / d.radius;
+    if (d.x < d.minX) {
+      d.x = d.minX;
+      d.vx *= -1;
+    } else if (d.x > d.maxX) {
+      d.x = d.maxX;
+      d.vx *= -1;
+    }
+
+    // プレイヤーとの接触判定（ポヨヨンとはじかれる！）
+    const pCenterX = player.x + player.width / 2;
+    const pCenterY = player.y + player.height / 2;
+    const dist = Math.hypot(pCenterX - d.x, pCenterY - (d.y - d.radius));
+    if (dist < player.width * 0.45 + d.radius) {
+      player.vy = -7.5;
+      player.vx = (d.vx > 0 ? 1 : -1) * 3.5;
+      player.isGrounded = false;
+      sounds.playBoing();
+      createParticles(d.x, d.y - d.radius, 'star', 8);
+    }
+  });
+
+  // 🍬 ワープキャンディ（まほうの扉）
+  warpCandies.forEach(w => {
+    if (w.cooldown > 0) w.cooldown--;
+    const pCenterX = player.x + player.width / 2;
+    const pCenterY = player.y + player.height / 2;
+    const dist = Math.hypot(pCenterX - w.x, pCenterY - w.y);
+    if (dist < 28 && w.cooldown <= 0) {
+      const partner = warpCandies.find(other => other.x === w.targetX && other.y === w.targetY);
+      w.cooldown = 120;
+      if (partner) partner.cooldown = 120;
+
+      player.x = w.targetX - player.width / 2;
+      player.y = w.targetY - player.height;
+      player.vx = 0;
+      player.vy = -2.5;
+
+      if (w.targetTier && w.targetTier > player.currentTier && w.targetTier <= 4) {
+        player.currentTier = w.targetTier;
+        const tierColorMap = { 1: 'red', 2: 'yellow', 3: 'black', 4: 'white' };
+        const newColor = tierColorMap[w.targetTier];
+        if (CANDY_RANK[newColor] > (CANDY_RANK[player.candyColor] || 1)) {
+          player.candyColor = newColor;
+          saveCandyColor(player.candyColor);
+          updateCandyUI(player.candyColor);
+        }
+      }
+
+      sounds.playWarp();
+      createParticles(w.x, w.y, 'star', 20);
+      createParticles(w.targetX, w.targetY, 'star', 20);
+      showBanner('🌀 まほうのキャンディワープ！ 🍬✨');
     }
   });
 
@@ -1188,14 +1762,23 @@ function updateParticles() {
 function render() {
   ctx.clearRect(0, 0, V_WIDTH, V_HEIGHT);
 
-  // 背景描画（高度に応じたパステル空とお菓子の雲）
+  // 背景描画（高度に応じたパステル空とお菓子の雲、または夜空）
   drawBackground();
 
   ctx.save();
   ctx.translate(-Math.floor(camera.x), -Math.floor(camera.y));
 
+  // ふわふわキャンディの風（上昇気流・一番奥に描画）
+  updrafts.forEach(drawUpdraft);
+
+  // ワープキャンディの描画
+  warpCandies.forEach(drawWarpCandy);
+
   // 足場の描画
   platforms.forEach(drawPlatform);
+
+  // ころがるドーナツの描画
+  donuts.forEach(drawDonut);
 
   // スイーツアイテムの描画
   items.forEach(drawItem);
@@ -1236,8 +1819,181 @@ function render() {
   }
 }
 
-// 背景とお菓子の雲（各エリアの高度に応じた美しいグラデーション）
+// 🍭 ふわふわキャンディの風（上昇気流）の描画
+function drawUpdraft(u) {
+  ctx.save();
+  const uGrad = ctx.createLinearGradient(0, u.y + u.height, 0, u.y);
+  uGrad.addColorStop(0, isNightMode ? 'rgba(180, 120, 255, 0.3)' : 'rgba(255, 180, 230, 0.28)');
+  uGrad.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+  ctx.fillStyle = uGrad;
+  ctx.beginPath();
+  ctx.roundRect(u.x, u.y, u.width, u.height, [20, 20, 0, 0]);
+  ctx.fill();
+
+  // 波打つ上昇カレントライン
+  ctx.strokeStyle = isNightMode ? 'rgba(210, 160, 255, 0.45)' : 'rgba(255, 150, 210, 0.4)';
+  ctx.lineWidth = 2;
+  const time = Date.now() * 0.003;
+  for (let sx = u.x + 18; sx < u.x + u.width; sx += 24) {
+    ctx.beginPath();
+    for (let sy = u.y + u.height; sy >= u.y; sy -= 15) {
+      const wave = Math.sin(time + sy * 0.04) * 6;
+      if (sy === u.y + u.height) ctx.moveTo(sx + wave, sy);
+      else ctx.lineTo(sx + wave, sy);
+    }
+    ctx.stroke();
+  }
+
+  // 根元のキャンディアイコン
+  ctx.font = '22px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🍭', u.x + u.width / 2, u.y + u.height - 8);
+  ctx.restore();
+}
+
+// 🍩 ころがるトッピングドーナツの描画
+function drawDonut(d) {
+  ctx.save();
+  const cy = d.y - d.radius;
+  ctx.translate(d.x, cy);
+  ctx.rotate(d.rotation);
+
+  // ドーナツ生地
+  ctx.fillStyle = d.dough;
+  ctx.beginPath();
+  ctx.arc(0, 0, d.radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#ba7b3b';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // とろ〜りアイシング
+  ctx.fillStyle = d.frosting;
+  ctx.beginPath();
+  ctx.arc(0, 0, d.radius * 0.88, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 中央の穴
+  ctx.fillStyle = isNightMode ? '#24143a' : '#ffeef8';
+  ctx.beginPath();
+  ctx.arc(0, 0, d.radius * 0.38, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#ba7b3b';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // カラフルスプリンクル（トッピング）
+  const sprinkles = [
+    { a: 0.3, r: d.radius * 0.62, c: '#ff3377' },
+    { a: 1.2, r: d.radius * 0.65, c: '#33ccff' },
+    { a: 2.1, r: d.radius * 0.6, c: '#ffff00' },
+    { a: 3.2, r: d.radius * 0.66, c: '#33cc66' },
+    { a: 4.1, r: d.radius * 0.58, c: '#ff9900' },
+    { a: 5.2, r: d.radius * 0.64, c: '#ffffff' }
+  ];
+  sprinkles.forEach(s => {
+    ctx.fillStyle = s.c;
+    const sx = Math.cos(s.a) * s.r;
+    const sy = Math.sin(s.a) * s.r;
+    ctx.fillRect(sx - 1.5, sy - 1, 3, 2);
+  });
+
+  ctx.restore();
+}
+
+// 🍬 ワープキャンディの描画
+function drawWarpCandy(w) {
+  ctx.save();
+  const floatY = w.y + Math.sin(Date.now() * 0.005 + (w.id.charCodeAt(1) || 0)) * 5;
+  ctx.translate(w.x, floatY);
+
+  // 回転するうずまき
+  const rot = Date.now() * 0.003;
+
+  // 外側の光のオーラ
+  ctx.fillStyle = isNightMode ? 'rgba(255, 120, 240, 0.28)' : 'rgba(255, 180, 220, 0.32)';
+  ctx.beginPath();
+  ctx.arc(0, 0, 24, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.rotate(rot);
+
+  // キャンディ本体
+  ctx.fillStyle = w.color || '#ff4088';
+  ctx.beginPath();
+  ctx.arc(0, 0, 16, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // うずまきライン
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(0, 0, 9, 0, Math.PI * 1.5);
+  ctx.stroke();
+
+  ctx.restore();
+
+  // ワープラベル
+  ctx.save();
+  ctx.font = 'bold 12px "M PLUS Rounded 1c", sans-serif';
+  ctx.fillStyle = isNightMode ? '#ffccff' : '#ff4785';
+  ctx.textAlign = 'center';
+  ctx.fillText('🍬 ワープ', w.x, floatY - 26);
+  ctx.restore();
+}
+
+// 背景とお菓子の雲（各エリアの高度に応じた美しいグラデーションまたは夜空）
 function drawBackground() {
+  if (isNightMode) {
+    // 【よるのお菓子の国】ミッドナイトパステルパープル＆ディープネイビー
+    const nightGrad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
+    nightGrad.addColorStop(0, '#100820');
+    nightGrad.addColorStop(0.5, '#221338');
+    nightGrad.addColorStop(1, '#381a4a');
+    ctx.fillStyle = nightGrad;
+    ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+
+    // きらめくお星さま（トゥインクル）
+    ctx.save();
+    NIGHT_STARS.forEach(s => {
+      const alpha = 0.35 + 0.55 * Math.sin(Date.now() * s.speed + s.phase);
+      ctx.fillStyle = `rgba(255, 245, 180, ${Math.max(0.1, alpha)})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // まあるく輝く三日月 🌙
+    ctx.fillStyle = 'rgba(255, 235, 130, 0.95)';
+    ctx.shadowColor = '#ffe066';
+    ctx.shadowBlur = 16;
+    ctx.beginPath();
+    ctx.arc(710, 70, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    // 三日月の影くり抜き
+    ctx.fillStyle = '#100820';
+    ctx.beginPath();
+    ctx.arc(702, 64, 21, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // ふわふわ夜の雲（ラベンダーパステル）
+    const cloudOffsetX = (camera.x * 0.25) % 800;
+    const cloudOffsetY = (camera.y * 0.18) % 300;
+    ctx.fillStyle = 'rgba(180, 150, 220, 0.35)';
+    for (let i = -1; i < 4; i++) {
+      const cx = i * 360 - cloudOffsetX;
+      drawMarshmallowCloud(cx + 60, 80 - cloudOffsetY + 50, 75);
+      drawMarshmallowCloud(cx + 240, 180 - cloudOffsetY + 50, 55);
+    }
+    return;
+  }
+
   const heightRatio = Math.max(0, Math.min(1, camera.y / (stageHeight - V_HEIGHT)));
   
   const grad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
@@ -1397,6 +2153,54 @@ function drawPlatform(p) {
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.lineWidth = 2;
     ctx.stroke();
+  } else if (p.type === 'melting_choco') {
+    // 🍫 とけるチョコの足場
+    if (p.isMelted) return; // とけて消えている時は描画しない
+
+    const shakeX = p.shake || 0;
+    const px = p.x + shakeX;
+    const py = p.y;
+    const pw = p.width;
+    const ph = p.height;
+
+    ctx.save();
+    if (isNightMode) {
+      ctx.shadowColor = '#ff66aa';
+      ctx.shadowBlur = 8;
+    }
+
+    // チョコレートバー本体
+    ctx.fillStyle = colorTier === 'black' ? '#291710' : (colorTier === 'white' ? '#f4ece5' : '#5c2d18');
+    ctx.beginPath();
+    ctx.roundRect(px, py, pw, ph, 8);
+    ctx.fill();
+
+    // 輪郭
+    ctx.strokeStyle = colorTier === 'black' ? '#180a06' : (colorTier === 'white' ? '#ded2c6' : '#3d1b0d');
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // 板チョコのブロック溝
+    const numBlocks = Math.max(2, Math.floor(pw / 26));
+    const blockW = pw / numBlocks;
+    ctx.fillStyle = colorTier === 'black' ? '#3d2319' : (colorTier === 'white' ? '#ffffff' : '#793c20');
+    for (let i = 0; i < numBlocks; i++) {
+      ctx.beginPath();
+      ctx.roundRect(px + i * blockW + 3, py + 4, blockW - 6, ph - 8, 4);
+      ctx.fill();
+    }
+
+    // 乗ったときのとろ〜りチョコしずく
+    if (p.meltTimer > 0) {
+      ctx.fillStyle = colorTier === 'black' ? '#291710' : (colorTier === 'white' ? '#f4ece5' : '#5c2d18');
+      const dripHeight = (p.meltTimer / 45) * 12;
+      for (let x = px + 12; x < px + pw - 8; x += 20) {
+        ctx.beginPath();
+        ctx.arc(x, py + ph + dripHeight * 0.6, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
   } else if (p.type === 'pudding') {
     // 🍮 ぷるるんプリンのトランポリン
     const squash = p.squash || 0;
@@ -1537,8 +2341,8 @@ function drawPlayer() {
     twirl = Math.sin(player.walkFrame) * 12;
   }
 
-  // キャンディ色に応じた女の子の画像を取得して描画
-  const currentImg = girlImages[player.candyColor] || girlImages.red;
+  // キャンディ色・ドレス・髪飾りを反映した女の子の動的画像を取得して描画
+  const currentImg = getGirlImage(player.candyColor, getDressColor(), getHeadwear());
   const w = 64;
   const h = 64;
   ctx.drawImage(currentImg, -w / 2, -h / 2 - 2, w, h);
@@ -1724,9 +2528,14 @@ function gameLoop() {
 // ==========================================
 
 function startGame() {
-  document.getElementById('start-screen').classList.remove('active');
-  document.getElementById('clear-screen').classList.remove('active');
-  document.getElementById('fail-screen').classList.remove('active');
+  const screens = ['start-screen', 'clear-screen', 'fail-screen', 'shop-screen', 'dressup-screen', 'petroom-screen'];
+  screens.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  if (typeof petRoomInterval !== 'undefined' && petRoomInterval) {
+    clearInterval(petRoomInterval);
+  }
 
   sounds.init();
   sounds.startBgm();

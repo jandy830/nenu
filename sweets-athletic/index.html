@@ -35,6 +35,9 @@
         </div>
       </div>
       <div class="header-tools">
+        <button id="btn-night" class="icon-btn" title="ひる・よるきりかえ">☀️</button>
+        <button id="btn-dressup" class="icon-btn" title="きせかえ">👗</button>
+        <button id="btn-petroom" class="icon-btn" title="ペットのおへや">🏡</button>
         <button id="btn-header-shop" class="icon-btn" title="ペットショップ">🛍️</button>
         <button id="btn-sound" class="icon-btn" title="おとのきりかえ">🎵</button>
         <button id="btn-restart" class="icon-btn" title="さいしょから">🔄</button>
@@ -61,16 +64,60 @@
           <div class="start-buttons">
             <button id="btn-start" class="btn-play">💖 あそぶ 💖</button>
             <button id="btn-open-shop" class="btn-shop">🛍️ ペットショップ</button>
+            <button id="btn-open-dressup" class="btn-sub-menu">👗 きせかえ</button>
+            <button id="btn-open-petroom" class="btn-sub-menu">🏡 ペットのへや</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- きせかえ画面（モーダル） -->
+      <div id="dressup-screen" class="overlay-screen modal-overlay">
+        <div class="overlay-card modal-card dressup-card">
+          <button id="btn-dressup-close-corner" class="modal-close-corner" title="とじる">✖</button>
+          <h2 class="modal-title">👗 女の子のきせかえ 🎀</h2>
+          <p class="modal-subtitle">すきなドレスとあたまのアクセサリーをえらんでね！</p>
+          
+          <div class="dressup-preview-wrap">
+            <div id="dressup-char-preview" class="dressup-char-preview"></div>
+          </div>
+
+          <div class="dressup-section-title">✨ ドレスのいろ</div>
+          <div class="dress-palette" id="dress-palette"></div>
+
+          <div class="dressup-section-title">✨ あたまのかざり</div>
+          <div class="headwear-palette" id="headwear-palette"></div>
+
+          <button id="btn-close-dressup" class="btn-confirm-action">💖 このコーデであそぶ！ 🎮</button>
+        </div>
+      </div>
+
+      <!-- ペットのおへや（なかよし広場モーダル） -->
+      <div id="petroom-screen" class="overlay-screen modal-overlay">
+        <div class="overlay-card modal-card petroom-card">
+          <button id="btn-petroom-close-corner" class="modal-close-corner" title="とじる">✖</button>
+          <div class="petroom-header">
+            <h2 class="modal-title">🏡 ペットのおへや 🐾</h2>
+            <div class="petroom-equipped-badge" id="petroom-active-badge">
+              いっしょ: 🐱 しろねこ (+1🍓)
+            </div>
+          </div>
+          <p class="modal-subtitle">お迎えしたペットたちが大集合！タップでなでなで＆おでかけ！</p>
+
+          <div class="petroom-playarea" id="petroom-playarea"></div>
+
+          <div class="petroom-buttons">
+            <button id="btn-petroom-to-shop" class="btn-sub-action">🛍️ ショップへいく</button>
+            <button id="btn-close-petroom" class="btn-confirm-action">🎮 ゲームにもどる！</button>
           </div>
         </div>
       </div>
 
       <!-- ペットショップ画面（画面全体にきれいに表示） -->
-      <div id="shop-screen" class="overlay-screen shop-overlay">
-        <div class="overlay-card shop-card">
-          <button id="btn-shop-close-corner" class="shop-close-corner" title="とじる">✖</button>
+      <div id="shop-screen" class="overlay-screen shop-overlay modal-overlay">
+        <div class="overlay-card shop-card modal-card">
+          <button id="btn-shop-close-corner" class="shop-close-corner modal-close-corner" title="とじる">✖</button>
           <div class="shop-header">
-            <h2 class="title-shop">🛍️ ペットショップ 🐾</h2>
+            <h2 class="title-shop modal-title">🛍️ ペットショップ 🐾</h2>
             <div class="shop-bank">
               もっている: <span class="highlight" id="shop-sweets-val">0</span> 🍓
             </div>
@@ -80,7 +127,7 @@
           <!-- ペット一覧グリッド -->
           <div class="pet-grid" id="pet-grid"></div>
 
-          <button id="btn-close-shop" class="btn-play-with-pet">💖 このペットとあそぶ！ 🎮</button>
+          <button id="btn-close-shop" class="btn-play-with-pet btn-confirm-action">💖 このペットとあそぶ！ 🎮</button>
         </div>
       </div>
 
@@ -98,6 +145,7 @@
           <div class="start-buttons">
             <button id="btn-clear-retry" class="btn-play">🔁 もう１かいあそぶ</button>
             <button id="btn-clear-shop" class="btn-shop">🛍️ ペットショップ</button>
+            <button id="btn-clear-dressup" class="btn-sub-menu">👗 きせかえ</button>
           </div>
         </div>
       </div>
@@ -111,6 +159,7 @@
           <div class="start-buttons">
             <button id="btn-fail-retry" class="btn-play">🔁 もう１かい！</button>
             <button id="btn-fail-shop" class="btn-shop">🛍️ ペットショップ</button>
+            <button id="btn-fail-dressup" class="btn-sub-menu">👗 きせかえ</button>
           </div>
         </div>
       </div>

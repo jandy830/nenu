@@ -277,6 +277,28 @@ body {
   transform: translateY(2px) scale(0.97);
 }
 
+.btn-sub-menu {
+  background: linear-gradient(135deg, #b066fe 0%, #8b32dc 100%);
+  color: #ffffff;
+  border: 3px solid #ffffff;
+  border-radius: 28px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 900;
+  font-family: inherit;
+  box-shadow: 0 8px 20px rgba(160, 50, 220, 0.3);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.btn-sub-menu:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.btn-sub-menu:active {
+  transform: translateY(2px) scale(0.97);
+}
+
 .start-sweets-bank {
   font-size: 15px;
   font-weight: 900;
@@ -301,7 +323,8 @@ body {
   display: inline-block;
 }
 
-/* ペットショップモーダル（画面全体にきれいに表示） */
+/* 汎用モーダル（画面全体にきれいに表示） */
+.modal-overlay,
 .shop-overlay {
   position: fixed !important;
   top: 0;
@@ -312,7 +335,7 @@ body {
   height: 100vh;
   height: 100dvh;
   z-index: 9999 !important;
-  background: rgba(45, 25, 40, 0.72) !important;
+  background: rgba(35, 20, 32, 0.75) !important;
   backdrop-filter: blur(8px);
   padding: 14px;
   overflow: hidden;
@@ -321,10 +344,12 @@ body {
   justify-content: center;
 }
 
+.modal-overlay.active,
 .shop-overlay.active {
   display: flex !important;
 }
 
+.modal-card,
 .shop-card {
   max-width: 560px;
   width: 100%;
@@ -342,6 +367,7 @@ body {
   animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+.modal-close-corner,
 .shop-close-corner {
   position: absolute;
   top: 14px;
@@ -362,8 +388,300 @@ body {
   z-index: 10;
 }
 
+.modal-close-corner:active,
 .shop-close-corner:active {
   transform: scale(0.92);
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ff4088;
+}
+
+.modal-subtitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #7b5971;
+  margin-bottom: 8px;
+  text-align: left;
+  padding-left: 4px;
+}
+
+.btn-confirm-action {
+  background: linear-gradient(135deg, #ff66aa 0%, #ff3377 100%);
+  color: #ffffff;
+  border: 3px solid #ffffff;
+  border-radius: 28px;
+  padding: 12px 24px;
+  font-size: 17px;
+  font-weight: 900;
+  font-family: inherit;
+  box-shadow: 0 6px 18px rgba(255, 51, 119, 0.4);
+  cursor: pointer;
+  align-self: center;
+  transition: transform 0.12s ease;
+  width: 100%;
+  max-width: 340px;
+  flex-shrink: 0;
+}
+
+.btn-confirm-action:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.btn-confirm-action:active {
+  transform: translateY(2px) scale(0.98);
+}
+
+/* きせかえカード */
+.dressup-card {
+  max-width: 500px;
+}
+
+.dressup-preview-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.dressup-char-preview {
+  width: 110px;
+  height: 110px;
+  background: radial-gradient(circle, #fff0f7 0%, #ffe6f2 70%);
+  border: 3px dashed #ffb3d9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(255, 120, 180, 0.25);
+  animation: pulseFloat 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes pulseFloat {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-3px) scale(1.02); }
+}
+
+.dressup-section-title {
+  font-size: 13px;
+  font-weight: 900;
+  color: #884466;
+  margin: 6px 0 4px;
+  text-align: left;
+  padding-left: 6px;
+}
+
+.dress-palette,
+.headwear-palette {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+  padding: 2px 4px;
+}
+
+.swatch-btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  background: #ffffff;
+  border: 2px solid #ffccd9;
+  border-radius: 16px;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(255, 140, 180, 0.15);
+  transition: transform 0.1s ease, border-color 0.1s ease;
+  color: #553344;
+}
+
+.swatch-btn:hover {
+  transform: translateY(-2px);
+}
+
+.swatch-btn.active {
+  border-color: #ff3377;
+  background: #fff0f7;
+  color: #ff2266;
+  box-shadow: 0 3px 10px rgba(255, 34, 102, 0.3);
+  transform: scale(1.04);
+}
+
+.swatch-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.15);
+}
+
+/* ペットのおへや */
+.petroom-card {
+  max-width: 580px;
+}
+
+.petroom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  padding-right: 42px;
+  padding-left: 4px;
+}
+
+.petroom-equipped-badge {
+  font-size: 13px;
+  font-weight: 900;
+  background: #fff0f7;
+  border: 2px solid #ffb3d9;
+  color: #ff3377;
+  padding: 3px 10px;
+  border-radius: 14px;
+}
+
+.petroom-playarea {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background: linear-gradient(180deg, #ffeef8 0%, #ffd9ed 65%, #ffccd9 100%);
+  border: 3px solid #ffb8cf;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: inset 0 4px 12px rgba(255, 120, 170, 0.15);
+}
+
+.petroom-playarea::before {
+  content: '🎀 🍰 ⭐ 🍓 🎀 ⭐ 🍰 🍓';
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  font-size: 13px;
+  text-align: center;
+  opacity: 0.35;
+  letter-spacing: 10px;
+  pointer-events: none;
+}
+
+.petroom-pet {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  user-select: none;
+}
+
+.petroom-pet:hover {
+  transform: scale(1.15);
+}
+
+.petroom-pet.active-equipped {
+  filter: drop-shadow(0 0 6px rgba(255, 170, 0, 0.8));
+}
+
+.petroom-pet-bubble {
+  font-size: 11px;
+  font-weight: 900;
+  background: #ffffff;
+  border: 1.5px solid #ff99bb;
+  border-radius: 10px;
+  padding: 1px 6px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 2px;
+  animation: floatBubble 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes floatBubble {
+  from { transform: translateY(0); }
+  to { transform: translateY(-3px); }
+}
+
+.petroom-pet-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.petroom-pet-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: #663344;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 8px;
+  padding: 0 4px;
+  margin-top: 2px;
+}
+
+.petroom-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn-sub-action {
+  background: linear-gradient(135deg, #ffaa44 0%, #ff7722 100%);
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 24px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 900;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(255, 120, 40, 0.3);
+  cursor: pointer;
+}
+
+/* 夜モードのボタンスタイル＆テーマ */
+body.night-mode {
+  background: linear-gradient(135deg, #180e2b 0%, #291642 40%, #11091f 100%);
+  color: #f7e6ff;
+}
+
+body.night-mode .game-container {
+  background: rgba(32, 18, 48, 0.94);
+  border-color: #6a448c;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+body.night-mode .game-header {
+  background: rgba(40, 24, 60, 0.97);
+  border-bottom-color: #6a448c;
+}
+
+body.night-mode .btn-home {
+  background: #2b1740;
+  border-color: #8b5fb8;
+  color: #ff99dd;
+}
+
+body.night-mode .status-item {
+  background: #2b1740;
+  border-color: #8b5fb8;
+  color: #ffb8ec;
+}
+
+body.night-mode .icon-btn {
+  background: #2b1740;
+  border-color: #8b5fb8;
+  color: #ffffff;
+}
+
+body.night-mode .touch-controls {
+  background: rgba(40, 24, 60, 0.97);
+  border-top-color: #6a448c;
+}
+
+body.night-mode .ctrl-btn {
+  background: #2b1740;
+  border-color: #8b5fb8;
+  color: #ffb8ec;
 }
 
 .shop-header {
