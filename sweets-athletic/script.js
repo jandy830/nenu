@@ -484,14 +484,16 @@ function initStage() {
     { x: 2580, y: 1240, width: 130, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
     { x: 2770, y: 1160, width: 120, height: 30, type: 'macaron', tier: 3, color: '#2b1b17', vy: 0.9, minY: 1110, maxY: 1210, colorTier: 'black' },
     { x: 2960, y: 1080, width: 140, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
-    { x: 3160, y: 1010, width: 200, height: 50, type: 'cookie', tier: 3, colorTier: 'black' },
+    { x: 3160, y: 1010, width: 160, height: 45, type: 'cookie', tier: 3, colorTier: 'black' },
+    // 黒から白へ届く中継ステップ！（段差を75pxに分割）
+    { x: 3340, y: 935, width: 110, height: 28, type: 'wafer', tier: 3, colorTier: 'black' },
 
     // ========================================================
     // エリア4: しろ色ステージ ☁️（y: 950〜450）
     // ========================================================
     // しろチェックポイント広場
-    { x: 3430, y: 860, width: 220, height: 50, type: 'cookie', tier: 4, colorTier: 'white', isCheckPoint: true },
-    { x: 3700, y: 780, width: 130, height: 32, type: 'wafer', tier: 4, colorTier: 'white' },
+    { x: 3480, y: 860, width: 200, height: 50, type: 'cookie', tier: 4, colorTier: 'white', isCheckPoint: true },
+    { x: 3720, y: 780, width: 130, height: 32, type: 'wafer', tier: 4, colorTier: 'white' },
     { x: 3890, y: 700, width: 120, height: 30, type: 'macaron', tier: 4, color: '#ffffff', vy: -0.8, minY: 650, maxY: 750, colorTier: 'white' },
     { x: 4080, y: 620, width: 140, height: 32, type: 'wafer', tier: 4, colorTier: 'white' },
     { x: 4280, y: 550, width: 160, height: 40, type: 'cookie', tier: 4, colorTier: 'white' },
@@ -529,7 +531,7 @@ function initStage() {
     { x: 3260, y: 960, type: '🖤', collected: false, floatOffset: 4 },
 
     // 白エリア
-    { x: 3530, y: 810, type: '☁️', collected: false, floatOffset: 0 },
+    { x: 3560, y: 810, type: '☁️', collected: false, floatOffset: 0 },
     { x: 3760, y: 730, type: '🧁', collected: false, floatOffset: 1 },
     { x: 3940, y: 650, type: '⭐', collected: false, floatOffset: 2 },
     { x: 4140, y: 570, type: '🍦', collected: false, floatOffset: 3 },
