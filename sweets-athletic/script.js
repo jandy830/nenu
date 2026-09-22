@@ -377,7 +377,7 @@ const player = {
   vx: 0,
   vy: 0,
   speed: 4.8,
-  jumpPower: -11.6,
+  jumpPower: -12.8, // ジャンプ力を強化（高くふわっと跳べる）
   isGrounded: false,
   facingRight: true,
   walkFrame: 0,
@@ -399,7 +399,7 @@ const keys = {
 // 4色のチェックポイント（落下時の復帰場所＆キャンディの色）
 const checkpoints = {
   1: { x: 80, y: 2180, color: 'red', name: 'あかステージ' },
-  2: { x: 1300, y: 1720, color: 'yellow', name: 'きいろステージ' },
+  2: { x: 1400, y: 1750, color: 'yellow', name: 'きいろステージ' },
   3: { x: 2360, y: 1260, color: 'black', name: 'くろステージ' },
   4: { x: 3450, y: 800, color: 'white', name: 'しろステージ' }
 };
@@ -450,27 +450,32 @@ function initStage() {
     { x: 490, y: 2180, width: 130, height: 32, type: 'wafer', tier: 1, colorTier: 'red' },
     { x: 680, y: 2100, width: 140, height: 32, type: 'wafer', tier: 1, colorTier: 'red' },
     { x: 880, y: 2020, width: 110, height: 30, type: 'macaron', tier: 1, color: '#ff2a6d', vy: 0.8, minY: 1980, maxY: 2060, colorTier: 'red' },
-    { x: 1060, y: 1950, width: 150, height: 36, type: 'cookie', tier: 1, colorTier: 'red' },
+    { x: 1060, y: 1950, width: 130, height: 36, type: 'cookie', tier: 1, colorTier: 'red' },
+    // 赤から黄色へ届くステップ！
+    { x: 1230, y: 1870, width: 100, height: 28, type: 'wafer', tier: 1, colorTier: 'red' },
 
     // ========================================================
     // エリア2: きいろステージ 🍋（y: 1850〜1400）
+    // （ねぬちゃんの要望：サイズを小さくコンパクトに！）
     // ========================================================
-    // きいろチェックポイント広場
-    { x: 1260, y: 1780, width: 220, height: 50, type: 'cookie', tier: 2, colorTier: 'yellow', isCheckPoint: true },
-    { x: 1530, y: 1700, width: 130, height: 32, type: 'wafer', tier: 2, colorTier: 'yellow' },
-    { x: 1720, y: 1620, width: 120, height: 30, type: 'macaron', tier: 2, color: '#ffdd00', vy: -0.9, minY: 1570, maxY: 1670, colorTier: 'yellow' },
-    { x: 1910, y: 1540, width: 140, height: 32, type: 'wafer', tier: 2, colorTier: 'yellow' },
-    { x: 2110, y: 1470, width: 180, height: 50, type: 'cookie', tier: 2, colorTier: 'yellow' },
+    // きいろチェックポイント広場（コンパクト）
+    { x: 1380, y: 1790, width: 130, height: 38, type: 'cookie', tier: 2, colorTier: 'yellow', isCheckPoint: true },
+    { x: 1560, y: 1710, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
+    { x: 1710, y: 1630, width: 85, height: 24, type: 'macaron', tier: 2, color: '#ffdd00', vy: -0.8, minY: 1590, maxY: 1670, colorTier: 'yellow' },
+    { x: 1850, y: 1550, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
+    { x: 2000, y: 1470, width: 110, height: 36, type: 'cookie', tier: 2, colorTier: 'yellow' },
+    // 黄色から黒へ届くステップ
+    { x: 2160, y: 1395, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
 
     // ========================================================
     // エリア3: くろ色ステージ 🍫（y: 1400〜950）
     // ========================================================
     // くろチェックポイント広場
-    { x: 2340, y: 1320, width: 220, height: 50, type: 'cookie', tier: 3, colorTier: 'black', isCheckPoint: true },
-    { x: 2610, y: 1240, width: 130, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
-    { x: 2800, y: 1160, width: 120, height: 30, type: 'macaron', tier: 3, color: '#2b1b17', vy: 0.9, minY: 1110, maxY: 1210, colorTier: 'black' },
-    { x: 2990, y: 1080, width: 140, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
-    { x: 3190, y: 1010, width: 200, height: 50, type: 'cookie', tier: 3, colorTier: 'black' },
+    { x: 2310, y: 1320, width: 200, height: 48, type: 'cookie', tier: 3, colorTier: 'black', isCheckPoint: true },
+    { x: 2580, y: 1240, width: 130, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
+    { x: 2770, y: 1160, width: 120, height: 30, type: 'macaron', tier: 3, color: '#2b1b17', vy: 0.9, minY: 1110, maxY: 1210, colorTier: 'black' },
+    { x: 2960, y: 1080, width: 140, height: 32, type: 'wafer', tier: 3, colorTier: 'black' },
+    { x: 3160, y: 1010, width: 200, height: 50, type: 'cookie', tier: 3, colorTier: 'black' },
 
     // ========================================================
     // エリア4: しろ色ステージ ☁️（y: 950〜450）
@@ -501,11 +506,11 @@ function initStage() {
     { x: 930, y: 1970, type: '🍭', collected: false, floatOffset: 4 },
 
     // 黄エリア
-    { x: 1360, y: 1730, type: '🍋', collected: false, floatOffset: 0 },
-    { x: 1590, y: 1650, type: '🍌', collected: false, floatOffset: 1 },
-    { x: 1770, y: 1570, type: '⭐', collected: false, floatOffset: 2 },
-    { x: 1970, y: 1490, type: '🍯', collected: false, floatOffset: 3 },
-    { x: 2170, y: 1420, type: '💛', collected: false, floatOffset: 4 },
+    { x: 1430, y: 1730, type: '🍋', collected: false, floatOffset: 0 },
+    { x: 1600, y: 1650, type: '🍌', collected: false, floatOffset: 1 },
+    { x: 1740, y: 1570, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 1890, y: 1490, type: '🍯', collected: false, floatOffset: 3 },
+    { x: 2045, y: 1410, type: '💛', collected: false, floatOffset: 4 },
 
     // 黒エリア
     { x: 2440, y: 1270, type: '🍫', collected: false, floatOffset: 0 },
