@@ -20,30 +20,62 @@
       <p class="sub">ワックスをパキパキわって、もちもちバターをむにゅむにゅしよう！</p>
     </header>
 
-    <div class="cards">
-      <button class="card" data-butter="normal">
-        <span class="card-emoji">🧈</span>
-        <div class="card-name">ふつうのバター</div>
-        <p class="card-desc">きほんのバターをパキパキ！</p>
-      </button>
+    <div class="category-section">
+      <h2 class="category-title">🧈 バタースクイーズ</h2>
+      <div class="cards">
+        <button class="card" data-butter="normal">
+          <span class="card-emoji">🧈</span>
+          <div class="card-name">ふつうのバター</div>
+          <p class="card-desc">きほんのバター！</p>
+        </button>
 
-      <button class="card" data-butter="choco">
-        <span class="card-emoji">🍫</span>
-        <div class="card-name">チョコバター</div>
-        <p class="card-desc">あまーいチョコのかおり♪</p>
-      </button>
+        <button class="card" data-butter="choco">
+          <span class="card-emoji">🍫</span>
+          <div class="card-name">チョコバター</div>
+          <p class="card-desc">あまーいチョコのかおり♪</p>
+        </button>
 
-      <button class="card" data-butter="ichigo">
-        <span class="card-emoji">🍓</span>
-        <div class="card-name">いちごバター</div>
-        <p class="card-desc">ピンクでかわいい♡</p>
-      </button>
+        <button class="card" data-butter="ichigo">
+          <span class="card-emoji">🍓</span>
+          <div class="card-name">いちごバター</div>
+          <p class="card-desc">ピンクでかわいい♡</p>
+        </button>
 
-      <button class="card" data-butter="matcha">
-        <span class="card-emoji">🍵</span>
-        <div class="card-name">まっちゃバター</div>
-        <p class="card-desc">おちゃのいいかおり〜</p>
-      </button>
+        <button class="card" data-butter="matcha">
+          <span class="card-emoji">🍵</span>
+          <div class="card-name">まっちゃバター</div>
+          <p class="card-desc">おちゃのいいかおり〜</p>
+        </button>
+      </div>
+    </div>
+
+    <div class="category-section">
+      <h2 class="category-title">🥟 肉まんスクイーズ</h2>
+      <div class="cards">
+        <button class="card" data-butter="nikuman_normal">
+          <span class="card-emoji">🥟</span>
+          <div class="card-name">ふつうの肉まん</div>
+          <p class="card-desc">ほかほか＆まっ白もちもち！</p>
+        </button>
+
+        <button class="card" data-butter="nikuman_ichigo">
+          <span class="card-emoji">🍓🥟</span>
+          <div class="card-name">いちご肉まん</div>
+          <p class="card-desc">ピンクのあまい肉まん♡</p>
+        </button>
+
+        <button class="card" data-butter="nikuman_choco">
+          <span class="card-emoji">🍫🥟</span>
+          <div class="card-name">チョコ肉まん</div>
+          <p class="card-desc">とろけるチョコまん♪</p>
+        </button>
+
+        <button class="card" data-butter="nikuman_matcha">
+          <span class="card-emoji">🍵🥟</span>
+          <div class="card-name">まっちゃ肉まん</div>
+          <p class="card-desc">ほろにがお茶の肉まん〜</p>
+        </button>
+      </div>
     </div>
 
     <a href="../" class="home-link">🏠 あそびばにもどる</a>
@@ -64,29 +96,19 @@
       <div id="butter-stage" class="butter-stage">
         <svg id="butter-svg" viewBox="0 0 320 220" class="butter-svg">
           <defs>
-            <!-- もちもちバター本体のグラデーション（ふっくら立体感） -->
+            <!-- もちもちバター本体のグラデーション -->
             <radialGradient id="squish-body-grad" cx="40%" cy="30%" r="70%">
               <stop offset="0%" stop-color="var(--butter-light)" />
               <stop offset="65%" stop-color="var(--butter-main)" />
               <stop offset="100%" stop-color="var(--butter-dark)" />
             </radialGradient>
-            <!-- もちもちバター底の影 -->
-            <linearGradient id="squish-bottom-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="var(--butter-main)" />
-              <stop offset="100%" stop-color="var(--butter-shadow)" />
-            </linearGradient>
 
-            <!-- 外側ワックスシェルのグラデーション（白っぽく硬いワックス質感） -->
+            <!-- 外側ワックスシェルのグラデーション -->
             <linearGradient id="wax-top-grad" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="rgba(255, 255, 255, 0.95)" />
               <stop offset="35%" stop-color="var(--butter-light)" />
               <stop offset="85%" stop-color="var(--butter-main)" />
               <stop offset="100%" stop-color="rgba(255, 255, 255, 0.85)" />
-            </linearGradient>
-            <linearGradient id="wax-front-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="var(--butter-main)" />
-              <stop offset="50%" stop-color="var(--butter-dark)" />
-              <stop offset="100%" stop-color="var(--butter-shadow)" />
             </linearGradient>
 
             <!-- ツヤツヤハイライト -->
@@ -104,21 +126,39 @@
           <!-- 影 -->
           <ellipse cx="160" cy="188" rx="120" ry="18" fill="rgba(100, 60, 20, 0.18)" id="butter-drop-shadow" />
 
-          <!-- 【層1: もちもちバター本体（内側）】 -->
+          <!-- 肉まんの敷き紙（肉まん選択時に表示） -->
+          <rect id="nikuman-paper" class="nikuman-paper hidden"
+            x="70" y="174" width="180" height="10" rx="3"
+            fill="#e8dcc4" stroke="#d5c4a6" stroke-width="1.5" stroke-dasharray="6,4" />
+
+          <!-- 【層1: もちもち本体（内側）】 -->
           <g id="butter-core" filter="url(#squish-shadow)">
-            <!-- ふっくら角丸のメインボディ -->
+            <!-- メインボディ（バターまたは肉まんの形） -->
             <path id="core-body" class="core-body"
               d="M 60,75 C 60,50 90,42 160,42 C 230,42 260,50 260,75 C 260,95 264,135 258,162 C 254,178 220,182 160,182 C 100,182 66,178 62,162 C 56,135 60,95 60,75 Z"
               fill="url(#squish-body-grad)" />
 
-            <!-- もちもちの上部ハイライト（ぽってりツヤ） -->
+            <!-- もちもちの上部ハイライト -->
             <ellipse cx="140" cy="65" rx="75" ry="16" fill="rgba(255, 255, 255, 0.45)" class="core-shine" />
             <ellipse cx="120" cy="62" rx="35" ry="7" fill="rgba(255, 255, 255, 0.7)" class="core-shine-bright" />
+
+            <!-- 肉まんのてっぺんのひだ（結び目）パーツ -->
+            <g id="nikuman-pleats" class="nikuman-pleats hidden">
+              <!-- ひだのしわ -->
+              <path d="M 160,42 Q 150,56 135,70" stroke="rgba(0,0,0,0.12)" stroke-width="3" stroke-linecap="round" fill="none" />
+              <path d="M 160,42 Q 162,58 160,72" stroke="rgba(0,0,0,0.12)" stroke-width="3" stroke-linecap="round" fill="none" />
+              <path d="M 160,42 Q 170,56 185,70" stroke="rgba(0,0,0,0.12)" stroke-width="3" stroke-linecap="round" fill="none" />
+              <path d="M 160,42 Q 140,50 115,58" stroke="rgba(0,0,0,0.12)" stroke-width="2.5" stroke-linecap="round" fill="none" />
+              <path d="M 160,42 Q 180,50 205,58" stroke="rgba(0,0,0,0.12)" stroke-width="2.5" stroke-linecap="round" fill="none" />
+              <!-- てっぺんのきゅっとした絞り -->
+              <ellipse cx="160" cy="42" rx="10" ry="6" fill="var(--butter-dark)" opacity="0.6" />
+              <ellipse cx="160" cy="40" rx="6" ry="3.5" fill="var(--butter-main)" />
+            </g>
           </g>
 
           <!-- 【層2: 外側の薄いワックス膜（パキパキ割れて剥がれる殻）】 -->
           <g id="wax-shell" class="wax-shell">
-            <!-- ワックス表面（上面・前面を覆うシェル） -->
+            <!-- ワックス表面 -->
             <path id="wax-cover" class="wax-cover"
               d="M 60,75 C 60,50 90,42 160,42 C 230,42 260,50 260,75 C 260,95 264,135 258,162 C 254,178 220,182 160,182 C 100,182 66,178 62,162 C 56,135 60,95 60,75 Z"
               fill="url(#wax-top-grad)" opacity="0.95" />
@@ -132,7 +172,7 @@
               fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round" />
           </g>
 
-          <!-- 【層3: ヒビ・穴あきレイヤー（割れた隙間から中身が見える）】 -->
+          <!-- 【層3: ヒビ・穴あきレイヤー】 -->
           <g id="crack-layer"></g>
         </svg>
       </div>

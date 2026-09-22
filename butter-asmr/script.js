@@ -240,33 +240,72 @@ class SoundManager {
 
 const sound = new SoundManager();
 
-// ----- バターデータ -----
+// ----- バター・スクイーズデータ -----
 const BUTTERS = {
+  // バタースクイーズ
   normal: {
     name: 'ふつうのバター',
     emoji: '🧈',
     cssClass: '',
     labelColor: '#ff8c42',
+    type: 'butter'
   },
   choco: {
     name: 'チョコバター',
     emoji: '🍫',
     cssClass: 'butter-choco',
     labelColor: '#7a5020',
+    type: 'butter'
   },
   ichigo: {
     name: 'いちごバター',
     emoji: '🍓',
     cssClass: 'butter-ichigo',
     labelColor: '#ff69b4',
+    type: 'butter'
   },
   matcha: {
     name: 'まっちゃバター',
     emoji: '🍵',
     cssClass: 'butter-matcha',
     labelColor: '#5b8a3c',
+    type: 'butter'
+  },
+
+  // 肉まんスクイーズ
+  nikuman_normal: {
+    name: 'ふつうの肉まん',
+    emoji: '🥟',
+    cssClass: 'butter-nikuman-normal',
+    labelColor: '#8a6a4e',
+    type: 'nikuman'
+  },
+  nikuman_ichigo: {
+    name: 'いちご肉まん',
+    emoji: '🍓🥟',
+    cssClass: 'butter-nikuman-ichigo',
+    labelColor: '#ff69b4',
+    type: 'nikuman'
+  },
+  nikuman_choco: {
+    name: 'チョコ肉まん',
+    emoji: '🍫🥟',
+    cssClass: 'butter-nikuman-choco',
+    labelColor: '#7a5020',
+    type: 'nikuman'
+  },
+  nikuman_matcha: {
+    name: 'まっちゃ肉まん',
+    emoji: '🍵🥟',
+    cssClass: 'butter-nikuman-matcha',
+    labelColor: '#5b8a3c',
+    type: 'nikuman'
   },
 };
+
+// 形状パス（バター用 ＆ 肉まん用）
+const PATH_BUTTER = 'M 60,75 C 60,50 90,42 160,42 C 230,42 260,50 260,75 C 260,95 264,135 258,162 C 254,178 220,182 160,182 C 100,182 66,178 62,162 C 56,135 60,95 60,75 Z';
+const PATH_NIKUMAN = 'M 65,165 C 55,140 55,100 90,65 C 120,40 160,36 160,36 C 160,36 200,40 230,65 C 265,100 265,140 255,165 C 250,175 220,180 160,180 C 100,180 70,175 65,165 Z';
 
 // ----- State -----
 let currentButter = null;
@@ -303,12 +342,31 @@ function goToPlay(butterKey) {
   currentButter = butterKey;
   const data = BUTTERS[butterKey];
 
-  // バター色を適用
+  // 色テーマを適用
   document.body.className = data.cssClass;
 
   // ラベル更新
   butterLabel.textContent = data.emoji + ' ' + data.name;
   butterLabel.style.color = data.labelColor;
+
+  // バター vs 肉まんの形状切り替え
+  const isNikuman = data.type === 'nikuman';
+  const nikumanPleats = document.getElementById('nikuman-pleats');
+  const nikumanPaper = document.getElementById('nikuman-paper');
+  const coreBody = document.getElementById('core-body');
+  const waxCover = document.getElementById('wax-cover');
+
+  if (isNikuman) {
+    if (nikumanPleats) nikumanPleats.classList.remove('hidden');
+    if (nikumanPaper) nikumanPaper.classList.remove('hidden');
+    if (coreBody) coreBody.setAttribute('d', PATH_NIKUMAN);
+    if (waxCover) waxCover.setAttribute('d', PATH_NIKUMAN);
+  } else {
+    if (nikumanPleats) nikumanPleats.classList.add('hidden');
+    if (nikumanPaper) nikumanPaper.classList.add('hidden');
+    if (coreBody) coreBody.setAttribute('d', PATH_BUTTER);
+    if (waxCover) waxCover.setAttribute('d', PATH_BUTTER);
+  }
 
   // リセット
   resetButter();
