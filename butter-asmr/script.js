@@ -26,48 +26,61 @@ class SoundManager {
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
 
-    // ノイズバースト（パキッの質感）
-    const bufSize = this.ctx.sampleRate * 0.06;
+    // ピンッとした高音クリック（パキの「パ」）
+    const ping = this.ctx.createOscillator();
+    ping.type = 'sine';
+    const pingFreq = 4000 - progress * 2500; // 高→低に変化
+    ping.frequency.setValueAtTime(pingFreq, now);
+    ping.frequency.exponentialRampToValueAtTime(pingFreq * 0.3, now + 0.02);
+
+    const pingGain = this.ctx.createGain();
+    pingGain.gain.setValueAtTime(0.25, now);
+    pingGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+    ping.connect(pingGain);
+    pingGain.connect(this.ctx.destination);
+    ping.start(now);
+    ping.stop(now + 0.04);
+
+    // カチッとしたアタック音（パキの「キ」）
+    const click = this.ctx.createOscillator();
+    click.type = 'triangle';
+    click.frequency.setValueAtTime(2000 - progress * 800, now + 0.008);
+    click.frequency.exponentialRampToValueAtTime(200, now + 0.025);
+
+    const clickGain = this.ctx.createGain();
+    clickGain.gain.setValueAtTime(0, now);
+    clickGain.gain.setValueAtTime(0.2, now + 0.008);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+
+    click.connect(clickGain);
+    clickGain.connect(this.ctx.destination);
+    click.start(now);
+    click.stop(now + 0.04);
+
+    // 超短ノイズ（質感の厚み）
+    const bufSize = Math.floor(this.ctx.sampleRate * 0.02);
     const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
     const data = buf.getChannelData(0);
     for (let i = 0; i < bufSize; i++) {
-      // 急速に減衰するノイズ
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 3);
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 8);
     }
     const noise = this.ctx.createBufferSource();
     noise.buffer = buf;
 
-    // フィルタ：進捗に応じて低音が増える
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.value = 3000 - progress * 2000; // 3000Hz → 1000Hz
-    filter.Q.value = 1.5;
+    const hpf = this.ctx.createBiquadFilter();
+    hpf.type = 'highpass';
+    hpf.frequency.value = 4000 - progress * 2000;
 
-    // ゲイン
-    const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(0.4 + progress * 0.3, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    const noiseGain = this.ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.15 + progress * 0.15, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
 
-    noise.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.ctx.destination);
+    noise.connect(hpf);
+    hpf.connect(noiseGain);
+    noiseGain.connect(this.ctx.destination);
     noise.start(now);
-    noise.stop(now + 0.08);
-
-    // クリック音（アタック感）
-    const osc = this.ctx.createOscillator();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(800 - progress * 400, now);
-    osc.frequency.exponentialRampToValueAtTime(100, now + 0.03);
-
-    const clickGain = this.ctx.createGain();
-    clickGain.gain.setValueAtTime(0.15, now);
-    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-
-    osc.connect(clickGain);
-    clickGain.connect(this.ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.05);
+    noise.stop(now + 0.03);
   }
 
   // 完全に割れた時の音
