@@ -1735,6 +1735,7 @@ function setupModalEvents() {
   const btnStagePlay = document.getElementById('btn-stage-play');
   const stageCard1 = document.getElementById('stage-card-1');
   const stageCard2 = document.getElementById('stage-card-2');
+  const stageCard3 = document.getElementById('stage-card-3');
   const btnClearNextStage = document.getElementById('btn-clear-next-stage');
 
   function openStageSelect() {
@@ -1777,6 +1778,12 @@ function setupModalEvents() {
       sounds.playCollect();
     });
   }
+  if (stageCard3) {
+    stageCard3.addEventListener('click', () => {
+      setStage(3);
+      sounds.playCollect();
+    });
+  }
   if (btnStagePlay) {
     btnStagePlay.addEventListener('click', chooseAndPlayStage);
   }
@@ -1785,6 +1792,8 @@ function setupModalEvents() {
     btnClearNextStage.addEventListener('click', () => {
       if (currentStage === 1) {
         setStage(2);
+      } else if (currentStage === 2) {
+        setStage(3);
       } else {
         setStage(1);
       }
@@ -1910,14 +1919,14 @@ let currentStage = 1;
 function loadCurrentStage() {
   try {
     const s = parseInt(localStorage.getItem(STAGE_KEY), 10);
-    return (s === 2) ? 2 : 1;
+    return (s === 2 || s === 3) ? s : 1;
   } catch (e) {
     return 1;
   }
 }
 
 function setStage(stageNum) {
-  currentStage = (stageNum === 2) ? 2 : 1;
+  currentStage = (stageNum === 3) ? 3 : (stageNum === 2 ? 2 : 1);
   try {
     localStorage.setItem(STAGE_KEY, currentStage);
   } catch (e) {}
@@ -1927,13 +1936,21 @@ function setStage(stageNum) {
 function updateStageUI() {
   const titleEl = document.getElementById('start-stage-title');
   if (titleEl) {
-    titleEl.textContent = currentStage === 1 ? '🍰 ステージ1：スイーツマウンテン' : '🍦 ステージ2：ひんやりフルーツパフェ';
+    if (currentStage === 3) {
+      titleEl.textContent = '🌌 ステージ3：ほしぞらギャラクシー';
+    } else if (currentStage === 2) {
+      titleEl.textContent = '🍦 ステージ2：ひんやりフルーツパフェ';
+    } else {
+      titleEl.textContent = '🍰 ステージ1：スイーツマウンテン';
+    }
   }
   const card1 = document.getElementById('stage-card-1');
   const card2 = document.getElementById('stage-card-2');
+  const card3 = document.getElementById('stage-card-3');
   if (card1 && card2) {
     card1.classList.toggle('active', currentStage === 1);
     card2.classList.toggle('active', currentStage === 2);
+    if (card3) card3.classList.toggle('active', currentStage === 3);
   }
 }
 
@@ -2317,11 +2334,170 @@ function initStage2() {
   particles = [];
 }
 
+// ==========================================
+// ステージ3：🌌 ほしぞらギャラクシースイーツ
+// ==========================================
+function initStage3() {
+  stageWidth = 5400;
+  stageHeight = 2400;
+
+  checkpoints = {
+    1: { x: 80, y: 2196, color: 'red', name: '🌠 ミルキーウェイ' },
+    2: { x: 1400, y: 1736, color: 'yellow', name: '🪐 プラネットドーナツ' },
+    3: { x: 2360, y: 1266, color: 'black', name: '☁️ ネビュラわたあめ' },
+    4: { x: 3460, y: 806, color: 'white', name: '✨ スターライトブリッジ' }
+  };
+
+  platforms = [
+    // ========================================================
+    // エリア1: 🌠 ミルキーウェイ＆お砂糖の星屑（地上 y: 2250〜1850）
+    // ========================================================
+    { x: 0, y: 2250, width: 440, height: 180, type: 'cookie', tier: 1, colorTier: 'red' },
+    // 🍮 プリンのトランポリン
+    { x: 340, y: 2220, width: 75, height: 30, type: 'pudding', tier: 1, colorTier: 'red' },
+    // ウエハースステップ
+    { x: 490, y: 2160, width: 110, height: 30, type: 'wafer', tier: 1, colorTier: 'red' },
+    // ☁️ ネビュラわたあめのスーパージャンプ！
+    { x: 680, y: 2090, width: 85, height: 30, type: 'cotton_candy', tier: 1, colorTier: 'red', squash: 0 },
+    // 宇宙マカロン（動く足場・パープル）
+    { x: 870, y: 2000, width: 110, height: 30, type: 'macaron', tier: 1, color: '#aa77ff', vy: 0.85, minY: 1950, maxY: 2050, colorTier: 'red' },
+    // つるつるアイス星屑床
+    { x: 1060, y: 1930, width: 130, height: 32, type: 'ice_cream', tier: 1, colorTier: 'red' },
+    { x: 1250, y: 1860, width: 95, height: 28, type: 'wafer', tier: 1, colorTier: 'red' },
+
+    // ========================================================
+    // エリア2: 🪐 プラネットドーナツ＆星空ステップ（y: 1850〜1400）
+    // ========================================================
+    { x: 1400, y: 1790, width: 150, height: 40, type: 'cookie', tier: 2, colorTier: 'yellow', isCheckPoint: true },
+    { x: 1590, y: 1710, width: 90, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
+    // ☁️ わたあめ大ジャンプ
+    { x: 1720, y: 1650, width: 85, height: 30, type: 'cotton_candy', tier: 2, colorTier: 'yellow', squash: 0 },
+    // ゴールデンマカロン（動く足場）
+    { x: 1840, y: 1540, width: 100, height: 28, type: 'macaron', tier: 2, color: '#ffdd44', vy: -0.95, minY: 1480, maxY: 1590, colorTier: 'yellow' },
+    // 🍫 とけるチョコ足場
+    { x: 2000, y: 1480, width: 95, height: 28, type: 'melting_choco', tier: 2, colorTier: 'yellow', initialY: 1480, meltTimer: 0, isMelted: false, respawnTimer: 0, isStepped: false, shake: 0 },
+    // つるつるアイス床
+    { x: 2150, y: 1420, width: 110, height: 30, type: 'ice_cream', tier: 2, colorTier: 'yellow' },
+    { x: 2270, y: 1360, width: 90, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
+
+    // ========================================================
+    // エリア3: ☁️ ネビュラわたあめ＆コズミックマカロン（y: 1400〜950）
+    // ========================================================
+    { x: 2360, y: 1320, width: 200, height: 48, type: 'cookie', tier: 3, colorTier: 'black', isCheckPoint: true },
+    // 🍮 プリンのトランポリン
+    { x: 2600, y: 1290, width: 75, height: 28, type: 'pudding', tier: 3, colorTier: 'black' },
+    // ディープネビュラマカロン（動く足場）
+    { x: 2720, y: 1170, width: 110, height: 30, type: 'macaron', tier: 3, color: '#8855ff', vy: 1.05, minY: 1110, maxY: 1230, colorTier: 'black' },
+    // 🍫 とけるチョコ足場
+    { x: 2880, y: 1120, width: 95, height: 28, type: 'melting_choco', tier: 3, colorTier: 'black', initialY: 1120, meltTimer: 0, isMelted: false, respawnTimer: 0, isStepped: false, shake: 0 },
+    // ☁️ わたあめ大ジャンプ
+    { x: 3030, y: 1060, width: 85, height: 30, type: 'cotton_candy', tier: 3, colorTier: 'black', squash: 0 },
+    // つるつるアイス床
+    { x: 3180, y: 990, width: 110, height: 30, type: 'ice_cream', tier: 3, colorTier: 'black' },
+    { x: 3320, y: 920, width: 95, height: 26, type: 'wafer', tier: 3, colorTier: 'black' },
+
+    // ========================================================
+    // エリア4: ✨ スターライトクリスタルブリッジ（y: 950〜450）
+    // ========================================================
+    { x: 3460, y: 860, width: 200, height: 50, type: 'cookie', tier: 4, colorTier: 'white', isCheckPoint: true },
+    // つるつるアイス床
+    { x: 3700, y: 790, width: 120, height: 30, type: 'ice_cream', tier: 4, colorTier: 'white' },
+    // シアンコズミックマカロン
+    { x: 3860, y: 700, width: 110, height: 30, type: 'macaron', tier: 4, color: '#00e5ff', vy: -1.0, minY: 640, maxY: 750, colorTier: 'white' },
+    // 🍮 プリンのトランポリン
+    { x: 4010, y: 720, width: 75, height: 28, type: 'pudding', tier: 4, colorTier: 'white' },
+    // ☁️ わたあめ大ジャンプ
+    { x: 4130, y: 610, width: 85, height: 30, type: 'cotton_candy', tier: 4, colorTier: 'white', squash: 0 },
+    // クリスタルレインボーアイスブリッジ
+    { x: 4270, y: 530, width: 150, height: 32, type: 'ice_cream', tier: 4, colorTier: 'rainbow' },
+    // レインボーウエハースブリッジ
+    { x: 4490, y: 450, width: 180, height: 32, type: 'wafer', tier: 4, colorTier: 'rainbow' },
+
+    // ========================================================
+    // エリア5: 👑 特大コズミックスターケーキ城の台座（y: 350）
+    // ========================================================
+    { x: 4740, y: 360, width: 540, height: 180, type: 'cake_ground', tier: 5, colorTier: 'rainbow' }
+  ];
+
+  updrafts = [
+    { x: 1190, y: 1780, width: 85, height: 260 },
+    { x: 3310, y: 840, width: 85, height: 260 }
+  ];
+
+  spikes = [
+    { x: 590, y: 2235, width: 50, height: 18, type: 'konpeito', color: '#ff77ff' },
+    { x: 990, y: 2235, width: 50, height: 18, type: 'konpeito', color: '#66eeff' },
+    { x: 1750, y: 1770, width: 45, height: 18, type: 'konpeito', color: '#ffe066' },
+    { x: 2650, y: 1335, width: 50, height: 20, type: 'choco_spike', color: '#331144' },
+    { x: 2940, y: 1210, width: 45, height: 20, type: 'choco_spike', color: '#331144' },
+    { x: 3810, y: 840, width: 45, height: 18, type: 'konpeito', color: '#9977ff' }
+  ];
+
+  // 🪐 宇宙のプラネットドーナツ！
+  donuts = [
+    { x: 220, y: 2232, radius: 18, vx: 1.7, minX: 80, maxX: 420, rotation: 0, dough: '#1f1a3a', frosting: '#ff55bb', sprinkles: true, squash: 0 },
+    { x: 2450, y: 1302, radius: 18, vx: -1.8, minX: 2370, maxX: 2530, rotation: 0, dough: '#1a2244', frosting: '#00e5ff', sprinkles: true, squash: 0 },
+    { x: 3560, y: 842, radius: 18, vx: 2.1, minX: 3480, maxX: 3640, rotation: 0, dough: '#2e143b', frosting: '#ffe066', sprinkles: true, squash: 0 }
+  ];
+
+  // 宇宙スイーツアイテム
+  items = [
+    // 赤エリア
+    { x: 220, y: 2200, type: '🌟', collected: false, floatOffset: 0 },
+    { x: 380, y: 2200, type: '🪐', collected: false, floatOffset: 1 },
+    { x: 560, y: 2110, type: '🚀', collected: false, floatOffset: 2 },
+    { x: 640, y: 2020, type: '💖', collected: false, floatOffset: 1 }, // 回復ハート
+    { x: 720, y: 1950, type: '⭐', collected: false, floatOffset: 3 },
+    { x: 910, y: 1940, type: '🍬', collected: false, floatOffset: 2 },
+    { x: 1100, y: 1880, type: '🌟', collected: false, floatOffset: 4 },
+
+    // 黄エリア
+    { x: 1450, y: 1730, type: '🪐', collected: false, floatOffset: 0 },
+    { x: 1620, y: 1640, type: '⭐', collected: false, floatOffset: 1 },
+    { x: 1760, y: 1510, type: '🍬', collected: false, floatOffset: 2 },
+    { x: 1860, y: 1470, type: '💖', collected: false, floatOffset: 2 }, // 回復ハート
+    { x: 2030, y: 1420, type: '🌟', collected: false, floatOffset: 3 },
+    { x: 2180, y: 1360, type: '🚀', collected: false, floatOffset: 4 },
+
+    // 黒エリア
+    { x: 2470, y: 1260, type: '🪐', collected: false, floatOffset: 0 },
+    { x: 2630, y: 1170, type: '🍬', collected: false, floatOffset: 1 },
+    { x: 2780, y: 1100, type: '💖', collected: false, floatOffset: 3 }, // 回復ハート
+    { x: 2930, y: 1060, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 3180, y: 910, type: '🌟', collected: false, floatOffset: 3 },
+    { x: 3330, y: 860, type: '🚀', collected: false, floatOffset: 4 },
+
+    // 白エリア
+    { x: 3530, y: 800, type: '🪐', collected: false, floatOffset: 0 },
+    { x: 3750, y: 720, type: '⭐', collected: false, floatOffset: 1 },
+    { x: 3930, y: 640, type: '💖', collected: false, floatOffset: 0 }, // 回復ハート
+    { x: 4140, y: 480, type: '🌟', collected: false, floatOffset: 2 },
+    { x: 4290, y: 470, type: '🍭', collected: false, floatOffset: 3 },
+    { x: 4520, y: 390, type: '🌈', collected: false, floatOffset: 4 },
+
+    // ゴールエリア
+    { x: 4780, y: 300, type: '🌟', collected: false, floatOffset: 1 },
+    { x: 4900, y: 290, type: '👑', collected: false, floatOffset: 2 },
+    { x: 5020, y: 300, type: '💖', collected: false, floatOffset: 3 }
+  ];
+
+  goal = {
+    x: 4860,
+    y: 200,
+    width: 200,
+    height: 160
+  };
+
+  particles = [];
+}
+
 // ステージ初期化（指定されたステージまたはcurrentStageを読み込む）
 function initStage(stageNum) {
   const s = stageNum || currentStage || 1;
   currentStage = s;
-  if (s === 2) {
+  if (s === 3) {
+    initStage3();
+  } else if (s === 2) {
     initStage2();
   } else {
     initStage1();
@@ -3128,6 +3304,12 @@ function drawDonut(d) {
 
 // 背景とお菓子の雲（各エリアの高度に応じた美しいグラデーションまたは夜空）
 function drawBackground() {
+  // ステージ3：ほしぞらギャラクシースイーツの専用背景
+  if (currentStage === 3) {
+    drawStage3Background();
+    return;
+  }
+
   // ステージ2：ひんやりフルーツパフェの専用背景
   if (currentStage === 2) {
     drawStage2Background();
@@ -3345,6 +3527,177 @@ function drawIceCrystals() {
     ctx.fill();
   }
   ctx.restore();
+}
+
+// ステージ3：ほしぞらギャラクシースイーツの背景描画
+function drawStage3Background() {
+  const heightRatio = Math.max(0, Math.min(1, camera.y / (stageHeight - V_HEIGHT)));
+
+  // 深宇宙コズミックグラデーション
+  const grad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
+  if (isNightMode) {
+    // 【よるモード】超深宇宙・ブラックベリーバイオレット
+    grad.addColorStop(0, '#060212');
+    grad.addColorStop(0.5, '#0e0824');
+    grad.addColorStop(1, '#1b0d36');
+  } else {
+    // 【通常モード】きらめく星空ネビュラパープル＆ギャラクシーブルー
+    if (heightRatio < 0.25) {
+      // 天空スターライト
+      grad.addColorStop(0, '#0f0524');
+      grad.addColorStop(0.5, '#1e1045');
+      grad.addColorStop(1, '#3b1861');
+    } else if (heightRatio < 0.5) {
+      // 星雲ネビュラゾーン
+      grad.addColorStop(0, '#150a30');
+      grad.addColorStop(0.6, '#281250');
+      grad.addColorStop(1, '#431969');
+    } else if (heightRatio < 0.75) {
+      // プラネットゾーン
+      grad.addColorStop(0, '#1c0f3d');
+      grad.addColorStop(0.6, '#2e1957');
+      grad.addColorStop(1, '#4b2170');
+    } else {
+      // ミルキーウェイ地上
+      grad.addColorStop(0, '#1f1242');
+      grad.addColorStop(0.6, '#311a5c');
+      grad.addColorStop(1, '#53237a');
+    }
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+
+  ctx.save();
+
+  // 1. 遠くの淡い星雲（ネビュラガス光彩）
+  const neb1 = ctx.createRadialGradient(220, 140, 10, 220, 140, 260);
+  neb1.addColorStop(0, 'rgba(180, 80, 255, 0.22)');
+  neb1.addColorStop(0.6, 'rgba(0, 220, 255, 0.12)');
+  neb1.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = neb1;
+  ctx.fillRect(0, 0, 500, 360);
+
+  const neb2 = ctx.createRadialGradient(680, 280, 20, 680, 280, 280);
+  neb2.addColorStop(0, 'rgba(255, 80, 180, 0.18)');
+  neb2.addColorStop(0.5, 'rgba(120, 60, 255, 0.10)');
+  neb2.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = neb2;
+  ctx.fillRect(400, 100, 400, 400);
+
+  // 2. 巨大なリング付き惑星（パステルサターン 🪐）
+  const planetX = 660 - (camera.x * 0.05) % 150;
+  const planetY = 95 - (camera.y * 0.03) % 80;
+  
+  // 惑星のリング（後ろ半分）
+  ctx.save();
+  ctx.translate(planetX, planetY);
+  ctx.rotate(-0.38);
+  ctx.strokeStyle = 'rgba(255, 215, 120, 0.45)';
+  ctx.lineWidth = 14;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 72, 18, 0, Math.PI, Math.PI * 2);
+  ctx.stroke();
+
+  // 惑星の球体（キャンディストライプ）
+  const pGrad = ctx.createLinearGradient(-32, -32, 32, 32);
+  pGrad.addColorStop(0, '#e5b2ff');
+  pGrad.addColorStop(0.35, '#ff99dd');
+  pGrad.addColorStop(0.7, '#ffc285');
+  pGrad.addColorStop(1, '#7ee8ff');
+  ctx.fillStyle = pGrad;
+  ctx.beginPath();
+  ctx.arc(0, 0, 34, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 惑星のリング（手前半分）
+  ctx.strokeStyle = 'rgba(255, 225, 140, 0.85)';
+  ctx.lineWidth = 14;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 72, 18, 0, 0, Math.PI);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  // 3. 流れ星（シューティングスター）
+  const t = Date.now() * 0.001;
+  const meteorTime = (t * 0.7) % 3.5;
+  if (meteorTime < 0.9) {
+    const progress = meteorTime / 0.9;
+    const mx = 820 - progress * 400;
+    const my = 40 + progress * 240;
+    const mLen = 90;
+    const mGrad = ctx.createLinearGradient(mx, my, mx + mLen * 0.86, my - mLen * 0.5);
+    mGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+    mGrad.addColorStop(0.3, 'rgba(255, 220, 100, 0.7)');
+    mGrad.addColorStop(1, 'rgba(255, 100, 200, 0)');
+    ctx.strokeStyle = mGrad;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(mx, my);
+    ctx.lineTo(mx + mLen * 0.86, my - mLen * 0.5);
+    ctx.stroke();
+
+    // 流れ星の頭
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(mx, my, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 4. きらめく星々
+  drawCosmicStars();
+
+  ctx.restore();
+
+  // 5. ふわふわの星屑雲
+  const cloudOffsetX = (camera.x * 0.25) % 800;
+  const cloudOffsetY = (camera.y * 0.18) % 300;
+  ctx.fillStyle = 'rgba(180, 140, 230, 0.35)';
+  for (let i = -1; i < 4; i++) {
+    const cx = i * 360 - cloudOffsetX;
+    drawMarshmallowCloud(cx + 60, 80 - cloudOffsetY + 50, 75);
+    drawMarshmallowCloud(cx + 240, 180 - cloudOffsetY + 50, 55);
+  }
+}
+
+function drawCosmicStars() {
+  const t = Date.now() * 0.001;
+  for (let i = 0; i < 35; i++) {
+    const sx = (i * 97 + (i % 7) * 23) % V_WIDTH;
+    const sy = (i * 61 + (i % 5) * 37) % (V_HEIGHT - 40) + 20;
+    const alpha = 0.3 + 0.6 * Math.sin(t * (1.5 + (i % 3) * 0.8) + i);
+    const size = 1.5 + (i % 3) * 1.5;
+    
+    ctx.fillStyle = (i % 4 === 0) ? `rgba(255, 220, 120, ${alpha})` :
+                    (i % 4 === 1) ? `rgba(130, 230, 255, ${alpha})` :
+                    (i % 4 === 2) ? `rgba(255, 150, 220, ${alpha})` :
+                                    `rgba(255, 255, 255, ${alpha})`;
+    
+    if (i % 5 === 0) {
+      // 4方向のキラリ星
+      const rad = size * 2.2;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy - rad);
+      ctx.lineTo(sx + rad * 0.3, sy);
+      ctx.lineTo(sx + rad, sy);
+      ctx.lineTo(sx + rad * 0.3, sy + rad * 0.3);
+      ctx.lineTo(sx, sy + rad);
+      ctx.lineTo(sx - rad * 0.3, sy + rad * 0.3);
+      ctx.lineTo(sx - rad, sy);
+      ctx.lineTo(sx - rad * 0.3, sy);
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.arc(sx, sy, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
 }
 
 // 🌵 とげとげ障害物（金平糖トゲ・チョコツノ）の描画
@@ -3703,6 +4056,11 @@ function drawItem(it) {
 
 // ゴール描画
 function drawGoal() {
+  if (currentStage === 3) {
+    drawStage3Goal();
+    return;
+  }
+
   if (currentStage === 2) {
     drawStage2ParfaitGoal();
     return;
@@ -3845,6 +4203,93 @@ function drawStage2ParfaitGoal() {
   ctx.font = '900 17px "M PLUS Rounded 1c"';
   ctx.textAlign = 'center';
   ctx.fillText('🍨 PARFAIT GOAL! 🍨', gx + gw / 2, gy + gh - 65);
+
+  ctx.restore();
+}
+
+// ステージ3：特大コズミックスターケーキ城のゴール描画
+function drawStage3Goal() {
+  const gx = goal.x;
+  const gy = goal.y;
+  const gw = goal.width;
+  const gh = goal.height;
+
+  ctx.save();
+
+  // ケーキ下段（コズミックパープル＆スターダストグラデーション）
+  const cakeGrad = ctx.createLinearGradient(gx, gy, gx + gw, gy);
+  cakeGrad.addColorStop(0, '#2d1454');
+  cakeGrad.addColorStop(0.25, '#752db8');
+  cakeGrad.addColorStop(0.5, '#2e7ee6');
+  cakeGrad.addColorStop(0.75, '#be2de6');
+  cakeGrad.addColorStop(1, '#ff66b3');
+  ctx.fillStyle = cakeGrad;
+
+  ctx.beginPath();
+  ctx.roundRect(gx, gy + 55, gw, 95, 20);
+  ctx.fill();
+  ctx.strokeStyle = '#ffe5ff';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  // 下段の星屑ドット
+  ctx.fillStyle = '#ffffff';
+  for (let sx = gx + 20; sx < gx + gw - 15; sx += 32) {
+    ctx.beginPath();
+    ctx.arc(sx, gy + 115, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 生クリームのホイップ波（星屑ホイップ）
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  for (let x = gx; x < gx + gw; x += 28) {
+    ctx.arc(x + 14, gy + 58, 10, 0, Math.PI);
+  }
+  ctx.fill();
+
+  // ケーキ中段（オーロラピンク）
+  const midGrad = ctx.createLinearGradient(gx + 24, gy + 15, gx + gw - 24, gy + 15);
+  midGrad.addColorStop(0, '#ff70b8');
+  midGrad.addColorStop(0.5, '#aa77ff');
+  midGrad.addColorStop(1, '#66ddff');
+  ctx.fillStyle = midGrad;
+  ctx.beginPath();
+  ctx.roundRect(gx + 24, gy + 14, gw - 48, 48, 14);
+  ctx.fill();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // 中段を囲む黄金のプラネットリング
+  ctx.save();
+  ctx.translate(gx + gw / 2, gy + 38);
+  ctx.rotate(-0.15);
+  ctx.strokeStyle = 'rgba(255, 220, 100, 0.9)';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, gw * 0.44, 15, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // 上部のスタータワー＆大きな金色の星 🌟
+  ctx.font = '48px "M PLUS Rounded 1c"';
+  ctx.textAlign = 'center';
+  ctx.fillText('🌟', gx + gw / 2, gy - 6);
+
+  // 左右のミニロケット＆お星さま飾り
+  ctx.font = '24px sans-serif';
+  ctx.fillText('🪐', gx + 30, gy + 10);
+  ctx.fillText('🚀', gx + gw - 30, gy + 10);
+
+  // COSMIC GOAL フラッグテキスト
+  ctx.fillStyle = '#ffe853';
+  ctx.shadowColor = '#ff66cc';
+  ctx.shadowBlur = 8;
+  ctx.font = '900 17px "M PLUS Rounded 1c"';
+  ctx.textAlign = 'center';
+  ctx.fillText('🌟 COSMIC GOAL! 🌟', gx + gw / 2, gy + 96);
+  ctx.shadowBlur = 0;
 
   ctx.restore();
 }
@@ -4152,11 +4597,23 @@ function reachGoal() {
   // クリアしたステージ名の表示＆つぎのステージボタンの更新
   const clearStageEl = document.getElementById('clear-stage-name');
   if (clearStageEl) {
-    clearStageEl.textContent = currentStage === 1 ? '🍰 ステージ1：スイーツマウンテン' : '🍦 ステージ2：ひんやりフルーツパフェ';
+    if (currentStage === 3) {
+      clearStageEl.textContent = '🌌 ステージ3：ほしぞらギャラクシー';
+    } else if (currentStage === 2) {
+      clearStageEl.textContent = '🍦 ステージ2：ひんやりフルーツパフェ';
+    } else {
+      clearStageEl.textContent = '🍰 ステージ1：スイーツマウンテン';
+    }
   }
   const nextStageBtn = document.getElementById('btn-clear-next-stage');
   if (nextStageBtn) {
-    nextStageBtn.textContent = currentStage === 1 ? '⏩ ステージ2へいく！ 🍦' : '🔁 もう一度あそぶ！ 🍨';
+    if (currentStage === 1) {
+      nextStageBtn.textContent = '⏩ ステージ2へいく！ 🍦';
+    } else if (currentStage === 2) {
+      nextStageBtn.textContent = '⏩ ステージ3へいく！ 🌌';
+    } else {
+      nextStageBtn.textContent = '👑 ぜんぶクリア！最初からあそぶ！ 🍰';
+    }
   }
 
   setTimeout(() => {
