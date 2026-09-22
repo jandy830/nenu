@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+  <title>🧈 バターASMR</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧈</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== えらぶ画面 ===== -->
+  <div id="select-screen" class="screen active">
+    <header class="header">
+      <h1>🧈 バターASMR</h1>
+      <p class="sub">すきなバターをえらんでパキパキしよう！</p>
+    </header>
+
+    <div class="cards">
+      <button class="card" data-butter="normal">
+        <span class="card-emoji">🧈</span>
+        <div class="card-name">ふつうのバター</div>
+        <p class="card-desc">きほんのバターをパキパキ！</p>
+      </button>
+
+      <button class="card" data-butter="choco">
+        <span class="card-emoji">🍫</span>
+        <div class="card-name">チョコバター</div>
+        <p class="card-desc">あまーいチョコのかおり♪</p>
+      </button>
+
+      <button class="card" data-butter="ichigo">
+        <span class="card-emoji">🍓</span>
+        <div class="card-name">いちごバター</div>
+        <p class="card-desc">ピンクでかわいい♡</p>
+      </button>
+
+      <button class="card" data-butter="matcha">
+        <span class="card-emoji">🍵</span>
+        <div class="card-name">まっちゃバター</div>
+        <p class="card-desc">おちゃのいいかおり〜</p>
+      </button>
+    </div>
+
+    <a href="../" class="home-link">🏠 あそびばにもどる</a>
+  </div>
+
+  <!-- ===== パキパキ画面 ===== -->
+  <div id="play-screen" class="screen">
+    <header class="play-header">
+      <button id="btn-back" class="btn-icon" aria-label="もどる">← もどる</button>
+      <div id="butter-label" class="butter-label">🧈 ふつうのバター</div>
+    </header>
+
+    <div id="butter-area" class="butter-area">
+      <!-- バターSVGがここに入る -->
+      <svg id="butter-svg" viewBox="0 0 300 200" class="butter-svg">
+        <!-- バター本体 -->
+        <defs>
+          <linearGradient id="butter-grad-top" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--butter-light)" />
+            <stop offset="100%" stop-color="var(--butter-main)" />
+          </linearGradient>
+          <linearGradient id="butter-grad-front" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--butter-main)" />
+            <stop offset="100%" stop-color="var(--butter-dark)" />
+          </linearGradient>
+          <linearGradient id="butter-grad-side" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="var(--butter-dark)" />
+            <stop offset="100%" stop-color="var(--butter-shadow)" />
+          </linearGradient>
+        </defs>
+
+        <!-- 上面 (平行四辺形) -->
+        <polygon id="butter-top" class="butter-face"
+          points="60,40 260,40 240,80 40,80"
+          fill="url(#butter-grad-top)" />
+
+        <!-- 前面 -->
+        <rect id="butter-front" class="butter-face"
+          x="40" y="80" width="200" height="100" rx="3"
+          fill="url(#butter-grad-front)" />
+
+        <!-- 右側面 (平行四辺形) -->
+        <polygon id="butter-side" class="butter-face"
+          points="240,80 260,40 260,140 240,180"
+          fill="url(#butter-grad-side)" />
+
+        <!-- ハイライト線 -->
+        <line x1="60" y1="42" x2="240" y2="42"
+          stroke="rgba(255,255,255,0.5)" stroke-width="2" />
+        <line x1="42" y1="82" x2="42" y2="178"
+          stroke="rgba(255,255,255,0.25)" stroke-width="1.5" />
+
+        <!-- ヒビ用レイヤー -->
+        <g id="crack-layer"></g>
+      </svg>
+
+      <p class="hint" id="hint-text">タップしてパキパキしよう！</p>
+    </div>
+
+    <!-- 完成時のボタン -->
+    <div id="complete-buttons" class="complete-buttons hidden">
+      <button id="btn-retry" class="btn-action">🔄 もういっかい</button>
+      <button id="btn-change" class="btn-action btn-secondary">🧈 べつのバター</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

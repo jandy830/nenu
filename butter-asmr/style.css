@@ -1,0 +1,349 @@
+/* ===== CSS Variables ===== */
+:root {
+  --font-main: 'M PLUS Rounded 1c', system-ui, -apple-system, sans-serif;
+  --bg-gradient: linear-gradient(135deg, #fff5e6 0%, #ffe4d9 50%, #ffd9ec 100%);
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: 4px solid #fff;
+  --card-radius: 28px;
+  --card-shadow: 0 8px 24px rgba(180, 140, 120, 0.25);
+  --card-shadow-hover: 0 14px 32px rgba(180, 140, 120, 0.4);
+  --text-brown: #6b4a2e;
+  --text-brown-light: #8a6a4e;
+  --accent-orange: #ff8c42;
+  --accent-pink: #ff5fa2;
+
+  /* バター色（デフォルト: ふつうのバター） */
+  --butter-light: #ffe680;
+  --butter-main: #ffd966;
+  --butter-dark: #f4c430;
+  --butter-shadow: #d4a010;
+}
+
+/* バター種類ごとの色 */
+.butter-choco {
+  --butter-light: #c49a50;
+  --butter-main: #8b6914;
+  --butter-dark: #6b4a10;
+  --butter-shadow: #5c3a1e;
+}
+
+.butter-ichigo {
+  --butter-light: #ffd6e0;
+  --butter-main: #ffb5c5;
+  --butter-dark: #ff85a2;
+  --butter-shadow: #ff69b4;
+}
+
+.butter-matcha {
+  --butter-light: #b5d9a0;
+  --butter-main: #90c47d;
+  --butter-dark: #6ba35a;
+  --butter-shadow: #5b8a3c;
+}
+
+/* ===== Reset ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--text-brown);
+  overflow-x: hidden;
+}
+
+/* ===== 画面切り替え ===== */
+.screen {
+  display: none;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===== えらぶ画面 ===== */
+#select-screen {
+  justify-content: center;
+  padding: 24px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.header h1 {
+  font-size: clamp(28px, 6vw, 44px);
+  font-weight: 900;
+  color: var(--accent-orange);
+  text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(255, 140, 66, 0.2);
+  margin-bottom: 8px;
+}
+
+.sub {
+  font-size: clamp(14px, 3vw, 18px);
+  font-weight: 700;
+  color: var(--text-brown-light);
+}
+
+/* カードグリッド */
+.cards {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+  max-width: 480px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--card-radius);
+  padding: 24px 16px;
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: inherit;
+  color: inherit;
+  outline: none;
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translateY(-4px) rotate(-1deg);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.card:active {
+  transform: translateY(-2px) scale(0.97);
+}
+
+.card-emoji {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.card-name {
+  font-size: clamp(16px, 3.5vw, 20px);
+  font-weight: 900;
+  color: var(--accent-orange);
+  margin-bottom: 4px;
+}
+
+/* カードごとの名前色 */
+.card[data-butter="choco"] .card-name { color: #7a5020; }
+.card[data-butter="ichigo"] .card-name { color: #ff69b4; }
+.card[data-butter="matcha"] .card-name { color: #5b8a3c; }
+
+.card-desc {
+  font-size: clamp(11px, 2.5vw, 14px);
+  font-weight: 700;
+  color: var(--text-brown-light);
+  line-height: 1.5;
+}
+
+.home-link {
+  display: inline-block;
+  margin-top: 28px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-brown-light);
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.home-link:hover {
+  opacity: 1;
+}
+
+/* ===== パキパキ画面 ===== */
+#play-screen {
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.play-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+.btn-icon {
+  background: var(--card-bg);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-brown);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(180, 140, 120, 0.15);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-icon:active {
+  transform: scale(0.95);
+}
+
+.butter-label {
+  font-size: clamp(18px, 4vw, 24px);
+  font-weight: 900;
+  color: var(--accent-orange);
+}
+
+/* バターエリア */
+.butter-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 16px;
+  position: relative;
+}
+
+.butter-svg {
+  width: 90%;
+  max-width: 400px;
+  height: auto;
+  filter: drop-shadow(0 8px 20px rgba(140, 100, 60, 0.3));
+  cursor: pointer;
+}
+
+.butter-face {
+  stroke: rgba(0, 0, 0, 0.08);
+  stroke-width: 0.5;
+}
+
+.hint {
+  margin-top: 24px;
+  font-size: clamp(14px, 3vw, 18px);
+  font-weight: 700;
+  color: var(--text-brown-light);
+  animation: hint-bounce 2s ease-in-out infinite;
+}
+
+@keyframes hint-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ===== 完成ボタン ===== */
+.complete-buttons {
+  display: flex;
+  gap: 12px;
+  padding: 20px 16px 32px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.complete-buttons.hidden {
+  display: none;
+}
+
+.btn-action {
+  flex: 1;
+  background: var(--card-bg);
+  border: 3px solid #fff;
+  border-radius: 20px;
+  padding: 16px 12px;
+  font-family: inherit;
+  font-size: clamp(14px, 3vw, 17px);
+  font-weight: 900;
+  color: var(--accent-orange);
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-action:active {
+  transform: scale(0.95);
+}
+
+.btn-secondary {
+  color: var(--text-brown-light);
+}
+
+/* ===== ヒビ線のスタイル ===== */
+.crack-line {
+  stroke: rgba(80, 50, 20, 0.6);
+  stroke-width: 2;
+  stroke-linecap: round;
+  fill: none;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: crack-draw 0.15s ease-out forwards;
+}
+
+@keyframes crack-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ===== かけらエフェクト ===== */
+.fragment {
+  position: absolute;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* ===== キラキラエフェクト ===== */
+.sparkle {
+  position: absolute;
+  pointer-events: none;
+  font-size: 24px;
+  animation: sparkle-pop 0.8s ease-out forwards;
+}
+
+@keyframes sparkle-pop {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ===== 画面遷移アニメーション ===== */
+.screen.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
