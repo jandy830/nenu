@@ -490,6 +490,197 @@ class SoundManager {
     clickGain.connect(this.ctx.destination);
     clickSource.start(now);
   }
+
+  // 1. サラサラ系（ちゃぷん、とろ〜ん、水滴・波紋音）
+  playSarasaraSound() {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const baseFreq = 750 + Math.random() * 450;
+
+    // 水滴の跳ねるサイン波
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(baseFreq * 1.5, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.7, now + 0.08);
+
+    const bpf = this.ctx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.frequency.setValueAtTime(baseFreq, now);
+    bpf.Q.value = 6.0;
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.4, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+    osc.connect(bpf);
+    bpf.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  }
+
+  // 2. アワアワ系（シュワシュワ、パチパチ、マイクロ気泡破裂音）
+  playAwaawaSound() {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // 高域の炭酸・微細泡ノイズバースト
+    const noiseDur = 0.045;
+    const noiseSize = Math.floor(this.ctx.sampleRate * noiseDur);
+    const noiseBuf = this.ctx.createBuffer(1, noiseSize, this.ctx.sampleRate);
+    const noiseData = noiseBuf.getChannelData(0);
+
+    for (let i = 0; i < noiseSize; i++) {
+      noiseData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseSize, 1.8);
+    }
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = noiseBuf;
+
+    const bpf = this.ctx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.frequency.value = 4500 + Math.random() * 1800;
+    bpf.Q.value = 3.5;
+
+    const noiseGain = this.ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.4, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + noiseDur);
+
+    noise.connect(bpf);
+    bpf.connect(noiseGain);
+    noiseGain.connect(this.ctx.destination);
+    noise.start(now);
+
+    // 2〜3個のプチッという極小ポップ
+    for (let p = 0; p < 2; p++) {
+      const popOsc = this.ctx.createOscillator();
+      popOsc.type = 'triangle';
+      const popTime = now + p * 0.015;
+      const popFreq = 1800 + Math.random() * 1200;
+      popOsc.frequency.setValueAtTime(popFreq, popTime);
+      popOsc.frequency.exponentialRampToValueAtTime(300, popTime + 0.01);
+
+      const popGain = this.ctx.createGain();
+      popGain.gain.setValueAtTime(0.2, popTime);
+      popGain.gain.exponentialRampToValueAtTime(0.001, popTime + 0.012);
+
+      popOsc.connect(popGain);
+      popGain.connect(this.ctx.destination);
+      popOsc.start(popTime);
+      popOsc.stop(popTime + 0.015);
+    }
+  }
+
+  // 3. ぶつぶつ系（ぐちょぐちょっ！ じゅくっ！ ぐちゅ〜！ ウェット生スライム音）
+  playButsubutsuSound() {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // 粘り気と水分が絡むウェットな変調サイン波
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    const baseFreq = 220 + Math.random() * 80;
+    osc.frequency.setValueAtTime(baseFreq * 1.6, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.04);
+    osc.frequency.linearRampToValueAtTime(baseFreq * 0.8, now + 0.08);
+
+    const lpf = this.ctx.createBiquadFilter();
+    lpf.type = 'lowpass';
+    lpf.frequency.setValueAtTime(700, now);
+    lpf.frequency.exponentialRampToValueAtTime(200, now + 0.09);
+
+    const oscGain = this.ctx.createGain();
+    oscGain.gain.setValueAtTime(0.5, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+    osc.connect(lpf);
+    lpf.connect(oscGain);
+    oscGain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.095);
+
+    // ぐちゅっと潰れる水分ノイズ（ロー〜ミッドの破裂音）
+    const wetDur = 0.065;
+    const wetSize = Math.floor(this.ctx.sampleRate * wetDur);
+    const wetBuf = this.ctx.createBuffer(1, wetSize, this.ctx.sampleRate);
+    const wetData = wetBuf.getChannelData(0);
+    for (let i = 0; i < wetSize; i++) {
+      wetData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / wetSize, 2);
+    }
+    const wetSource = this.ctx.createBufferSource();
+    wetSource.buffer = wetBuf;
+
+    const bpf = this.ctx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.frequency.value = 650 + Math.random() * 300;
+    bpf.Q.value = 1.8;
+
+    const wetGain = this.ctx.createGain();
+    wetGain.gain.setValueAtTime(0.45, now + 0.005);
+    wetGain.gain.exponentialRampToValueAtTime(0.001, now + wetDur);
+
+    wetSource.connect(bpf);
+    bpf.connect(wetGain);
+    wetGain.connect(this.ctx.destination);
+    wetSource.start(now + 0.005);
+  }
+
+  // 4. カリカリ系（カリカリッ！ パキッ！ クリスピー結晶音）
+  playKarikariSound() {
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+
+    // 硬質クリスタルがパキッと割れる鋭いスナップ
+    const snapOsc = this.ctx.createOscillator();
+    snapOsc.type = 'triangle';
+    const startFreq = 4200 + Math.random() * 1000;
+    snapOsc.frequency.setValueAtTime(startFreq, now);
+    snapOsc.frequency.exponentialRampToValueAtTime(280, now + 0.018);
+
+    const snapGain = this.ctx.createGain();
+    snapGain.gain.setValueAtTime(0.55, now);
+    snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
+    snapOsc.connect(snapGain);
+    snapGain.connect(this.ctx.destination);
+    snapOsc.start(now);
+    snapOsc.stop(now + 0.022);
+
+    // カリカリと連続で砕ける微細な結晶スパイク音群
+    const crackDur = 0.042;
+    const crackSize = Math.floor(this.ctx.sampleRate * crackDur);
+    const crackBuf = this.ctx.createBuffer(1, crackSize, this.ctx.sampleRate);
+    const crackData = crackBuf.getChannelData(0);
+
+    const burstCount = 4 + Math.floor(Math.random() * 3);
+    for (let b = 0; b < burstCount; b++) {
+      const burstPos = Math.floor(Math.random() * (crackSize * 0.8));
+      const burstLen = Math.floor(this.ctx.sampleRate * 0.002);
+      for (let j = 0; j < burstLen && burstPos + j < crackSize; j++) {
+        crackData[burstPos + j] += (Math.random() * 2 - 1) * (1 - j / burstLen) * 0.9;
+      }
+    }
+
+    const crackSource = this.ctx.createBufferSource();
+    crackSource.buffer = crackBuf;
+
+    const bpf = this.ctx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.frequency.value = 5200 + Math.random() * 1500;
+    bpf.Q.value = 3.5;
+
+    const crackGain = this.ctx.createGain();
+    crackGain.gain.setValueAtTime(0.48, now + 0.002);
+    crackGain.gain.exponentialRampToValueAtTime(0.001, now + crackDur);
+
+    crackSource.connect(bpf);
+    bpf.connect(crackGain);
+    crackGain.connect(this.ctx.destination);
+    crackSource.start(now + 0.002);
+  }
 }
 
 const sound = new SoundManager();
@@ -657,6 +848,40 @@ const BUTTERS = {
     type: 'pushpop',
     theme: 'candy'
   },
+
+  // スライムASMR
+  slime_sarasara: {
+    name: 'サラサラ系スライム',
+    emoji: '💧✨',
+    cssClass: 'slime-theme-sarasara',
+    labelColor: '#0288d1',
+    type: 'slime',
+    slimeType: 'sarasara'
+  },
+  slime_awaawa: {
+    name: 'アワアワ系スライム',
+    emoji: '🫧☁️',
+    cssClass: 'slime-theme-awaawa',
+    labelColor: '#ec407a',
+    type: 'slime',
+    slimeType: 'awaawa'
+  },
+  slime_butsubutsu: {
+    name: 'ぶつぶつ系スライム',
+    emoji: '🟣🧋',
+    cssClass: 'slime-theme-butsubutsu',
+    labelColor: '#8e24aa',
+    type: 'slime',
+    slimeType: 'butsubutsu'
+  },
+  slime_karikari: {
+    name: 'カリカリ系スライム',
+    emoji: '💎❄️',
+    cssClass: 'slime-theme-karikari',
+    labelColor: '#00acc1',
+    type: 'slime',
+    slimeType: 'karikari'
+  },
 };
 
 // 形状パス（バター用 ＆ 肉まん用）
@@ -700,6 +925,15 @@ const pushpopGrid = document.getElementById('pushpop-grid');
 const pushpopBanner = document.getElementById('pushpop-banner');
 const pushpopHint = document.getElementById('pushpop-hint');
 
+// スライムDOM
+const slimeArea = document.getElementById('slime-area');
+const slimeBlob = document.getElementById('slime-blob');
+const slimeSvg = document.getElementById('slime-svg');
+const slimeBanner = document.getElementById('slime-banner');
+const slimeHint = document.getElementById('slime-hint');
+const slimeParticlesGroup = document.getElementById('slime-particles-group');
+const slimePokesGroup = document.getElementById('slime-pokes-group');
+
 // ----- 画面遷移 -----
 function showScreen(screen) {
   document.querySelectorAll('.screen').forEach(s => {
@@ -724,6 +958,7 @@ function goToPlay(butterKey) {
   keyboardArea.classList.add('hidden');
   tanghuluArea.classList.add('hidden');
   pushpopArea.classList.add('hidden');
+  slimeArea.classList.add('hidden');
 
   if (data.type === 'keyboard') {
     // キーボード画面を表示（余計なボタンを排してキーボードに集中）
@@ -741,6 +976,12 @@ function goToPlay(butterKey) {
     completeButtons.classList.remove('hidden');
     btnRetry.classList.remove('hidden');
     initPushpop(data.theme);
+  } else if (data.type === 'slime') {
+    // スライム画面を表示
+    slimeArea.classList.remove('hidden');
+    completeButtons.classList.remove('hidden');
+    btnRetry.classList.remove('hidden');
+    initSlime(data.slimeType);
   } else {
     // スクイーズ画面を表示
     butterArea.classList.remove('hidden');
@@ -826,6 +1067,8 @@ btnRetry.addEventListener('click', () => {
     initTanghulu(data.fruitType);
   } else if (data.type === 'pushpop') {
     initPushpop(data.theme);
+  } else if (data.type === 'slime') {
+    initSlime(data.slimeType);
   } else {
     resetButter();
   }
@@ -1607,5 +1850,298 @@ window.addEventListener('pointerup', () => {
 
 window.addEventListener('pointercancel', () => {
   pushpopState.isPointerDown = false;
+});
+
+// ==========================================
+// 🧪 スライムASMR ロジック（4系統）
+// ==========================================
+let slimeState = {
+  currentType: 'sarasara',
+  isPointerDown: false,
+  startX: 0,
+  startY: 0,
+  pokeCount: 0,
+};
+
+// スライムの初期化
+function initSlime(slimeType) {
+  slimeState.currentType = slimeType;
+  slimeState.pokeCount = 0;
+  slimeState.isPointerDown = false;
+
+  slimeParticlesGroup.innerHTML = '';
+  slimePokesGroup.innerHTML = '';
+  slimeBanner.classList.add('hidden');
+  slimeHint.textContent = '指でつついて、のばして、こねてみよう♪';
+  slimeBlob.style.transform = '';
+  slimeBlob.classList.remove('rebound');
+
+  // パーティクル生成（系統別）
+  spawnSlimeInternalParticles(slimeType);
+}
+
+// 系統ごとの内部テクスチャ（泡、ビーズ、結晶など）
+function spawnSlimeInternalParticles(slimeType) {
+  slimeParticlesGroup.innerHTML = '';
+
+  if (slimeType === 'awaawa') {
+    // アワアワ系: 細かい微細な泡（大小気泡を30個配置）
+    for (let i = 0; i < 30; i++) {
+      const cx = 85 + Math.random() * 150;
+      const cy = 80 + Math.random() * 105;
+      const r = 3 + Math.random() * 7;
+      const bubble = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      bubble.setAttribute('cx', cx);
+      bubble.setAttribute('cy', cy);
+      bubble.setAttribute('r', r);
+      bubble.setAttribute('fill', 'rgba(255, 255, 255, 0.65)');
+      bubble.setAttribute('stroke', 'rgba(255, 255, 255, 0.9)');
+      bubble.setAttribute('stroke-width', '1.2');
+      bubble.setAttribute('class', 'slime-bubble-item');
+      slimeParticlesGroup.appendChild(bubble);
+    }
+  } else if (slimeType === 'butsubutsu') {
+    // ぶつぶつ系: カラフルで不揃いなぶつぶつ球体（32個配置）
+    const colors = ['#e040fb', '#ff4081', '#00e5ff', '#76ff03', '#ffd600', '#ff6e40'];
+    for (let i = 0; i < 32; i++) {
+      const cx = 85 + Math.random() * 150;
+      const cy = 85 + Math.random() * 100;
+      const r = 5 + Math.random() * 8;
+      const col = colors[i % colors.length];
+
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'slime-bead-item');
+      
+      const bead = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      bead.setAttribute('cx', cx);
+      bead.setAttribute('cy', cy);
+      bead.setAttribute('r', r);
+      bead.setAttribute('fill', col);
+
+      const shine = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      shine.setAttribute('cx', cx - r * 0.3);
+      shine.setAttribute('cy', cy - r * 0.3);
+      shine.setAttribute('r', r * 0.3);
+      shine.setAttribute('fill', 'rgba(255, 255, 255, 0.7)');
+
+      g.appendChild(bead);
+      g.appendChild(shine);
+      slimeParticlesGroup.appendChild(g);
+    }
+  } else if (slimeType === 'karikari') {
+    // カリカリ系: 多角形の氷片・クリスタルチップ（24個）
+    for (let i = 0; i < 24; i++) {
+      const cx = 85 + Math.random() * 150;
+      const cy = 85 + Math.random() * 100;
+      const w = 9 + Math.random() * 15;
+      const h = 7 + Math.random() * 13;
+      const rot = Math.random() * 360;
+
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      const points = `${cx - w/2},${cy} ${cx},${cy - h/2} ${cx + w/2},${cy} ${cx},${cy + h/2}`;
+      rect.setAttribute('points', points);
+      rect.setAttribute('fill', 'rgba(255, 255, 255, 0.75)');
+      rect.setAttribute('stroke', 'rgba(255, 255, 255, 0.95)');
+      rect.setAttribute('stroke-width', '1.5');
+      rect.setAttribute('transform', `rotate(${rot} ${cx} ${cy})`);
+      rect.setAttribute('class', 'slime-crystal-item');
+      slimeParticlesGroup.appendChild(rect);
+    }
+  }
+}
+
+// ポーク（指突き刺し）処理
+function triggerSlimePoke(svgX, svgY) {
+  slimeState.pokeCount++;
+
+  // 1. 各系統の専用サウンドを再生
+  if (slimeState.currentType === 'sarasara') {
+    sound.playSarasaraSound();
+    spawnSlimeRipple(svgX, svgY);
+  } else if (slimeState.currentType === 'awaawa') {
+    sound.playAwaawaSound();
+    popNearbyBubbles(svgX, svgY);
+  } else if (slimeState.currentType === 'butsubutsu') {
+    sound.playButsubutsuSound();
+    squishNearbyBeads(svgX, svgY);
+  } else if (slimeState.currentType === 'karikari') {
+    sound.playKarikariSound();
+    crackNearbyCrystals(svgX, svgY);
+  }
+
+  // 2. ポークくぼみ（指のへこみ跡）を生成
+  createPokeHole(svgX, svgY);
+
+  // 3. 一定回数でバナー＆ファンファーレ
+  if (slimeState.pokeCount === 18) {
+    slimeBanner.classList.remove('hidden');
+    slimeHint.textContent = '✨ スライムこねこね名人！ ✨';
+    sound.playFanfare();
+    setTimeout(() => slimeBanner.classList.add('hidden'), 2400);
+  }
+}
+
+// 指のへこみ（ポーク穴）
+function createPokeHole(x, y) {
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('class', 'poke-hole');
+
+  // 深いくぼみ影
+  const depth = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+  depth.setAttribute('cx', x);
+  depth.setAttribute('cy', y);
+  depth.setAttribute('rx', '15');
+  depth.setAttribute('ry', '11');
+  depth.setAttribute('fill', 'rgba(0, 0, 0, 0.22)');
+  g.appendChild(depth);
+
+  // くぼみの光沢フチ
+  const rim = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+  rim.setAttribute('cx', x);
+  rim.setAttribute('cy', y - 2);
+  rim.setAttribute('rx', '16');
+  rim.setAttribute('ry', '12');
+  rim.setAttribute('fill', 'none');
+  rim.setAttribute('stroke', 'rgba(255, 255, 255, 0.65)');
+  rim.setAttribute('stroke-width', '2');
+  g.appendChild(rim);
+
+  slimePokesGroup.appendChild(g);
+
+  // 時間経過でゆっくり自然修復（スライムがプルンと戻る）
+  setTimeout(() => {
+    g.style.opacity = '0';
+    setTimeout(() => g.remove(), 1200);
+  }, 2000);
+}
+
+// サラサラ波紋
+function spawnSlimeRipple(x, y) {
+  const ripple = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  ripple.setAttribute('cx', x);
+  ripple.setAttribute('cy', y);
+  ripple.setAttribute('r', '6');
+  ripple.setAttribute('class', 'slime-ripple');
+  slimePokesGroup.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 650);
+}
+
+// アワアワ泡消滅＆再生成
+function popNearbyBubbles(x, y) {
+  const bubbles = slimeParticlesGroup.querySelectorAll('.slime-bubble-item');
+  bubbles.forEach(b => {
+    const bx = parseFloat(b.getAttribute('cx'));
+    const by = parseFloat(b.getAttribute('cy'));
+    const dist = Math.hypot(bx - x, by - y);
+    if (dist < 32 && b.style.opacity !== '0') {
+      b.style.transform = 'scale(1.4)';
+      b.style.opacity = '0';
+      setTimeout(() => {
+        b.setAttribute('cx', 85 + Math.random() * 150);
+        b.setAttribute('cy', 80 + Math.random() * 105);
+        b.style.transform = 'scale(0)';
+        b.style.opacity = '1';
+        setTimeout(() => b.style.transform = 'scale(1)', 50);
+      }, 1400);
+    }
+  });
+}
+
+// ぶつぶつビーズめり込み
+function squishNearbyBeads(x, y) {
+  const beads = slimeParticlesGroup.querySelectorAll('.slime-bead-item');
+  beads.forEach(g => {
+    const circle = g.querySelector('circle');
+    if (!circle) return;
+    const bx = parseFloat(circle.getAttribute('cx'));
+    const by = parseFloat(circle.getAttribute('cy'));
+    const dist = Math.hypot(bx - x, by - y);
+    if (dist < 36) {
+      const angle = Math.atan2(by - y, bx - x);
+      const pushDist = (36 - dist) * 0.7;
+      const dx = Math.cos(angle) * pushDist;
+      const dy = Math.sin(angle) * pushDist + 3;
+      g.style.transform = `translate(${dx}px, ${dy}px) scale(0.85)`;
+      setTimeout(() => {
+        g.style.transform = '';
+      }, 600);
+    }
+  });
+}
+
+// カリカリ結晶砕き
+function crackNearbyCrystals(x, y) {
+  const crystals = slimeParticlesGroup.querySelectorAll('.slime-crystal-item');
+  crystals.forEach(c => {
+    const bbox = c.getBBox();
+    const cx = bbox.x + bbox.width / 2;
+    const cy = bbox.y + bbox.height / 2;
+    const dist = Math.hypot(cx - x, cy - y);
+    if (dist < 34 && c.style.opacity !== '0.2') {
+      c.style.transform = 'scale(0.7) rotate(15deg)';
+      c.style.opacity = '0.35';
+      setTimeout(() => {
+        c.style.transform = '';
+        c.style.opacity = '1';
+      }, 1600);
+    }
+  });
+}
+
+// スライムのポインターイベント（タップ・ポーク ＆ ドラッグ引き伸ばし）
+slimeBlob.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  slimeState.isPointerDown = true;
+  slimeState.startX = e.clientX;
+  slimeState.startY = e.clientY;
+  slimeBlob.classList.remove('rebound');
+
+  const rect = slimeSvg.getBoundingClientRect();
+  const scaleX = 320 / rect.width;
+  const scaleY = 260 / rect.height;
+  const svgX = (e.clientX - rect.left) * scaleX;
+  const svgY = (e.clientY - rect.top) * scaleY;
+
+  triggerSlimePoke(svgX, svgY);
+});
+
+window.addEventListener('pointermove', (e) => {
+  if (!slimeState.isPointerDown) return;
+  const dx = e.clientX - slimeState.startX;
+  const dy = e.clientY - slimeState.startY;
+  const dist = Math.hypot(dx, dy);
+
+  // 指の移動に応じてスライムをぐにゃ〜んと引き伸ばす
+  if (dist > 8) {
+    const maxStretch = 70;
+    const scaleX = 1 + (dx / 300) * 0.4;
+    const scaleY = 1 + (dy / 300) * 0.4;
+    const skewX = (dx / maxStretch) * 12;
+    slimeBlob.style.transform = `scale(${Math.max(0.8, scaleX)}, ${Math.max(0.8, scaleY)}) skewX(${skewX}deg)`;
+
+    // 移動中に一定間隔でポーク音・こね音
+    if (dist > 30 && Math.random() < 0.14) {
+      if (slimeState.currentType === 'sarasara') sound.playSarasaraSound();
+      else if (slimeState.currentType === 'awaawa') sound.playAwaawaSound();
+      else if (slimeState.currentType === 'butsubutsu') sound.playButsubutsuSound();
+      else if (slimeState.currentType === 'karikari') sound.playKarikariSound();
+    }
+  }
+});
+
+window.addEventListener('pointerup', () => {
+  if (!slimeState.isPointerDown) return;
+  slimeState.isPointerDown = false;
+
+  // 離した瞬間に「ぽよよん！」と弾性反発アニメーション
+  slimeBlob.style.transform = '';
+  slimeBlob.classList.add('rebound');
+  sound.playPop();
+  setTimeout(() => slimeBlob.classList.remove('rebound'), 550);
+});
+
+window.addEventListener('pointercancel', () => {
+  slimeState.isPointerDown = false;
+  slimeBlob.style.transform = '';
 });
 

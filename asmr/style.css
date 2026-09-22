@@ -217,6 +217,10 @@ body {
 .card[data-butter="pushpop_star"] .card-name { color: #fbc02d; }
 .card[data-butter="pushpop_bear"] .card-name { color: #795548; }
 .card[data-butter="pushpop_candy"] .card-name { color: #ab47bc; }
+.card[data-butter="slime_sarasara"] .card-name { color: #0288d1; }
+.card[data-butter="slime_awaawa"] .card-name { color: #ec407a; }
+.card[data-butter="slime_butsubutsu"] .card-name { color: #8e24aa; }
+.card[data-butter="slime_karikari"] .card-name { color: #00acc1; }
 
 .card-desc {
   font-size: clamp(11px, 2.4vw, 13px);
@@ -984,4 +988,142 @@ body.mode-squish .core-body {
 }
 .pushpop-theme-candy .pushpop-bubble:nth-child(3n) {
   --bubble-color: #ff4081;
+}
+
+/* ===== スライムASMR エリア ===== */
+.slime-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 16px;
+  position: relative;
+  touch-action: none;
+}
+
+.slime-area.hidden {
+  display: none !important;
+}
+
+.slime-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 380px;
+  perspective: 800px;
+}
+
+.slime-blob {
+  width: 100%;
+  max-width: 340px;
+  cursor: pointer;
+  transform-origin: center 70%;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: transform 0.08s ease-out;
+}
+
+/* 離したときの弾性ボヨンボヨン */
+.slime-blob.rebound {
+  animation: slime-rebound 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes slime-rebound {
+  0% { transform: scale(var(--reb-x, 1.15), var(--reb-y, 0.85)); }
+  30% { transform: scale(0.93, 1.07); }
+  60% { transform: scale(1.04, 0.96); }
+  85% { transform: scale(0.99, 1.01); }
+  100% { transform: scale(1, 1); }
+}
+
+.slime-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.15));
+}
+
+.slime-body-path {
+  transition: filter 0.2s;
+}
+
+/* スライムのポーク穴（へこみ・くぼみ） */
+.poke-hole {
+  animation: poke-in 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transition: opacity 1.2s ease-out;
+}
+
+@keyframes poke-in {
+  0% { transform: scale(0.4); opacity: 0.2; }
+  60% { transform: scale(1.15); opacity: 0.9; }
+  100% { transform: scale(1); opacity: 0.85; }
+}
+
+/* サラサラ系の波紋 */
+.slime-ripple {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 2.5;
+  animation: ripple-expand 0.6s ease-out forwards;
+}
+
+@keyframes ripple-expand {
+  0% { r: 5; opacity: 1; stroke-width: 3; }
+  100% { r: 40; opacity: 0; stroke-width: 0.5; }
+}
+
+/* アワアワ泡パーティクル */
+.slime-bubble-item {
+  animation: bubble-pop-in 0.15s ease-out;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+@keyframes bubble-pop-in {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+/* ぶつぶつビーズパーティクル */
+.slime-bead-item {
+  transition: transform 0.15s ease-out;
+}
+
+/* カリカリ結晶パーティクル */
+.slime-crystal-item {
+  transition: transform 0.1s ease-out, opacity 0.3s;
+}
+
+/* スライム各系統のカラーテーマ */
+
+/* 1. 💧 サラサラ系（ウォータースライム） */
+.slime-theme-sarasara {
+  --slime-light: #cceeff;
+  --slime-main: #33b3ff;
+  --slime-dark: #0077cc;
+}
+
+/* 2. 🫧 アワアワ系（バブルフォーム） */
+.slime-theme-awaawa {
+  --slime-light: #ffe6f0;
+  --slime-main: #ff85b3;
+  --slime-dark: #cc2966;
+}
+
+/* 3. 🟣 ぶつぶつ系（つぶつぶスライム） */
+.slime-theme-butsubutsu {
+  --slime-light: #e8d0f5;
+  --slime-main: #9c4dcc;
+  --slime-dark: #5c1d80;
+}
+
+/* 4. 💎 カリカリ系（クリスピースライム） */
+.slime-theme-karikari {
+  --slime-light: #d6f5f5;
+  --slime-main: #2ec4b6;
+  --slime-dark: #12746b;
 }
