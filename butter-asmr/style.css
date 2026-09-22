@@ -293,15 +293,26 @@ body {
   color: var(--text-brown-light);
 }
 
-/* ===== ヒビ線のスタイル ===== */
+/* ===== ヒビ線のスタイル（ワックス風） ===== */
 .crack-line {
-  stroke: rgba(80, 50, 20, 0.6);
-  stroke-width: 2;
-  stroke-linecap: round;
+  stroke: rgba(40, 20, 0, 0.7);
+  stroke-width: 2.5;
+  stroke-linecap: square;
   fill: none;
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
-  animation: crack-draw 0.15s ease-out forwards;
+  animation: crack-draw 0.1s ease-out forwards;
+  filter: drop-shadow(1px 1px 0px rgba(255,255,255,0.5));
+}
+
+.crack-line-inner {
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 1;
+  stroke-linecap: square;
+  fill: none;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: crack-draw 0.1s ease-out forwards;
 }
 
 @keyframes crack-draw {

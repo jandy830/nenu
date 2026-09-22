@@ -20,60 +20,62 @@ class SoundManager {
     }
   }
 
-  // パキッ音（ゴリゴリ系）
+  // パキッ音（ワックスが割れる音）
   playCrack(progress) {
     this.init();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
 
-    // ゴリゴリしたノイズ（密度の高いザラザラ感）
-    const duration = 0.08 + progress * 0.05;
-    const bufSize = Math.floor(this.ctx.sampleRate * duration);
-    const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    let prev = 0;
-    for (let i = 0; i < bufSize; i++) {
-      // ザラザラしたノイズ：前のサンプルと混ぜてゴリッとした質感に
-      const raw = Math.random() * 2 - 1;
-      // 波形を歪ませてゴリゴリ感を出す
-      const distorted = Math.tanh(raw * 3) * 0.8;
-      data[i] = (distorted * 0.6 + prev * 0.4) * Math.pow(1 - i / bufSize, 1.2);
-      prev = data[i];
+    // パキッの瞬間（硬いワックスが割れるアタック）
+    const attackLen = 0.012;
+    const attackSize = Math.floor(this.ctx.sampleRate * attackLen);
+    const attackBuf = this.ctx.createBuffer(1, attackSize, this.ctx.sampleRate);
+    const attackData = attackBuf.getChannelData(0);
+    for (let i = 0; i < attackSize; i++) {
+      // 非常に急峻な減衰で「パキッ」感
+      attackData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / attackSize, 6);
     }
-    const noise = this.ctx.createBufferSource();
-    noise.buffer = buf;
-
-    // ローパスで重みを出す（高音をカット）
-    const lpf = this.ctx.createBiquadFilter();
-    lpf.type = 'lowpass';
-    lpf.frequency.value = 3000 - progress * 1200;
-    lpf.Q.value = 2;
-
-    // ゲイン
-    const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(0.5 + progress * 0.3, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
-
-    noise.connect(lpf);
-    lpf.connect(gain);
-    gain.connect(this.ctx.destination);
-    noise.start(now);
-    noise.stop(now + duration);
-
-    // ゴッという低音アタック
-    const osc = this.ctx.createOscillator();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(300 - progress * 150, now);
-    osc.frequency.exponentialRampToValueAtTime(60, now + 0.03);
+    const attack = this.ctx.createBufferSource();
+    attack.buffer = attackBuf;
 
     const attackGain = this.ctx.createGain();
-    attackGain.gain.setValueAtTime(0.3, now);
-    attackGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    attackGain.gain.setValueAtTime(0.6 + progress * 0.2, now);
+    attackGain.gain.exponentialRampToValueAtTime(0.001, now + attackLen);
 
-    osc.connect(attackGain);
+    attack.connect(attackGain);
     attackGain.connect(this.ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.05);
+    attack.start(now);
+    attack.stop(now + attackLen);
+
+    // パリパリの余韻（ワックスの細かい破片が広がる音）
+    const tailLen = 0.05 + progress * 0.03;
+    const tailSize = Math.floor(this.ctx.sampleRate * tailLen);
+    const tailBuf = this.ctx.createBuffer(1, tailSize, this.ctx.sampleRate);
+    const tailData = tailBuf.getChannelData(0);
+    for (let i = 0; i < tailSize; i++) {
+      // まばらなパチパチパルス
+      if (Math.random() < 0.12) {
+        tailData[i] = (Math.random() > 0.5 ? 1 : -1) * (0.3 + Math.random() * 0.5) * Math.pow(1 - i / tailSize, 2);
+      }
+    }
+    const tail = this.ctx.createBufferSource();
+    tail.buffer = tailBuf;
+
+    // バンドパスで乾いた硬い質感に
+    const bpf = this.ctx.createBiquadFilter();
+    bpf.type = 'bandpass';
+    bpf.frequency.value = 5000 - progress * 2000;
+    bpf.Q.value = 0.8;
+
+    const tailGain = this.ctx.createGain();
+    tailGain.gain.setValueAtTime(0.35, now + 0.005);
+    tailGain.gain.exponentialRampToValueAtTime(0.001, now + tailLen);
+
+    tail.connect(bpf);
+    bpf.connect(tailGain);
+    tailGain.connect(this.ctx.destination);
+    tail.start(now + 0.005);
+    tail.stop(now + tailLen);
   }
 
   // 完全に割れた時の音
@@ -278,24 +280,36 @@ function addCrack(x, y) {
   // パキッ音を鳴らす（進捗に応じて音が変化）
   sound.playCrack(crackCount / MAX_CRACKS);
 
-  // ランダムな方向にヒビ線を2〜3本生成
-  const numLines = 2 + Math.floor(Math.random() * 2);
+  // ワックス風の鋭いヒビ線を生成
+  const numLines = 1 + Math.floor(Math.random() * 2);
   for (let i = 0; i < numLines; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const len = 15 + Math.random() * 30;
-    const x2 = x + Math.cos(angle) * len;
-    const y2 = y + Math.sin(angle) * len;
+    const len = 20 + Math.random() * 35;
 
-    // 途中で曲がるヒビ
-    const midX = (x + x2) / 2 + (Math.random() - 0.5) * 15;
-    const midY = (y + y2) / 2 + (Math.random() - 0.5) * 15;
+    // 折れ線で鋭いクラックを表現（2〜3セグメント）
+    const segments = 2 + Math.floor(Math.random() * 2);
+    let pathD = `M ${x} ${y}`;
+    let cx = x, cy = y;
+    for (let s = 0; s < segments; s++) {
+      const segAngle = angle + (Math.random() - 0.5) * 1.2;
+      const segLen = len / segments;
+      cx += Math.cos(segAngle) * segLen;
+      cy += Math.sin(segAngle) * segLen;
+      pathD += ` L ${cx} ${cy}`;
+    }
 
+    // メインのヒビ線（暗い線）
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', `M ${x} ${y} Q ${midX} ${midY} ${x2} ${y2}`);
+    path.setAttribute('d', pathD);
     path.setAttribute('class', 'crack-line');
-    // ランダムに太さを変える
-    path.style.strokeWidth = (1 + Math.random() * 2) + 'px';
+    path.style.strokeWidth = (1.5 + Math.random() * 2) + 'px';
     crackLayer.appendChild(path);
+
+    // 内側のハイライト線（白い線で深さを表現）
+    const inner = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    inner.setAttribute('d', pathD);
+    inner.setAttribute('class', 'crack-line-inner');
+    crackLayer.appendChild(inner);
   }
 
   // ヒントを消す
