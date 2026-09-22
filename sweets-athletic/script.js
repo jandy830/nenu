@@ -395,20 +395,20 @@ const UNLOCKED_PETS_KEY = 'sweets_athletic_unlocked_pets';
 const SELECTED_PET_KEY = 'sweets_athletic_selected_pet';
 
 const PET_LIST = [
-  // 動物たち
-  { id: 'cat', name: 'しろねこ', icon: '🐱', price: 0, isFlying: false },
-  { id: 'rabbit', name: 'いちごうさぎ', icon: '🐰', price: 10, isFlying: false },
-  { id: 'dog', name: 'プリンいぬ', icon: '🐶', price: 20, isFlying: false },
-  { id: 'bear', name: 'くまチョコ', icon: '🐻', price: 30, isFlying: false },
-  { id: 'hamster', name: 'マカロンハム', icon: '🐹', price: 40, isFlying: false },
-  { id: 'unicorn', name: 'にじユニコーン', icon: '🦄', price: 70, isFlying: false },
-  // ふわふわ＆お菓子の仲間たち
-  { id: 'heart_balloon', name: 'ハート風船', icon: '🎈', price: 15, isFlying: true },
-  { id: 'pudding_pet', name: 'ぷるるんプリン', icon: '🍮', price: 25, isFlying: false },
-  { id: 'marshmallow_cloud', name: 'マシュマロ雲', icon: '☁️', price: 35, isFlying: true },
-  { id: 'star_pet', name: 'きらきら星', icon: '⭐', price: 50, isFlying: true },
-  { id: 'ghost_pet', name: 'キャンディおばけ', icon: '🍬', price: 60, isFlying: true },
-  { id: 'rainbow_balloon', name: 'にじいろバルーン', icon: '🌈', price: 80, isFlying: true }
+  // 買うたびに1コインずつもらえるコインが増加！
+  // 猫=1, うさぎ=2, 犬=3, プリン=4, くま=5, 風船=6, ハムスター=7, 雲=8, 星=9, おばけ=10, ユニコーン=11, 虹風船=12
+  { id: 'cat', name: 'しろねこ', icon: '🐱', price: 0, coinPower: 1, isFlying: false },
+  { id: 'rabbit', name: 'いちごうさぎ', icon: '🐰', price: 10, coinPower: 2, isFlying: false },
+  { id: 'dog', name: 'プリンいぬ', icon: '🐶', price: 20, coinPower: 3, isFlying: false },
+  { id: 'pudding_pet', name: 'ぷるるんプリン', icon: '🍮', price: 25, coinPower: 4, isFlying: false },
+  { id: 'bear', name: 'くまチョコ', icon: '🐻', price: 30, coinPower: 5, isFlying: false },
+  { id: 'heart_balloon', name: 'ハート風船', icon: '🎈', price: 35, coinPower: 6, isFlying: true },
+  { id: 'hamster', name: 'マカロンハム', icon: '🐹', price: 40, coinPower: 7, isFlying: false },
+  { id: 'marshmallow_cloud', name: 'マシュマロ雲', icon: '☁️', price: 50, coinPower: 8, isFlying: true },
+  { id: 'star_pet', name: 'きらきら星', icon: '⭐', price: 60, coinPower: 9, isFlying: true },
+  { id: 'ghost_pet', name: 'キャンディおばけ', icon: '🍬', price: 70, coinPower: 10, isFlying: true },
+  { id: 'unicorn', name: 'にじユニコーン', icon: '🦄', price: 80, coinPower: 11, isFlying: false },
+  { id: 'rainbow_balloon', name: 'にじいろバルーン', icon: '🌈', price: 100, coinPower: 12, isFlying: true }
 ];
 
 function getTotalSweets() {
@@ -461,6 +461,7 @@ function setSelectedPet(petId) {
   try {
     localStorage.setItem(SELECTED_PET_KEY, petId);
   } catch (e) {}
+  updateSweetsUI();
   renderPetShop();
 }
 
@@ -470,6 +471,18 @@ function updateSweetsUI() {
   const shopBankEl = document.getElementById('shop-sweets-val');
   if (bankEl) bankEl.textContent = total;
   if (shopBankEl) shopBankEl.textContent = total;
+
+  const currentPetId = getSelectedPet();
+  const currentPet = PET_LIST.find(p => p.id === currentPetId) || PET_LIST[0];
+  const petPower = currentPet.coinPower || 1;
+
+  const petNameEl = document.getElementById('start-pet-name');
+  const petBonusEl = document.getElementById('start-pet-bonus');
+  const coinBadgeEl = document.getElementById('score-coin-power');
+
+  if (petNameEl) petNameEl.textContent = `${currentPet.icon} ${currentPet.name}`;
+  if (petBonusEl) petBonusEl.textContent = `🍓 +${petPower}コイン`;
+  if (coinBadgeEl) coinBadgeEl.textContent = `+${petPower}`;
 }
 
 function renderPetShop() {
@@ -502,6 +515,7 @@ function renderPetShop() {
     card.innerHTML = `
       <div class="pet-icon">${p.icon}</div>
       <div class="pet-name">${p.name}</div>
+      <div class="pet-coin-badge">🍓 +${p.coinPower} コイン</div>
       <div class="pet-price">${isUnlocked ? 'おともだち' : `🍓 ${p.price}こ`}</div>
       ${buttonHtml}
     `;
@@ -513,9 +527,9 @@ function renderPetShop() {
   const btnClose = document.getElementById('btn-close-shop');
   if (btnClose) {
     if (gameState === 'PLAYING') {
-      btnClose.textContent = `🎮 ${currentPetItem.name} とつづきをあそぶ！ 💖`;
+      btnClose.textContent = `🎮 ${currentPetItem.name} とつづきをあそぶ！ (🍓+${currentPetItem.coinPower}) 💖`;
     } else {
-      btnClose.textContent = `💖 ${currentPetItem.name} とあそぶ！ 🎮`;
+      btnClose.textContent = `💖 ${currentPetItem.name} とあそぶ！ (🍓+${currentPetItem.coinPower}) 🎮`;
     }
   }
 }
@@ -860,6 +874,22 @@ function createParticles(x, y, type = 'star', count = 10) {
   }
 }
 
+// ふわっと浮かぶコイン獲得文字（+1🍓、+2🍓など）
+function createFloatingText(x, y, text) {
+  particles.push({
+    x: x,
+    y: y,
+    vx: (Math.random() - 0.5) * 0.6,
+    vy: -2.0,
+    size: 20,
+    text: text,
+    alpha: 1,
+    type: 'text',
+    rot: 0,
+    vRot: 0
+  });
+}
+
 
 // ==========================================
 // 4. ゲームの更新と描画
@@ -1049,11 +1079,14 @@ function update() {
         player.y < itY + 28
       ) {
         it.collected = true;
-        score += 1;
+        const currentPet = PET_LIST.find(p => p.id === getSelectedPet()) || PET_LIST[0];
+        const earnAmount = currentPet.coinPower || 1;
+        score += earnAmount;
         document.getElementById('score-val').textContent = score;
-        addTotalSweets(1); // スイーツ貯金に+1貯金！
+        addTotalSweets(earnAmount); // ペットのコインパワー分たまる！
         sounds.playCollect();
         createParticles(itX + 10, itY + 10, 'sparkle', 10);
+        createFloatingText(itX + 10, itY - 10, `+${earnAmount} 🍓`);
       }
     }
   });
@@ -1137,9 +1170,14 @@ function updateParticles() {
     const p = particles[i];
     p.x += p.vx;
     p.y += p.vy;
-    p.vy += 0.25; // パーティクルの重力
-    p.alpha -= 0.02;
-    p.rot += p.vRot;
+    if (p.type === 'text') {
+      p.vy *= 0.95;
+      p.alpha -= 0.025;
+    } else {
+      p.vy += 0.25; // パーティクルの重力
+      p.alpha -= 0.02;
+      p.rot += p.vRot;
+    }
     if (p.alpha <= 0) {
       particles.splice(i, 1);
     }
@@ -1656,11 +1694,15 @@ function drawParticle(p) {
     ctx.beginPath();
     ctx.arc(0, 0, p.size, 0, Math.PI * 2);
     ctx.fill();
-  } else if (p.type === 'heart') {
-    ctx.font = `${Math.floor(p.size * 2)}px sans-serif`;
+  } else if (p.type === 'text') {
+    ctx.font = 'bold 20px "M PLUS Rounded 1c", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('💖', 0, 0);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.strokeText(p.text, 0, 0);
+    ctx.fillStyle = '#ff2b75';
+    ctx.fillText(p.text, 0, 0);
   } else {
     ctx.fillStyle = p.color;
     ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);

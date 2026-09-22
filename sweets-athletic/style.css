@@ -80,6 +80,17 @@ body {
   box-shadow: 0 2px 6px rgba(255, 140, 185, 0.15);
 }
 
+.coin-power-badge {
+  font-size: 11px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ff9900, #ff5500);
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 1px 6px;
+  margin-left: 2px;
+  box-shadow: 0 1px 4px rgba(255, 120, 0, 0.3);
+}
+
 .candy-status {
   border-color: #ff99c8;
 }
@@ -278,6 +289,18 @@ body {
   border: 2px solid #ffb3d9;
 }
 
+.start-pet-info {
+  font-size: 13px;
+  font-weight: 900;
+  color: #7b5971;
+  background: #fff8fc;
+  border: 1.5px solid #ffcce6;
+  border-radius: 16px;
+  padding: 3px 12px;
+  margin-bottom: 8px;
+  display: inline-block;
+}
+
 /* ペットショップモーダル（画面全体にきれいに表示） */
 .shop-overlay {
   position: fixed !important;
@@ -420,6 +443,17 @@ body {
   font-weight: 900;
   color: #553344;
   margin-bottom: 3px;
+}
+
+.pet-coin-badge {
+  font-size: 11px;
+  font-weight: 900;
+  color: #e65c00;
+  background: #fff3e6;
+  border: 1.5px solid #ffcc99;
+  border-radius: 12px;
+  padding: 2px 6px;
+  margin-bottom: 4px;
 }
 
 .pet-price {
