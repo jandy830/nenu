@@ -20,62 +20,78 @@ class SoundManager {
     }
   }
 
-  // パキッ音（ワックスが割れる音）
+  // パキッ音（ワックスクラッキングASMR音）
   playCrack(progress) {
     this.init();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
 
-    // パキッの瞬間（硬いワックスが割れるアタック）
-    const attackLen = 0.012;
-    const attackSize = Math.floor(this.ctx.sampleRate * attackLen);
-    const attackBuf = this.ctx.createBuffer(1, attackSize, this.ctx.sampleRate);
-    const attackData = attackBuf.getChannelData(0);
-    for (let i = 0; i < attackSize; i++) {
-      // 非常に急峻な減衰で「パキッ」感
-      attackData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / attackSize, 6);
-    }
-    const attack = this.ctx.createBufferSource();
-    attack.buffer = attackBuf;
+    // 1. カチッ！と弾ける鋭い高周波スナップ（硬い殻がパキッと割れる核）
+    const snapOsc = this.ctx.createOscillator();
+    snapOsc.type = 'triangle';
+    // 割れが進むにつれて基本周波数が微妙に下がり、ゴリパキ感が出る
+    const startFreq = 3800 - progress * 1500 + (Math.random() * 400 - 200);
+    snapOsc.frequency.setValueAtTime(startFreq, now);
+    snapOsc.frequency.exponentialRampToValueAtTime(180, now + 0.016);
 
-    const attackGain = this.ctx.createGain();
-    attackGain.gain.setValueAtTime(0.6 + progress * 0.2, now);
-    attackGain.gain.exponentialRampToValueAtTime(0.001, now + attackLen);
+    const snapGain = this.ctx.createGain();
+    snapGain.gain.setValueAtTime(0.5, now);
+    snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.018);
 
-    attack.connect(attackGain);
-    attackGain.connect(this.ctx.destination);
-    attack.start(now);
-    attack.stop(now + attackLen);
+    snapOsc.connect(snapGain);
+    snapGain.connect(this.ctx.destination);
+    snapOsc.start(now);
+    snapOsc.stop(now + 0.02);
 
-    // パリパリの余韻（ワックスの細かい破片が広がる音）
-    const tailLen = 0.05 + progress * 0.03;
-    const tailSize = Math.floor(this.ctx.sampleRate * tailLen);
-    const tailBuf = this.ctx.createBuffer(1, tailSize, this.ctx.sampleRate);
-    const tailData = tailBuf.getChannelData(0);
-    for (let i = 0; i < tailSize; i++) {
-      // まばらなパチパチパルス
-      if (Math.random() < 0.12) {
-        tailData[i] = (Math.random() > 0.5 ? 1 : -1) * (0.3 + Math.random() * 0.5) * Math.pow(1 - i / tailSize, 2);
+    // 2. パリパリッ！と広がる微細なマルチクラック音（破片・ヒビの走行音）
+    const crackDuration = 0.045 + progress * 0.025;
+    const crackSize = Math.floor(this.ctx.sampleRate * crackDuration);
+    const crackBuf = this.ctx.createBuffer(1, crackSize, this.ctx.sampleRate);
+    const crackData = crackBuf.getChannelData(0);
+
+    // 3〜5箇所のランダムなスパイク（細かいワックスのパキパキ連打）
+    const burstCount = 3 + Math.floor(Math.random() * 3);
+    for (let b = 0; b < burstCount; b++) {
+      const burstPos = Math.floor(Math.random() * (crackSize * 0.8));
+      const burstLen = Math.floor(this.ctx.sampleRate * 0.003);
+      for (let j = 0; j < burstLen && burstPos + j < crackSize; j++) {
+        const decay = Math.pow(1 - j / burstLen, 2);
+        crackData[burstPos + j] += (Math.random() * 2 - 1) * decay * 0.9;
       }
     }
-    const tail = this.ctx.createBufferSource();
-    tail.buffer = tailBuf;
 
-    // バンドパスで乾いた硬い質感に
+    const crackSource = this.ctx.createBufferSource();
+    crackSource.buffer = crackBuf;
+
     const bpf = this.ctx.createBiquadFilter();
     bpf.type = 'bandpass';
-    bpf.frequency.value = 5000 - progress * 2000;
-    bpf.Q.value = 0.8;
+    bpf.frequency.value = 4500 - progress * 1600;
+    bpf.Q.value = 2.0;
 
-    const tailGain = this.ctx.createGain();
-    tailGain.gain.setValueAtTime(0.35, now + 0.005);
-    tailGain.gain.exponentialRampToValueAtTime(0.001, now + tailLen);
+    const crackGain = this.ctx.createGain();
+    crackGain.gain.setValueAtTime(0.45, now);
+    crackGain.gain.exponentialRampToValueAtTime(0.001, now + crackDuration);
 
-    tail.connect(bpf);
-    bpf.connect(tailGain);
-    tailGain.connect(this.ctx.destination);
-    tail.start(now + 0.005);
-    tail.stop(now + tailLen);
+    crackSource.connect(bpf);
+    bpf.connect(crackGain);
+    crackGain.connect(this.ctx.destination);
+    crackSource.start(now + 0.002);
+    crackSource.stop(now + crackDuration + 0.005);
+
+    // 3. コッという指・ナイフで触れた手応え（低音インパクト）
+    const thud = this.ctx.createOscillator();
+    thud.type = 'sine';
+    thud.frequency.setValueAtTime(220, now);
+    thud.frequency.exponentialRampToValueAtTime(50, now + 0.022);
+
+    const thudGain = this.ctx.createGain();
+    thudGain.gain.setValueAtTime(0.28, now);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+
+    thud.connect(thudGain);
+    thudGain.connect(this.ctx.destination);
+    thud.start(now);
+    thud.stop(now + 0.03);
   }
 
   // 完全に割れた時の音
@@ -238,8 +254,8 @@ function resetButter() {
   butterSvg.style.opacity = '1';
   butterSvg.style.transform = '';
 
-  // かけら・キラキラを除去
-  butterArea.querySelectorAll('.fragment, .sparkle').forEach(el => el.remove());
+  // かけら・キラキラ・破片を除去
+  butterArea.querySelectorAll('.fragment, .sparkle, .wax-chip').forEach(el => el.remove());
 }
 
 // ----- カード選択 -----
@@ -272,13 +288,21 @@ function getLocalPoint(svgEl, clientX, clientY) {
 }
 
 // ヒビ線を追加
-function addCrack(x, y) {
+function addCrack(x, y, screenX, screenY) {
   if (crackCount >= MAX_CRACKS) return;
 
   crackCount++;
 
   // パキッ音を鳴らす（進捗に応じて音が変化）
   sound.playCrack(crackCount / MAX_CRACKS);
+
+  // パキッとした微小振動
+  triggerMicroShake();
+
+  // タップ位置からワックス破片を弾けさせる
+  if (screenX !== undefined && screenY !== undefined) {
+    spawnTapChips(screenX, screenY);
+  }
 
   // ワックス風の鋭いヒビ線を生成
   const numLines = 1 + Math.floor(Math.random() * 2);
@@ -323,21 +347,83 @@ function addCrack(x, y) {
   }
 }
 
+// タップ時の微振動演出
+function triggerMicroShake() {
+  butterSvg.classList.remove('micro-shake');
+  void butterSvg.offsetWidth;
+  butterSvg.classList.add('micro-shake');
+}
+
+// タップ位置から小さなワックス片がパキッと弾ける
+function spawnTapChips(clientX, clientY) {
+  const areaRect = butterArea.getBoundingClientRect();
+  const relX = clientX - areaRect.left;
+  const relY = clientY - areaRect.top;
+
+  const style = getComputedStyle(document.body);
+  const colorLight = style.getPropertyValue('--butter-light').trim() || '#ffe680';
+  const colorMain = style.getPropertyValue('--butter-main').trim() || '#ffd966';
+
+  const chipCount = 3 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < chipCount; i++) {
+    const chip = document.createElement('div');
+    chip.className = 'wax-chip';
+
+    const w = 5 + Math.random() * 7;
+    const h = 3 + Math.random() * 5;
+    chip.style.width = w + 'px';
+    chip.style.height = h + 'px';
+    chip.style.left = (relX - w / 2) + 'px';
+    chip.style.top = (relY - h / 2) + 'px';
+    chip.style.background = (i % 2 === 0) ? colorLight : colorMain;
+
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 25 + Math.random() * 45;
+    const dx = Math.cos(angle) * dist;
+    // 少し上向きに飛び散る重力効果
+    const dy = Math.sin(angle) * dist + 15;
+    const rot = (Math.random() - 0.5) * 540;
+
+    chip.animate([
+      { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1 },
+      { transform: `translate(${dx}px, ${dy}px) scale(0.5) rotate(${rot}deg)`, opacity: 0 }
+    ], {
+      duration: 350 + Math.random() * 150,
+      easing: 'cubic-bezier(0.1, 0.9, 0.2, 1)',
+      fill: 'forwards'
+    });
+
+    butterArea.appendChild(chip);
+    setTimeout(() => chip.remove(), 550);
+  }
+}
+
 // ----- タッチ/マウスイベント -----
 let isSwiping = false;
+let lastSwipeX = 0;
+let lastSwipeY = 0;
 
 butterSvg.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   isSwiping = true;
+  lastSwipeX = e.clientX;
+  lastSwipeY = e.clientY;
   const pt = getLocalPoint(butterSvg, e.clientX, e.clientY);
-  addCrack(pt.x, pt.y);
+  addCrack(pt.x, pt.y, e.clientX, e.clientY);
 });
 
 butterSvg.addEventListener('pointermove', (e) => {
   if (!isSwiping) return;
   e.preventDefault();
-  const pt = getLocalPoint(butterSvg, e.clientX, e.clientY);
-  addCrack(pt.x, pt.y);
+
+  // スワイプ移動距離が一定以上のときだけ割れを追加（自然なクラック間隔）
+  const dist = Math.hypot(e.clientX - lastSwipeX, e.clientY - lastSwipeY);
+  if (dist > 18) {
+    lastSwipeX = e.clientX;
+    lastSwipeY = e.clientY;
+    const pt = getLocalPoint(butterSvg, e.clientX, e.clientY);
+    addCrack(pt.x, pt.y, e.clientX, e.clientY);
+  }
 });
 
 butterSvg.addEventListener('pointerup', () => {
