@@ -20,67 +20,63 @@ class SoundManager {
     }
   }
 
-  // パキッ音（軽め〜重め、crackCountに応じて変化）
+  // パキッ音（ワックスがけ風パリパリ）
   playCrack(progress) {
     this.init();
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
 
-    // ピンッとした高音クリック（パキの「パ」）
-    const ping = this.ctx.createOscillator();
-    ping.type = 'sine';
-    const pingFreq = 4000 - progress * 2500; // 高→低に変化
-    ping.frequency.setValueAtTime(pingFreq, now);
-    ping.frequency.exponentialRampToValueAtTime(pingFreq * 0.3, now + 0.02);
-
-    const pingGain = this.ctx.createGain();
-    pingGain.gain.setValueAtTime(0.25, now);
-    pingGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
-
-    ping.connect(pingGain);
-    pingGain.connect(this.ctx.destination);
-    ping.start(now);
-    ping.stop(now + 0.04);
-
-    // カチッとしたアタック音（パキの「キ」）
-    const click = this.ctx.createOscillator();
-    click.type = 'triangle';
-    click.frequency.setValueAtTime(2000 - progress * 800, now + 0.008);
-    click.frequency.exponentialRampToValueAtTime(200, now + 0.025);
-
-    const clickGain = this.ctx.createGain();
-    clickGain.gain.setValueAtTime(0, now);
-    clickGain.gain.setValueAtTime(0.2, now + 0.008);
-    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
-
-    click.connect(clickGain);
-    clickGain.connect(this.ctx.destination);
-    click.start(now);
-    click.stop(now + 0.04);
-
-    // 超短ノイズ（質感の厚み）
-    const bufSize = Math.floor(this.ctx.sampleRate * 0.02);
+    // パリパリしたクラックルノイズ（ワックスの質感）
+    // ランダムなパルスが並ぶバッファを生成
+    const duration = 0.06 + progress * 0.04;
+    const bufSize = Math.floor(this.ctx.sampleRate * duration);
     const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
     const data = buf.getChannelData(0);
     for (let i = 0; i < bufSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufSize, 8);
+      // ランダムに「パチッ」というパルスを入れる
+      if (Math.random() < 0.08) {
+        const spike = (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random() * 0.5);
+        data[i] = spike * Math.pow(1 - i / bufSize, 1.5);
+      } else {
+        data[i] = 0;
+      }
     }
-    const noise = this.ctx.createBufferSource();
-    noise.buffer = buf;
+    const crackle = this.ctx.createBufferSource();
+    crackle.buffer = buf;
 
+    // ハイパスで乾いた質感に
     const hpf = this.ctx.createBiquadFilter();
     hpf.type = 'highpass';
-    hpf.frequency.value = 4000 - progress * 2000;
+    hpf.frequency.value = 2000;
 
-    const noiseGain = this.ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.15 + progress * 0.15, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.5 + progress * 0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-    noise.connect(hpf);
-    hpf.connect(noiseGain);
-    noiseGain.connect(this.ctx.destination);
-    noise.start(now);
-    noise.stop(now + 0.03);
+    crackle.connect(hpf);
+    hpf.connect(gain);
+    gain.connect(this.ctx.destination);
+    crackle.start(now);
+    crackle.stop(now + duration);
+
+    // パキッのアタック（最初の一発）
+    const attackBufSize = Math.floor(this.ctx.sampleRate * 0.008);
+    const attackBuf = this.ctx.createBuffer(1, attackBufSize, this.ctx.sampleRate);
+    const attackData = attackBuf.getChannelData(0);
+    for (let i = 0; i < attackBufSize; i++) {
+      attackData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / attackBufSize, 4);
+    }
+    const attack = this.ctx.createBufferSource();
+    attack.buffer = attackBuf;
+
+    const attackGain = this.ctx.createGain();
+    attackGain.gain.setValueAtTime(0.6, now);
+    attackGain.gain.exponentialRampToValueAtTime(0.001, now + 0.01);
+
+    attack.connect(attackGain);
+    attackGain.connect(this.ctx.destination);
+    attack.start(now);
+    attack.stop(now + 0.015);
   }
 
   // 完全に割れた時の音
