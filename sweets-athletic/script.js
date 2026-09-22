@@ -1725,9 +1725,79 @@ function setupModalEvents() {
       if (e.target === petroomScreen) closePetroom();
     });
   }
+
+  // ステージ選択モーダル要素
+  const stageScreen = document.getElementById('stage-screen');
+  const btnStageSelect = document.getElementById('btn-stage-select');
+  const btnStartSelectStage = document.getElementById('btn-start-select-stage');
+  const btnClearStageSelect = document.getElementById('btn-clear-stage-select');
+  const btnStageCloseCorner = document.getElementById('btn-stage-close-corner');
+  const btnStagePlay = document.getElementById('btn-stage-play');
+  const stageCard1 = document.getElementById('stage-card-1');
+  const stageCard2 = document.getElementById('stage-card-2');
+  const btnClearNextStage = document.getElementById('btn-clear-next-stage');
+
+  function openStageSelect() {
+    updateStageUI();
+    if (stageScreen) stageScreen.classList.add('active');
+    sounds.init();
+  }
+
+  function closeStageSelect() {
+    if (stageScreen) stageScreen.classList.remove('active');
+    sounds.init();
+  }
+
+  function chooseAndPlayStage() {
+    closeStageSelect();
+    sounds.init();
+    sounds.playJump();
+    startGame();
+  }
+
+  if (btnStageSelect) btnStageSelect.addEventListener('click', openStageSelect);
+  if (btnStartSelectStage) btnStartSelectStage.addEventListener('click', openStageSelect);
+  if (btnClearStageSelect) btnClearStageSelect.addEventListener('click', openStageSelect);
+  if (btnStageCloseCorner) btnStageCloseCorner.addEventListener('click', closeStageSelect);
+  if (stageScreen) {
+    stageScreen.addEventListener('click', (e) => {
+      if (e.target === stageScreen) closeStageSelect();
+    });
+  }
+
+  if (stageCard1) {
+    stageCard1.addEventListener('click', () => {
+      setStage(1);
+      sounds.playCollect();
+    });
+  }
+  if (stageCard2) {
+    stageCard2.addEventListener('click', () => {
+      setStage(2);
+      sounds.playCollect();
+    });
+  }
+  if (btnStagePlay) {
+    btnStagePlay.addEventListener('click', chooseAndPlayStage);
+  }
+
+  if (btnClearNextStage) {
+    btnClearNextStage.addEventListener('click', () => {
+      if (currentStage === 1) {
+        setStage(2);
+      } else {
+        setStage(1);
+      }
+      sounds.init();
+      sounds.playJump();
+      startGame();
+    });
+  }
 }
 
 function initApp() {
+  currentStage = loadCurrentStage();
+  updateStageUI();
   const savedColor = loadCandyColor();
   updateCharPreview(savedColor);
   updateCandyUI(savedColor);
@@ -1826,12 +1896,46 @@ const keys = {
 };
 
 // 4色のチェックポイント（落下時の復帰場所＆キャンディの色）
-const checkpoints = {
+let checkpoints = {
   1: { x: 80, y: 2196, color: 'red', name: 'あかステージ' },
   2: { x: 1422, y: 1736, color: 'yellow', name: 'きいろステージ' },
   3: { x: 2387, y: 1266, color: 'black', name: 'くろステージ' },
   4: { x: 3517, y: 806, color: 'white', name: 'しろステージ' }
 };
+
+// ステージ管理
+const STAGE_KEY = 'sweets_athletic_current_stage';
+let currentStage = 1;
+
+function loadCurrentStage() {
+  try {
+    const s = parseInt(localStorage.getItem(STAGE_KEY), 10);
+    return (s === 2) ? 2 : 1;
+  } catch (e) {
+    return 1;
+  }
+}
+
+function setStage(stageNum) {
+  currentStage = (stageNum === 2) ? 2 : 1;
+  try {
+    localStorage.setItem(STAGE_KEY, currentStage);
+  } catch (e) {}
+  updateStageUI();
+}
+
+function updateStageUI() {
+  const titleEl = document.getElementById('start-stage-title');
+  if (titleEl) {
+    titleEl.textContent = currentStage === 1 ? '🍰 ステージ1：スイーツマウンテン' : '🍦 ステージ2：ひんやりフルーツパフェ';
+  }
+  const card1 = document.getElementById('stage-card-1');
+  const card2 = document.getElementById('stage-card-2');
+  if (card1 && card2) {
+    card1.classList.toggle('active', currentStage === 1);
+    card2.classList.toggle('active', currentStage === 2);
+  }
+}
 
 // キャンディ表示更新
 function updateCandyUI(color) {
@@ -1885,10 +1989,19 @@ let spikes = [];
 let stageWidth = 5200;
 let stageHeight = 2400;
 
-// ステージ初期化
-function initStage() {
+// ==========================================
+// ステージ1：🍰 スイーツマウンテン（お菓子の国）
+// ==========================================
+function initStage1() {
   stageWidth = 5200;
   stageHeight = 2400;
+
+  checkpoints = {
+    1: { x: 80, y: 2196, color: 'red', name: 'あかステージ' },
+    2: { x: 1422, y: 1736, color: 'yellow', name: 'きいろステージ' },
+    3: { x: 2387, y: 1266, color: 'black', name: 'くろステージ' },
+    4: { x: 3517, y: 806, color: 'white', name: 'しろステージ' }
+  };
 
   platforms = [
     // ========================================================
@@ -2042,6 +2155,177 @@ function initStage() {
   };
 
   particles = [];
+}
+
+// ==========================================
+// ステージ2：🍦 ひんやりフルーツパフェ
+// ==========================================
+function initStage2() {
+  stageWidth = 5200;
+  stageHeight = 2400;
+
+  checkpoints = {
+    1: { x: 80, y: 2196, color: 'red', name: '🍨 ミントアイスの丘' },
+    2: { x: 1380, y: 1736, color: 'yellow', name: '🍓 フローズンベリー' },
+    3: { x: 2330, y: 1266, color: 'black', name: '🍫 チョコミント洞窟' },
+    4: { x: 3420, y: 806, color: 'white', name: '🍒 天空フルーツパフェ' }
+  };
+
+  platforms = [
+    // ========================================================
+    // エリア1: 🍨 ミント＆バニラアイスの丘（地上 y: 2250〜1850）
+    // ========================================================
+    // スタート地点：つるつる滑るアイス床！
+    { x: 0, y: 2250, width: 440, height: 180, type: 'ice_cream', tier: 1, colorTier: 'white' },
+    // 🍮 プリンのトランポリン
+    { x: 330, y: 2220, width: 75, height: 30, type: 'pudding', tier: 1, colorTier: 'white' },
+    // キャンディケイン風ウエハース
+    { x: 480, y: 2180, width: 120, height: 32, type: 'wafer', tier: 1, colorTier: 'red' },
+    // ☁️ わたあめのふかふかスーパージャンプ！
+    { x: 670, y: 2110, width: 85, height: 32, type: 'cotton_candy', tier: 1, colorTier: 'white', squash: 0 },
+    // ミントマカロン（動く足場）
+    { x: 860, y: 2020, width: 110, height: 30, type: 'macaron', tier: 1, color: '#66ffcc', vy: 0.8, minY: 1980, maxY: 2060, colorTier: 'white' },
+    // つるつるアイス床
+    { x: 1040, y: 1950, width: 140, height: 36, type: 'ice_cream', tier: 1, colorTier: 'white' },
+    { x: 1230, y: 1870, width: 100, height: 28, type: 'wafer', tier: 1, colorTier: 'red' },
+
+    // ========================================================
+    // エリア2: 🍓 フローズンベリー＆かき氷の山（y: 1850〜1400）
+    // ========================================================
+    // チェックポイント
+    { x: 1380, y: 1790, width: 140, height: 38, type: 'cookie', tier: 2, colorTier: 'yellow', isCheckPoint: true },
+    { x: 1560, y: 1720, width: 95, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
+    // ☁️ わたあめ大ジャンプ
+    { x: 1680, y: 1670, width: 80, height: 30, type: 'cotton_candy', tier: 2, colorTier: 'yellow', squash: 0 },
+    // マカロン
+    { x: 1800, y: 1560, width: 100, height: 28, type: 'macaron', tier: 2, color: '#ffbb33', vy: -0.9, minY: 1510, maxY: 1610, colorTier: 'yellow' },
+    // つるつるアイス床
+    { x: 1950, y: 1500, width: 110, height: 28, type: 'ice_cream', tier: 2, colorTier: 'yellow' },
+    // 🍫 とけるチョコアイスの足場
+    { x: 2100, y: 1450, width: 95, height: 28, type: 'melting_choco', tier: 2, colorTier: 'yellow', initialY: 1450, meltTimer: 0, isMelted: false, respawnTimer: 0, isStepped: false, shake: 0 },
+    { x: 2220, y: 1390, width: 90, height: 26, type: 'wafer', tier: 2, colorTier: 'yellow' },
+
+    // ========================================================
+    // エリア3: 🍫 チョコミント＆アイス洞窟（y: 1400〜950）
+    // ========================================================
+    { x: 2330, y: 1320, width: 200, height: 48, type: 'cookie', tier: 3, colorTier: 'black', isCheckPoint: true },
+    // 🍮 プリンのトランポリン
+    { x: 2570, y: 1290, width: 75, height: 28, type: 'pudding', tier: 3, colorTier: 'black' },
+    // チョコミントマカロン
+    { x: 2680, y: 1180, width: 110, height: 30, type: 'macaron', tier: 3, color: '#33cc99', vy: 1.0, minY: 1120, maxY: 1240, colorTier: 'black' },
+    // つるつるアイス床
+    { x: 2830, y: 1130, width: 100, height: 28, type: 'ice_cream', tier: 3, colorTier: 'black' },
+    // 🍫 とけるチョコ足場
+    { x: 2970, y: 1090, width: 95, height: 28, type: 'melting_choco', tier: 3, colorTier: 'black', initialY: 1090, meltTimer: 0, isMelted: false, respawnTimer: 0, isStepped: false, shake: 0 },
+    // ☁️ わたあめ大ジャンプ
+    { x: 3120, y: 1030, width: 85, height: 30, type: 'cotton_candy', tier: 3, colorTier: 'black', squash: 0 },
+    { x: 3260, y: 940, width: 110, height: 28, type: 'wafer', tier: 3, colorTier: 'black' },
+
+    // ========================================================
+    // エリア4: 🍒 天空のフルーツパラダイス（y: 950〜450）
+    // ========================================================
+    { x: 3420, y: 860, width: 200, height: 50, type: 'cookie', tier: 4, colorTier: 'white', isCheckPoint: true },
+    // つるつるアイス床
+    { x: 3660, y: 790, width: 120, height: 30, type: 'ice_cream', tier: 4, colorTier: 'white' },
+    // フルーツマカロン
+    { x: 3820, y: 710, width: 110, height: 30, type: 'macaron', tier: 4, color: '#ff66aa', vy: -0.9, minY: 660, maxY: 760, colorTier: 'white' },
+    // 🍮 プリンのトランポリン
+    { x: 3960, y: 740, width: 75, height: 28, type: 'pudding', tier: 4, colorTier: 'white' },
+    // ☁️ わたあめ大ジャンプ
+    { x: 4070, y: 620, width: 85, height: 30, type: 'cotton_candy', tier: 4, colorTier: 'white', squash: 0 },
+    // つるつるアイスブリッジ
+    { x: 4200, y: 550, width: 140, height: 32, type: 'ice_cream', tier: 4, colorTier: 'white' },
+    // レインボーフルーツブリッジ
+    { x: 4420, y: 460, width: 180, height: 32, type: 'wafer', tier: 4, colorTier: 'rainbow' },
+
+    // ========================================================
+    // エリア5: 🍨 特大デラックスパフェタワー台座（y: 350）
+    // ========================================================
+    { x: 4680, y: 360, width: 520, height: 180, type: 'cake_ground', tier: 5, colorTier: 'rainbow' }
+  ];
+
+  updrafts = [
+    { x: 1130, y: 1780, width: 85, height: 260 },
+    { x: 3260, y: 850, width: 85, height: 260 }
+  ];
+
+  // 🌵 ペパーミントの氷トゲ＆チョコツノ
+  spikes = [
+    { x: 580, y: 2235, width: 50, height: 18, type: 'konpeito', color: '#66ffcc' },
+    { x: 970, y: 2235, width: 50, height: 18, type: 'konpeito', color: '#99ffff' },
+    { x: 1720, y: 1770, width: 45, height: 18, type: 'konpeito', color: '#ff66aa' },
+    { x: 2610, y: 1335, width: 50, height: 20, type: 'choco_spike', color: '#225544' },
+    { x: 2900, y: 1220, width: 45, height: 20, type: 'choco_spike', color: '#225544' },
+    { x: 3760, y: 840, width: 45, height: 18, type: 'konpeito', color: '#66ccff' }
+  ];
+
+  // 🍩 チョコミント＆ストロベリーアイスドーナツ
+  donuts = [
+    { x: 220, y: 2232, radius: 18, vx: 1.6, minX: 80, maxX: 420, rotation: 0, dough: '#4a2818', frosting: '#66ffcc', sprinkles: true, squash: 0 },
+    { x: 2420, y: 1302, radius: 18, vx: -1.8, minX: 2340, maxX: 2500, rotation: 0, dough: '#f6e4cc', frosting: '#33ccff', sprinkles: true, squash: 0 },
+    { x: 3520, y: 842, radius: 18, vx: 2.0, minX: 3440, maxX: 3600, rotation: 0, dough: '#4a2818', frosting: '#ff66aa', sprinkles: true, squash: 0 }
+  ];
+
+  // アイテム（フルーツ＆アイス＆回復ハート）
+  items = [
+    // 赤エリア
+    { x: 220, y: 2200, type: '🍒', collected: false, floatOffset: 0 },
+    { x: 370, y: 2200, type: '🍨', collected: false, floatOffset: 1 },
+    { x: 550, y: 2130, type: '❄️', collected: false, floatOffset: 2 },
+    { x: 630, y: 2040, type: '💖', collected: false, floatOffset: 1 }, // 回復ハート
+    { x: 710, y: 1970, type: '⭐', collected: false, floatOffset: 3 },
+    { x: 890, y: 1960, type: '🍓', collected: false, floatOffset: 2 },
+    { x: 1080, y: 1900, type: '🍒', collected: false, floatOffset: 4 },
+
+    // 黄エリア
+    { x: 1430, y: 1730, type: '🍌', collected: false, floatOffset: 0 },
+    { x: 1600, y: 1650, type: '🍊', collected: false, floatOffset: 1 },
+    { x: 1730, y: 1530, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 1830, y: 1490, type: '💖', collected: false, floatOffset: 2 }, // 回復ハート
+    { x: 2000, y: 1440, type: '🍨', collected: false, floatOffset: 3 },
+    { x: 2140, y: 1390, type: '❄️', collected: false, floatOffset: 4 },
+
+    // 黒エリア
+    { x: 2440, y: 1270, type: '🍫', collected: false, floatOffset: 0 },
+    { x: 2600, y: 1190, type: '🍨', collected: false, floatOffset: 1 },
+    { x: 2750, y: 1110, type: '💖', collected: false, floatOffset: 3 }, // 回復ハート
+    { x: 2900, y: 1070, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 3150, y: 920, type: '⭐', collected: false, floatOffset: 3 },
+    { x: 3300, y: 880, type: '🍒', collected: false, floatOffset: 4 },
+
+    // 白エリア
+    { x: 3500, y: 810, type: '🍨', collected: false, floatOffset: 0 },
+    { x: 3720, y: 730, type: '🍓', collected: false, floatOffset: 1 },
+    { x: 3900, y: 650, type: '💖', collected: false, floatOffset: 0 }, // 回復ハート
+    { x: 4110, y: 490, type: '⭐', collected: false, floatOffset: 2 },
+    { x: 4260, y: 490, type: '🍒', collected: false, floatOffset: 3 },
+    { x: 4480, y: 400, type: '🌈', collected: false, floatOffset: 4 },
+
+    // パフェタワー
+    { x: 4740, y: 310, type: '🍨', collected: false, floatOffset: 1 },
+    { x: 4850, y: 300, type: '🍒', collected: false, floatOffset: 2 },
+    { x: 4960, y: 310, type: '💖', collected: false, floatOffset: 3 }
+  ];
+
+  goal = {
+    x: 4800,
+    y: 210,
+    width: 180,
+    height: 150
+  };
+
+  particles = [];
+}
+
+// ステージ初期化（指定されたステージまたはcurrentStageを読み込む）
+function initStage(stageNum) {
+  const s = stageNum || currentStage || 1;
+  currentStage = s;
+  if (s === 2) {
+    initStage2();
+  } else {
+    initStage1();
+  }
 }
 
 // パーティクル生成（スイーツ取得やクリア紙吹雪）
@@ -2844,6 +3128,12 @@ function drawDonut(d) {
 
 // 背景とお菓子の雲（各エリアの高度に応じた美しいグラデーションまたは夜空）
 function drawBackground() {
+  // ステージ2：ひんやりフルーツパフェの専用背景
+  if (currentStage === 2) {
+    drawStage2Background();
+    return;
+  }
+
   if (isNightMode) {
     // 【よるのお菓子の国】ミッドナイトパステルパープル＆ディープネイビー
     const nightGrad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
@@ -2934,6 +3224,127 @@ function drawMarshmallowCloud(x, y, s) {
   ctx.arc(x + s * 0.3, y - s * 0.15, s * 0.4, 0, Math.PI * 2);
   ctx.arc(x + s * 0.65, y, s * 0.35, 0, Math.PI * 2);
   ctx.fill();
+}
+
+// ステージ2：ひんやりフルーツパフェの背景描画
+function drawStage2Background() {
+  const heightRatio = Math.max(0, Math.min(1, camera.y / (stageHeight - V_HEIGHT)));
+
+  if (isNightMode) {
+    // 【よるのアイスパフェの国】オーロラナイト＆アイスブルー
+    const nightGrad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
+    nightGrad.addColorStop(0, '#0a1228');
+    nightGrad.addColorStop(0.4, '#142244');
+    nightGrad.addColorStop(1, '#231842');
+    ctx.fillStyle = nightGrad;
+    ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+
+    // オーロラ光彩の揺らめき
+    ctx.save();
+    const auroraGrad = ctx.createLinearGradient(0, 0, V_WIDTH, 200);
+    auroraGrad.addColorStop(0, 'rgba(80, 240, 220, 0.18)');
+    auroraGrad.addColorStop(0.5, 'rgba(170, 130, 255, 0.20)');
+    auroraGrad.addColorStop(1, 'rgba(255, 130, 190, 0.15)');
+    ctx.fillStyle = auroraGrad;
+    ctx.fillRect(0, 0, V_WIDTH, 240);
+
+    // きらめくお星さま
+    NIGHT_STARS.forEach(s => {
+      const alpha = 0.35 + 0.55 * Math.sin(Date.now() * s.speed + s.phase);
+      ctx.fillStyle = `rgba(215, 245, 255, ${Math.max(0.1, alpha)})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // アイスムーン 🌙
+    ctx.fillStyle = 'rgba(220, 248, 255, 0.95)';
+    ctx.shadowColor = '#80e5ff';
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    ctx.arc(710, 70, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#0a1228';
+    ctx.beginPath();
+    ctx.arc(702, 64, 21, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // ふわふわ夜のシャーベット雲
+    const cloudOffsetX = (camera.x * 0.25) % 800;
+    const cloudOffsetY = (camera.y * 0.18) % 300;
+    ctx.fillStyle = 'rgba(160, 195, 235, 0.35)';
+    for (let i = -1; i < 4; i++) {
+      const cx = i * 360 - cloudOffsetX;
+      drawMarshmallowCloud(cx + 60, 80 - cloudOffsetY + 50, 75);
+      drawMarshmallowCloud(cx + 240, 180 - cloudOffsetY + 50, 55);
+    }
+    drawIceCrystals();
+    return;
+  }
+
+  // ひるのパステルアイス＆フルーツグラデーション
+  const grad = ctx.createLinearGradient(0, 0, 0, V_HEIGHT);
+  if (heightRatio < 0.25) {
+    // 【エリア4〜5：天空フルーツパフェタワー】ゆめかわオーロラパステル
+    grad.addColorStop(0, '#c7f1ff');
+    grad.addColorStop(0.5, '#e5dcff');
+    grad.addColorStop(1, '#ffe0f0');
+  } else if (heightRatio < 0.5) {
+    // 【エリア3：チョコミント洞窟】ミントブルー＆ミルキーチョコクランベリー
+    grad.addColorStop(0, '#bbf2e5');
+    grad.addColorStop(0.6, '#d8f5ee');
+    grad.addColorStop(1, '#eee4f5');
+  } else if (heightRatio < 0.75) {
+    // 【エリア2：フローズンベリー】淡いベリーピンク＆シャーベットブルー
+    grad.addColorStop(0, '#fedce8');
+    grad.addColorStop(0.6, '#f3e6f5');
+    grad.addColorStop(1, '#dff3fc');
+  } else {
+    // 【エリア1：ミント＆バニラアイスの丘】すっきりアイスミント＆ホイップクリーム
+    grad.addColorStop(0, '#d1f4ed');
+    grad.addColorStop(0.6, '#e2f7f1');
+    grad.addColorStop(1, '#fff5f8');
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, V_WIDTH, V_HEIGHT);
+
+  // ふわふわシャーベット雲
+  const cloudOffsetX = (camera.x * 0.25) % 800;
+  const cloudOffsetY = (camera.y * 0.18) % 300;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+  for (let i = -1; i < 4; i++) {
+    const cx = i * 360 - cloudOffsetX;
+    drawMarshmallowCloud(cx + 60, 80 - cloudOffsetY + 50, 75);
+    drawMarshmallowCloud(cx + 240, 180 - cloudOffsetY + 50, 55);
+  }
+
+  // ひんやり舞う雪の結晶・アイスキラキラ
+  drawIceCrystals();
+}
+
+function drawIceCrystals() {
+  const t = Date.now() * 0.001;
+  ctx.save();
+  ctx.fillStyle = isNightMode ? 'rgba(200, 240, 255, 0.75)' : 'rgba(255, 255, 255, 0.65)';
+  for (let i = 0; i < 20; i++) {
+    const sx = ((i * 137 + t * 24) % (V_WIDTH + 60)) - 30;
+    const sy = ((i * 93 + t * (18 + (i % 4) * 8)) % (V_HEIGHT + 60)) - 30;
+    const size = 3 + (i % 4);
+    ctx.beginPath();
+    ctx.moveTo(sx, sy - size);
+    ctx.lineTo(sx + size * 0.35, sy - size * 0.35);
+    ctx.lineTo(sx + size, sy);
+    ctx.lineTo(sx + size * 0.35, sy + size * 0.35);
+    ctx.lineTo(sx, sy + size);
+    ctx.lineTo(sx - size * 0.35, sy + size * 0.35);
+    ctx.lineTo(sx - size, sy);
+    ctx.lineTo(sx - size * 0.35, sy - size * 0.35);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 // 🌵 とげとげ障害物（金平糖トゲ・チョコツノ）の描画
@@ -3290,8 +3701,13 @@ function drawItem(it) {
   ctx.fillText(it.type, it.x + 12, floatY + 12);
 }
 
-// ゴール（特大レインボーケーキ城）
+// ゴール描画
 function drawGoal() {
+  if (currentStage === 2) {
+    drawStage2ParfaitGoal();
+    return;
+  }
+
   const gx = goal.x;
   const gy = goal.y;
 
@@ -3337,6 +3753,100 @@ function drawGoal() {
   ctx.fillStyle = '#ff1a75';
   ctx.font = '900 18px "M PLUS Rounded 1c"';
   ctx.fillText('🌈 RAINBOW GOAL! 🌈', gx + goal.width / 2, gy + 90);
+}
+
+// ステージ2：特大デラックスパフェタワーのゴール描画
+function drawStage2ParfaitGoal() {
+  const gx = goal.x;
+  const gy = goal.y;
+  const gw = goal.width;
+  const gh = goal.height;
+
+  ctx.save();
+
+  // グラスの台座（フット）
+  ctx.fillStyle = 'rgba(220, 248, 255, 0.75)';
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(gx + gw / 2, gy + gh - 10, 52, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // ステム（グラスの脚）
+  ctx.fillRect(gx + gw / 2 - 9, gy + gh - 46, 18, 38);
+  ctx.strokeRect(gx + gw / 2 - 9, gy + gh - 46, 18, 38);
+
+  // パフェグラス本体（逆台形）
+  ctx.beginPath();
+  ctx.moveTo(gx + 24, gy + 32);
+  ctx.lineTo(gx + gw - 24, gy + 32);
+  ctx.lineTo(gx + gw / 2 + 30, gy + gh - 46);
+  ctx.lineTo(gx + gw / 2 - 30, gy + gh - 46);
+  ctx.closePath();
+
+  // 美味しいカラフルアイス・フルーツレイヤーグラデーション
+  const parfaitGrad = ctx.createLinearGradient(0, gy + 32, 0, gy + gh - 46);
+  parfaitGrad.addColorStop(0, '#ffffff');    // バニラアイス
+  parfaitGrad.addColorStop(0.22, '#7eedc7'); // チョコミントアイス
+  parfaitGrad.addColorStop(0.48, '#ff70a6'); // ストロベリーソース＆アイス
+  parfaitGrad.addColorStop(0.72, '#ffe066'); // マンゴープリン
+  parfaitGrad.addColorStop(1, '#ff3385');    // ラズベリーゼリー
+  ctx.fillStyle = parfaitGrad;
+  ctx.fill();
+  ctx.stroke();
+
+  // グラスのツヤ・ハイライト
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
+  ctx.beginPath();
+  ctx.moveTo(gx + 32, gy + 38);
+  ctx.lineTo(gx + 44, gy + 38);
+  ctx.lineTo(gx + gw / 2 - 18, gy + gh - 52);
+  ctx.lineTo(gx + gw / 2 - 26, gy + gh - 52);
+  ctx.closePath();
+  ctx.fill();
+
+  // もこもこホイップクリーム
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(gx + gw / 2 - 42, gy + 26, 24, 0, Math.PI * 2);
+  ctx.arc(gx + gw / 2 + 42, gy + 26, 24, 0, Math.PI * 2);
+  ctx.arc(gx + gw / 2, gy + 14, 32, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#ffd4eb';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // 斜めに刺さったチョコロールウエハース
+  ctx.save();
+  ctx.translate(gx + gw / 2 + 38, gy + 8);
+  ctx.rotate(0.42);
+  ctx.fillStyle = '#d49b6a';
+  ctx.fillRect(-9, -52, 18, 56);
+  ctx.fillStyle = '#5c3a21';
+  for (let wy = -48; wy < 0; wy += 12) {
+    ctx.fillRect(-9, wy, 18, 4);
+  }
+  ctx.restore();
+
+  // フルーツトッピング（キウイ・オレンジ）
+  ctx.font = '28px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🥝', gx + gw / 2 - 50, gy + 18);
+  ctx.fillText('🍊', gx + gw / 2 + 52, gy + 20);
+
+  // てっぺんのつやつや特大チェリー 🍒
+  ctx.font = '44px "M PLUS Rounded 1c"';
+  ctx.textAlign = 'center';
+  ctx.fillText('🍒', gx + gw / 2, gy - 8);
+
+  // PARFAIT GOAL テキスト
+  ctx.fillStyle = '#ff1493';
+  ctx.font = '900 17px "M PLUS Rounded 1c"';
+  ctx.textAlign = 'center';
+  ctx.fillText('🍨 PARFAIT GOAL! 🍨', gx + gw / 2, gy + gh - 65);
+
+  ctx.restore();
 }
 
 // プレイヤー（ピンクツインテール女の子 ＋ 背中のキャンディ）の描画
@@ -3556,7 +4066,7 @@ function gameLoop() {
 // ==========================================
 
 function startGame() {
-  const screens = ['start-screen', 'clear-screen', 'fail-screen', 'shop-screen', 'dressup-screen', 'petroom-screen'];
+  const screens = ['start-screen', 'clear-screen', 'fail-screen', 'shop-screen', 'dressup-screen', 'petroom-screen', 'stage-screen'];
   screens.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
@@ -3581,13 +4091,16 @@ function startGame() {
     }
   }, 1000);
 
-  initStage();
-  player.x = 80;
-  player.y = 2180;
+  currentStage = loadCurrentStage();
+  initStage(currentStage);
+
+  const startCp = (checkpoints && checkpoints[1]) ? checkpoints[1] : { x: 80, y: 2180 };
+  player.x = startCp.x;
+  player.y = startCp.y;
   player.vx = 0;
   player.vy = 0;
-  player.safeX = 80;
-  player.safeY = 2180;
+  player.safeX = startCp.x;
+  player.safeY = startCp.y;
   player.candyColor = loadCandyColor(); // 保存されたキャンディの色を引き継ぐ！
   player.currentTier = CANDY_RANK[player.candyColor] || 1;
   player.checkpointTier = 1;
@@ -3603,8 +4116,8 @@ function startGame() {
   player.isParachuting = false;
   player.jumpHeldLastFrame = false;
 
-  pet.x = 40;
-  pet.y = 2180 + player.height - 30;
+  pet.x = player.x - 40;
+  pet.y = player.y + player.height - 30;
   pet.vx = 0;
   pet.vy = 0;
   pet.isGrounded = true;
@@ -3635,6 +4148,16 @@ function reachGoal() {
   if (score < 8) stars = '⭐';
   else if (score < 16) stars = '⭐⭐';
   document.getElementById('clear-rank').textContent = stars;
+
+  // クリアしたステージ名の表示＆つぎのステージボタンの更新
+  const clearStageEl = document.getElementById('clear-stage-name');
+  if (clearStageEl) {
+    clearStageEl.textContent = currentStage === 1 ? '🍰 ステージ1：スイーツマウンテン' : '🍦 ステージ2：ひんやりフルーツパフェ';
+  }
+  const nextStageBtn = document.getElementById('btn-clear-next-stage');
+  if (nextStageBtn) {
+    nextStageBtn.textContent = currentStage === 1 ? '⏩ ステージ2へいく！ 🍦' : '🔁 もう一度あそぶ！ 🍨';
+  }
 
   setTimeout(() => {
     document.getElementById('clear-screen').classList.add('active');
@@ -3711,7 +4234,8 @@ function setupControls() {
 
 // 初期化実行
 window.addEventListener('load', () => {
-  initStage();
+  currentStage = loadCurrentStage();
+  initStage(currentStage);
   setupControls();
   requestAnimationFrame(gameLoop);
 });

@@ -38,6 +38,7 @@
         </div>
       </div>
       <div class="header-tools">
+        <button id="btn-stage-select" class="icon-btn" title="ステージえらび">🗺️</button>
         <button id="btn-night" class="icon-btn" title="ひる・よるきりかえ">☀️</button>
         <button id="btn-dressup" class="icon-btn" title="きせかえ">👗</button>
         <button id="btn-petroom" class="icon-btn" title="ペットのおへや">🏡</button>
@@ -62,6 +63,10 @@
           </div>
           <div class="start-pet-info">
             いっしょのおともだち: <span class="highlight" id="start-pet-name">🐱 しろねこ</span> (<span id="start-pet-bonus">🍓 +1コイン</span>)
+          </div>
+          <div class="start-stage-info">
+            あそぶステージ: <span class="highlight" id="start-stage-title">🍰 ステージ1：スイーツマウンテン</span>
+            <button id="btn-start-select-stage" class="btn-stage-tag" title="ステージをかえる">🗺️ えらぶ</button>
           </div>
           <p class="guide-text">いちごをあつめてペットをお迎えしよう！<br>ケーキのゴールをめざしてね 🎂</p>
           <div class="start-buttons">
@@ -176,19 +181,62 @@
         </div>
       </div>
 
+      <!-- ステージ選択画面（モーダル） -->
+      <div id="stage-screen" class="overlay-screen modal-overlay">
+        <div class="overlay-card modal-card stage-card-modal">
+          <button id="btn-stage-close-corner" class="modal-close-corner" title="とじる">✖</button>
+          
+          <div class="shop-header">
+            <h2 class="modal-title">🗺️ ステージをえらぶ 🎈</h2>
+          </div>
+          <p class="guide-text">あそびたいステージをタップしてね！</p>
+          
+          <div class="stage-list-grid">
+            <!-- ステージ1 -->
+            <div class="stage-card-item active" id="stage-card-1" data-stage="1">
+              <div class="stage-badge-tag">ステージ 1</div>
+              <div class="stage-card-icon">🍰</div>
+              <div class="stage-card-body">
+                <div class="stage-card-title">スイーツマウンテン</div>
+                <div class="stage-card-desc">カラフルなお菓子の山を登って、てっぺんのレインボーケーキ城を目指そう！🏰🌈</div>
+                <div class="stage-card-state">✨ あそべるよ！</div>
+              </div>
+            </div>
+
+            <!-- ステージ2 -->
+            <div class="stage-card-item" id="stage-card-2" data-stage="2">
+              <div class="stage-badge-tag new-badge">ステージ 2 ★ NEW!</div>
+              <div class="stage-card-icon">🍦</div>
+              <div class="stage-card-body">
+                <div class="stage-card-title">ひんやりフルーツパフェ</div>
+                <div class="stage-card-desc">つるつる滑るアイスやフローズンベリー！てっぺんの特大パフェタワーを目指そう！🍨🍒</div>
+                <div class="stage-card-state">✨ あそべるよ！</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stage-modal-buttons">
+            <button id="btn-stage-play" class="btn-confirm-action">💖 このステージであそぶ！ 🎮</button>
+          </div>
+        </div>
+      </div>
+
       <!-- ゴール（クリア）画面 -->
       <div id="clear-screen" class="overlay-screen">
         <div class="overlay-card clear-card">
           <div class="celebrate-emoji">🎉🎂✨</div>
-          <h2 class="title-clear">ゴール！クリアおめでとう！</h2>
+          <h2 class="title-clear" id="clear-title">ゴール！クリアおめでとう！</h2>
           <div class="clear-stats">
+            <p>クリアしたステージ: <span class="highlight" id="clear-stage-name">🍰 ステージ1</span></p>
             <p>せなかのキャンディ: <span class="highlight rainbow-text" id="clear-candy">🌈 レインボー！</span></p>
             <p>あつめたスイーツ: <span class="highlight" id="clear-sweets">0</span> こ 🍓</p>
             <p>タイム: <span class="highlight" id="clear-time">0</span> びょう ⏱️</p>
           </div>
           <div class="clear-rank" id="clear-rank">⭐⭐⭐</div>
           <div class="start-buttons">
+            <button id="btn-clear-next-stage" class="btn-play btn-next-stage">⏩ つぎのステージへ！</button>
             <button id="btn-clear-retry" class="btn-play">🔁 もう１かいあそぶ</button>
+            <button id="btn-clear-stage-select" class="btn-sub-action">🗺️ ステージえらび</button>
             <button id="btn-clear-shop" class="btn-shop">🛍️ ペットショップ</button>
             <button id="btn-clear-dressup" class="btn-sub-menu">👗 きせかえ</button>
           </div>
