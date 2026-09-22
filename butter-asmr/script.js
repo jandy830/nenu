@@ -353,17 +353,24 @@ function goToPlay(butterKey) {
   const isNikuman = data.type === 'nikuman';
   const nikumanPleats = document.getElementById('nikuman-pleats');
   const nikumanPaper = document.getElementById('nikuman-paper');
+  const nikumanFace = document.getElementById('nikuman-face');
+  const faceNormal = document.getElementById('face-normal');
+  const faceSquish = document.getElementById('face-squish');
   const coreBody = document.getElementById('core-body');
   const waxCover = document.getElementById('wax-cover');
 
   if (isNikuman) {
     if (nikumanPleats) nikumanPleats.classList.remove('hidden');
     if (nikumanPaper) nikumanPaper.classList.remove('hidden');
+    if (nikumanFace) nikumanFace.classList.remove('hidden');
+    if (faceNormal) faceNormal.classList.remove('hidden');
+    if (faceSquish) faceSquish.classList.add('hidden');
     if (coreBody) coreBody.setAttribute('d', PATH_NIKUMAN);
     if (waxCover) waxCover.setAttribute('d', PATH_NIKUMAN);
   } else {
     if (nikumanPleats) nikumanPleats.classList.add('hidden');
     if (nikumanPaper) nikumanPaper.classList.add('hidden');
+    if (nikumanFace) nikumanFace.classList.add('hidden');
     if (coreBody) coreBody.setAttribute('d', PATH_BUTTER);
     if (waxCover) waxCover.setAttribute('d', PATH_BUTTER);
   }
@@ -453,6 +460,14 @@ function applySquish(screenX, screenY) {
   butterStage.classList.remove('rebound');
   butterStage.classList.add('is-squeezing');
   butterStage.style.transform = `translateY(${translateY}px) scale(${scaleX}, ${scaleY}) skewX(${skewX}deg)`;
+
+  // 肉まんのお顔を「むぎゅ〜顔」に切り替え
+  const faceNormal = document.getElementById('face-normal');
+  const faceSquish = document.getElementById('face-squish');
+  if (faceNormal && faceSquish) {
+    faceNormal.classList.add('hidden');
+    faceSquish.classList.remove('hidden');
+  }
 }
 
 // 指を離したときの反発（ぽよよん！）
@@ -463,6 +478,14 @@ function releaseSquish() {
   butterStage.classList.remove('rebound');
   void butterStage.offsetWidth;
   butterStage.classList.add('rebound');
+
+  // 肉まんのお顔を「笑顔」に戻す
+  const faceNormal = document.getElementById('face-normal');
+  const faceSquish = document.getElementById('face-squish');
+  if (faceNormal && faceSquish) {
+    faceSquish.classList.add('hidden');
+    faceNormal.classList.remove('hidden');
+  }
 
   // ぽよん音
   sound.playPop();

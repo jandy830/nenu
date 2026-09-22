@@ -213,10 +213,17 @@ body {
   line-height: 1.4;
 }
 
-/* 肉まんひだと敷き紙 */
+/* 肉まんひだと敷き紙とお顔 */
 .nikuman-pleats.hidden,
-.nikuman-paper.hidden {
+.nikuman-paper.hidden,
+.nikuman-face.hidden,
+#face-normal.hidden,
+#face-squish.hidden {
   display: none;
+}
+
+.nikuman-face {
+  pointer-events: none;
 }
 
 .home-link {
