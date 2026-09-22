@@ -107,6 +107,64 @@
       </div>
     </div>
 
+    <div class="category-section">
+      <h2 class="category-title">🍓 フルーツ飴ASMR</h2>
+      <div class="cards">
+        <button class="card" data-butter="tanghulu_ichigo">
+          <span class="card-emoji">🍓✨</span>
+          <div class="card-name">いちご飴</div>
+          <p class="card-desc">パリンッ！ カリッとあまい</p>
+        </button>
+
+        <button class="card" data-butter="tanghulu_muscat">
+          <span class="card-emoji">🍇✨</span>
+          <div class="card-name">マスカット飴</div>
+          <p class="card-desc">シャインマスカットの飴♪</p>
+        </button>
+
+        <button class="card" data-butter="tanghulu_mikan">
+          <span class="card-emoji">🍊✨</span>
+          <div class="card-name">みかん飴</div>
+          <p class="card-desc">ジューシー＆パリパリ！</p>
+        </button>
+
+        <button class="card" data-butter="tanghulu_apple">
+          <span class="card-emoji">🍎✨</span>
+          <div class="card-name">りんご飴</div>
+          <p class="card-desc">おまつりの大人気あめ♡</p>
+        </button>
+      </div>
+    </div>
+
+    <div class="category-section">
+      <h2 class="category-title">🫧 プッシュポップASMR</h2>
+      <div class="cards">
+        <button class="card" data-butter="pushpop_rainbow">
+          <span class="card-emoji">💖🌈</span>
+          <div class="card-name">レインボーハート</div>
+          <p class="card-desc">にじいろハートをポコポコ♪</p>
+        </button>
+
+        <button class="card" data-butter="pushpop_star">
+          <span class="card-emoji">⭐✨</span>
+          <div class="card-name">パステルスター</div>
+          <p class="card-desc">ゆめかわ星のバブル☆</p>
+        </button>
+
+        <button class="card" data-butter="pushpop_bear">
+          <span class="card-emoji">🐻🎈</span>
+          <div class="card-name">くまちゃん</div>
+          <p class="card-desc">かわいいクマをぽちぽち♡</p>
+        </button>
+
+        <button class="card" data-butter="pushpop_candy">
+          <span class="card-emoji">🍭🍬</span>
+          <div class="card-name">キャンディ</div>
+          <p class="card-desc">ポップなキャンディバブル！</p>
+        </button>
+      </div>
+    </div>
+
     <a href="../" class="home-link">🏠 あそびばにもどる</a>
   </div>
 
@@ -261,6 +319,30 @@
         </div>
       </div>
       <p class="hint" id="keyboard-hint">すきなだけカタカタたたいてね♪</p>
+    </div>
+
+    <!-- フルーツ飴エリア（フルーツ飴選択時に表示） -->
+    <div id="tanghulu-area" class="tanghulu-area hidden">
+      <div id="tanghulu-banner" class="squish-banner hidden">✨ たべごろ！カリカリフルーツ飴 ✨</div>
+      <div class="tanghulu-stage" id="tanghulu-stage">
+        <!-- フルーツ串本体 -->
+        <div class="tanghulu-skewer">
+          <div class="skewer-stick"></div>
+          <div class="tanghulu-items" id="tanghulu-items"></div>
+        </div>
+      </div>
+      <p class="hint" id="tanghulu-hint">タップして飴をパリンッと割ろう！</p>
+    </div>
+
+    <!-- プッシュポップエリア（プッシュポップ選択時に表示） -->
+    <div id="pushpop-area" class="pushpop-area hidden">
+      <div id="pushpop-banner" class="squish-banner hidden">✨ ぜんぶ押せた！くるっとうらがえし！ ✨</div>
+      <div class="pushpop-wrapper" id="pushpop-wrapper">
+        <div class="pushpop-plate" id="pushpop-plate">
+          <div class="pushpop-grid" id="pushpop-grid"></div>
+        </div>
+      </div>
+      <p class="hint" id="pushpop-hint">指でなぞってポコポコ押しこもう♪</p>
     </div>
 
     <!-- アクションボタン（いつでも利用可能） -->
