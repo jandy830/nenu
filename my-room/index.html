@@ -120,8 +120,14 @@
         <button class="cat-tab active" data-category="sweets">
           <span class="cat-icon">🍰</span> おかし
         </button>
+        <button class="cat-tab" data-category="basic">
+          <span class="cat-icon">🏠</span> ふつう
+        </button>
         <button class="cat-tab" data-category="natural">
           <span class="cat-icon">🌿</span> ナチュラル
+        </button>
+        <button class="cat-tab" data-category="cool">
+          <span class="cat-icon">🕶️</span> クール
         </button>
         <button class="cat-tab" data-category="pop">
           <span class="cat-icon">⚡️</span> ポップ
@@ -140,7 +146,66 @@
       </div>
     </div>
 
-    <!-- 背景暗幕（バッグが開いている時） -->
+    <!-- カメラフラッシュ演出 -->
+    <div id="camera-flash" class="camera-flash"></div>
+
+    <!-- 写真タグえらびポップアップ -->
+    <div id="photo-tag-modal" class="custom-modal hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>📸 パシャリ成功！</h3>
+        </div>
+        <p class="modal-desc">このおへやのテーマはどれかな？</p>
+        <div class="photo-preview-wrap">
+          <img id="photo-preview-img" alt="おへやのしゃしん">
+        </div>
+        <div class="tag-buttons">
+          <button class="btn-tag" data-tag="パステル">🎀 パステル</button>
+          <button class="btn-tag" data-tag="ナチュラル">🌿 ナチュラル</button>
+          <button class="btn-tag" data-tag="クール">🕶️ クール</button>
+          <button class="btn-tag" data-tag="ポップ">⚡️ ポップ</button>
+          <button class="btn-tag" data-tag="ふつう">🏠 ふつう</button>
+          <button class="btn-tag" data-tag="おかし">🍰 おかし</button>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-save-photo" class="btn-primary-action">アルバムにほぞん ✨</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- アルバムモーダル -->
+    <div id="album-modal" class="custom-modal hidden">
+      <div class="modal-card modal-card-large">
+        <div class="modal-header">
+          <div class="album-title-group">
+            <span class="modal-icon">🖼️</span>
+            <h3>おへやアルバム</h3>
+          </div>
+          <button id="btn-close-album" class="btn-close" title="とじる">✕</button>
+        </div>
+
+        <!-- アルバム内フィルタータブ -->
+        <div class="album-filter-tabs">
+          <button class="album-filter-tab active" data-filter="all">ぜんぶ</button>
+          <button class="album-filter-tab" data-filter="パステル">🎀 パステル</button>
+          <button class="album-filter-tab" data-filter="ナチュラル">🌿 ナチュラル</button>
+          <button class="album-filter-tab" data-filter="クール">🕶️ クール</button>
+          <button class="album-filter-tab" data-filter="ポップ">⚡️ ポップ</button>
+          <button class="album-filter-tab" data-filter="ふつう">🏠 ふつう</button>
+        </div>
+
+        <div id="album-grid" class="album-grid">
+          <!-- JSで動的に追加 -->
+        </div>
+
+        <div id="album-empty" class="album-empty hidden">
+          <span class="empty-icon">📷</span>
+          <p>まだしゃしんがないよ！<br>「📸 パシャリ」ボタンでおへやをとってみてね♡</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 背景暗幕（バッグやモーダルが開いている時） -->
     <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
   </div>
 

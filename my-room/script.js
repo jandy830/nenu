@@ -580,13 +580,325 @@ document.addEventListener('DOMContentLoaded', () => {
       height: 80,
       svg: `
         <svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- つるすコード -->
           <line x1="30" y1="0" x2="30" y2="35" stroke="#C084FC" stroke-width="2"/>
-          <!-- お星さまライト -->
           <polygon points="30,25 36,38 50,38 38,48 42,62 30,54 18,62 22,48 10,38 24,38" fill="#FEF08A" stroke="#FACC15" stroke-width="2.5" filter="drop-shadow(0 0 6px #FDE047)"/>
           <circle cx="26" cy="44" r="2" fill="#A16207"/>
           <circle cx="34" cy="44" r="2" fill="#A16207"/>
           <path d="M28 48 Q 30 50 32 48" stroke="#A16207" stroke-width="1.5" fill="none"/>
+        </svg>
+      `
+    },
+
+    // === ふつう (basic) ===
+    {
+      id: 'basic-bed',
+      category: 'basic',
+      name: 'ふつうのベッド',
+      width: 130,
+      height: 85,
+      svg: `
+        <svg viewBox="0 0 130 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 木枠ベッド -->
+          <rect x="12" y="30" width="108" height="42" rx="6" fill="#E8D5C4" stroke="#A88B74" stroke-width="2.5"/>
+          <rect x="8" y="16" width="12" height="56" rx="4" fill="#A88B74"/>
+          <!-- マットレス & シーツ -->
+          <rect x="22" y="32" width="94" height="36" rx="4" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1.5"/>
+          <!-- かけ布団（水色） -->
+          <rect x="44" y="30" width="74" height="38" rx="5" fill="#BAE6FD" stroke="#38BDF8" stroke-width="2"/>
+          <!-- まくら -->
+          <rect x="22" y="24" width="22" height="18" rx="6" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+          <!-- 脚 -->
+          <rect x="108" y="68" width="6" height="12" rx="2" fill="#A88B74"/>
+        </svg>
+      `
+    },
+    {
+      id: 'basic-desk',
+      category: 'basic',
+      name: 'べんきょう机',
+      width: 90,
+      height: 80,
+      svg: `
+        <svg viewBox="0 0 90 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 天板 -->
+          <rect x="10" y="26" width="70" height="10" rx="3" fill="#FDE68A" stroke="#B45309" stroke-width="2"/>
+          <!-- デスクライト -->
+          <path d="M22 26 V 12 H 32" stroke="#64748B" stroke-width="2.5" fill="none"/>
+          <path d="M30 10 L 40 16 L 36 18 L 28 12 Z" fill="#EF4444"/>
+          <!-- ノート & ペン立て -->
+          <rect x="52" y="20" width="12" height="6" rx="1" fill="#60A5FA"/>
+          <rect x="68" y="18" width="8" height="8" rx="2" fill="#34D399"/>
+          <!-- 引き出しユニット（右側） -->
+          <rect x="54" y="36" width="22" height="36" rx="3" fill="#FDE68A" stroke="#B45309" stroke-width="2"/>
+          <line x1="54" y1="48" x2="76" y2="48" stroke="#B45309" stroke-width="1.5"/>
+          <line x1="54" y1="60" x2="76" y2="60" stroke="#B45309" stroke-width="1.5"/>
+          <circle cx="65" cy="42" r="1.5" fill="#78350F"/>
+          <circle cx="65" cy="54" r="1.5" fill="#78350F"/>
+          <circle cx="65" cy="66" r="1.5" fill="#78350F"/>
+          <!-- 左脚 -->
+          <rect x="14" y="36" width="6" height="36" rx="2" fill="#B45309"/>
+        </svg>
+      `
+    },
+    {
+      id: 'basic-chair',
+      category: 'basic',
+      name: 'べんきょうイス',
+      width: 60,
+      height: 75,
+      svg: `
+        <svg viewBox="0 0 60 75" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 背もたれ（ブルー） -->
+          <rect x="18" y="10" width="24" height="24" rx="8" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
+          <!-- 座面 -->
+          <ellipse cx="30" cy="40" rx="18" ry="7" fill="#38BDF8" stroke="#0284C7" stroke-width="2"/>
+          <!-- 脚（キャスター付き） -->
+          <rect x="28" y="47" width="4" height="18" fill="#64748B"/>
+          <line x1="16" y1="65" x2="44" y2="65" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="16" cy="68" r="2.5" fill="#0F172A"/>
+          <circle cx="30" cy="68" r="2.5" fill="#0F172A"/>
+          <circle cx="44" cy="68" r="2.5" fill="#0F172A"/>
+        </svg>
+      `
+    },
+    {
+      id: 'basic-closet',
+      category: 'basic',
+      name: 'クローゼット',
+      width: 75,
+      height: 105,
+      svg: `
+        <svg viewBox="0 0 75 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 本体（白タンス） -->
+          <rect x="10" y="8" width="55" height="88" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="3"/>
+          <!-- 扉の割れ目 -->
+          <line x1="37.5" y1="12" x2="37.5" y2="92" stroke="#CBD5E1" stroke-width="2"/>
+          <!-- 取っ手 -->
+          <circle cx="32" cy="50" r="2.5" fill="#F59E0B"/>
+          <circle cx="43" cy="50" r="2.5" fill="#F59E0B"/>
+          <!-- 脚 -->
+          <rect x="14" y="96" width="6" height="6" rx="1" fill="#64748B"/>
+          <rect x="55" y="96" width="6" height="6" rx="1" fill="#64748B"/>
+        </svg>
+      `
+    },
+    {
+      id: 'basic-sofa',
+      category: 'basic',
+      name: 'ふつうのソファ',
+      width: 105,
+      height: 70,
+      svg: `
+        <svg viewBox="0 0 105 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 背もたれ -->
+          <rect x="12" y="16" width="81" height="34" rx="10" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2.5"/>
+          <!-- ひじかけ左右 -->
+          <rect x="8" y="28" width="14" height="28" rx="7" fill="#CBD5E1" stroke="#94A3B8" stroke-width="2"/>
+          <rect x="83" y="28" width="14" height="28" rx="7" fill="#CBD5E1" stroke="#94A3B8" stroke-width="2"/>
+          <!-- 座面クッション -->
+          <rect x="20" y="34" width="32" height="22" rx="6" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5"/>
+          <rect x="53" y="34" width="32" height="22" rx="6" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5"/>
+          <!-- 脚 -->
+          <rect x="18" y="56" width="6" height="8" rx="2" fill="#78350F"/>
+          <rect x="81" y="56" width="6" height="8" rx="2" fill="#78350F"/>
+        </svg>
+      `
+    },
+    {
+      id: 'basic-window',
+      category: 'basic',
+      name: 'カーテンの窓',
+      width: 80,
+      height: 85,
+      svg: `
+        <svg viewBox="0 0 80 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 窓枠 -->
+          <rect x="15" y="10" width="50" height="60" rx="4" fill="#BAE6FD" stroke="#94A3B8" stroke-width="3"/>
+          <line x1="40" y1="10" x2="40" y2="70" stroke="#94A3B8" stroke-width="2"/>
+          <line x1="15" y1="40" x2="65" y2="40" stroke="#94A3B8" stroke-width="2"/>
+          <!-- カーテンレール -->
+          <rect x="8" y="6" width="64" height="4" rx="2" fill="#D97706"/>
+          <!-- カーテン左右（ピンク） -->
+          <path d="M10 10 Q 14 36 8 68 L 22 68 Q 24 36 16 10 Z" fill="#F472B6"/>
+          <path d="M70 10 Q 66 36 72 68 L 58 68 Q 56 36 64 10 Z" fill="#F472B6"/>
+          <!-- タッセル紐 -->
+          <rect x="10" y="42" width="10" height="3" fill="#FDE047"/>
+          <rect x="60" y="42" width="10" height="3" fill="#FDE047"/>
+        </svg>
+      `
+    },
+    {
+      id: 'basic-door',
+      category: 'basic',
+      name: 'お部屋のドア',
+      width: 70,
+      height: 110,
+      svg: `
+        <svg viewBox="0 0 70 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- ドア枠 -->
+          <rect x="8" y="6" width="54" height="100" rx="4" fill="#D97706" stroke="#92400E" stroke-width="3"/>
+          <!-- ドアパネル飾り -->
+          <rect x="16" y="16" width="38" height="36" rx="3" fill="#F59E0B" stroke="#B45309" stroke-width="1.5"/>
+          <rect x="16" y="58" width="38" height="40" rx="3" fill="#F59E0B" stroke="#B45309" stroke-width="1.5"/>
+          <!-- 金のドアノブ -->
+          <circle cx="50" cy="56" r="3.5" fill="#FDE047" stroke="#CA8A04" stroke-width="1.5"/>
+        </svg>
+      `
+    },
+    {
+      id: 'basic-rug',
+      category: 'basic',
+      name: 'まるいラグ',
+      width: 90,
+      height: 70,
+      svg: `
+        <svg viewBox="0 0 90 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="45" cy="35" rx="40" ry="26" fill="#F1F5F9" stroke="#94A3B8" stroke-width="2.5"/>
+          <ellipse cx="45" cy="35" rx="32" ry="20" stroke="#CBD5E1" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+        </svg>
+      `
+    },
+    {
+      id: 'basic-trash',
+      category: 'basic',
+      name: 'ゴミばこ',
+      width: 45,
+      height: 50,
+      svg: `
+        <svg viewBox="0 0 45 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- ゴミ箱缶 -->
+          <rect x="10" y="16" width="25" height="30" rx="4" fill="#E2E8F0" stroke="#64748B" stroke-width="2"/>
+          <rect x="8" y="12" width="29" height="5" rx="2.5" fill="#94A3B8"/>
+          <!-- ペダル -->
+          <rect x="18" y="44" width="9" height="4" rx="1" fill="#475569"/>
+        </svg>
+      `
+    },
+
+    // === クール (cool) ===
+    {
+      id: 'cool-bed',
+      category: 'cool',
+      name: 'クールベッド',
+      width: 130,
+      height: 85,
+      svg: `
+        <svg viewBox="0 0 130 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- スチールのヘッドボード（黒） -->
+          <rect x="10" y="14" width="10" height="60" rx="3" fill="#1E293B" stroke="#0F172A" stroke-width="2"/>
+          <!-- マットレス枠 -->
+          <rect x="18" y="34" width="100" height="36" rx="4" fill="#334155" stroke="#0F172A" stroke-width="2"/>
+          <!-- ネイビーのシャープなお布団 -->
+          <rect x="42" y="32" width="76" height="38" rx="4" fill="#1E3A8A" stroke="#2563EB" stroke-width="2"/>
+          <!-- クールライン（シアン） -->
+          <line x1="42" y1="46" x2="118" y2="46" stroke="#06B6D4" stroke-width="2"/>
+          <!-- まくら（黒） -->
+          <rect x="22" y="24" width="22" height="18" rx="4" fill="#0F172A" stroke="#334155" stroke-width="1.5"/>
+          <!-- 脚 -->
+          <rect x="110" y="70" width="6" height="10" rx="2" fill="#1E293B"/>
+        </svg>
+      `
+    },
+    {
+      id: 'cool-desk',
+      category: 'cool',
+      name: 'ゲーミングデスク',
+      width: 100,
+      height: 85,
+      svg: `
+        <svg viewBox="0 0 100 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- デスク天板（ブラック） -->
+          <rect x="10" y="32" width="80" height="8" rx="2" fill="#0F172A" stroke="#38BDF8" stroke-width="2"/>
+          <!-- ワイドモニター -->
+          <rect x="24" y="8" width="52" height="22" rx="3" fill="#0284C7" stroke="#0F172A" stroke-width="2"/>
+          <line x1="28" y1="16" x2="68" y2="24" stroke="#38BDF8" stroke-width="2"/>
+          <rect x="47" y="26" width="6" height="6" fill="#475569"/>
+          <!-- RGBライン -->
+          <line x1="12" y1="36" x2="88" y2="36" stroke="#06B6D4" stroke-width="2"/>
+          <!-- 脚（Z型スチール） -->
+          <path d="M16 40 L 16 76 L 30 76" stroke="#334155" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M84 40 L 84 76 L 70 76" stroke="#334155" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </svg>
+      `
+    },
+    {
+      id: 'cool-chair',
+      category: 'cool',
+      name: 'サイバーチェア',
+      width: 70,
+      height: 95,
+      svg: `
+        <svg viewBox="0 0 70 95" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 背もたれ（黒×ブルー） -->
+          <path d="M22 14 C 22 8 28 6 35 6 C 42 6 48 8 48 14 L 46 54 L 24 54 Z" fill="#0F172A" stroke="#0284C7" stroke-width="2.5"/>
+          <path d="M26 14 H 44 V 24 H 26 Z" fill="#06B6D4"/>
+          <!-- クッション座面 -->
+          <rect x="16" y="54" width="38" height="12" rx="4" fill="#1E293B" stroke="#0284C7" stroke-width="2"/>
+          <!-- ひじかけ -->
+          <rect x="10" y="42" width="6" height="16" rx="2" fill="#0284C7"/>
+          <rect x="54" y="42" width="6" height="16" rx="2" fill="#0284C7"/>
+          <!-- 脚 -->
+          <rect x="32" y="66" width="6" height="16" fill="#475569"/>
+          <line x1="18" y1="84" x2="52" y2="84" stroke="#0F172A" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="18" cy="87" r="2.5" fill="#06B6D4"/>
+          <circle cx="35" cy="87" r="2.5" fill="#06B6D4"/>
+          <circle cx="52" cy="87" r="2.5" fill="#06B6D4"/>
+        </svg>
+      `
+    },
+    {
+      id: 'cool-sofa',
+      category: 'cool',
+      name: 'レザーソファ',
+      width: 105,
+      height: 70,
+      svg: `
+        <svg viewBox="0 0 105 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 背もたれ（黒レザー） -->
+          <rect x="12" y="16" width="81" height="34" rx="8" fill="#1E293B" stroke="#0F172A" stroke-width="2.5"/>
+          <!-- ひじかけ左右 -->
+          <rect x="8" y="26" width="14" height="30" rx="5" fill="#0F172A" stroke="#334155" stroke-width="2"/>
+          <rect x="83" y="26" width="14" height="30" rx="5" fill="#0F172A" stroke="#334155" stroke-width="2"/>
+          <!-- 座面クッション -->
+          <rect x="20" y="34" width="32" height="22" rx="4" fill="#334155" stroke="#0F172A" stroke-width="1.5"/>
+          <rect x="53" y="34" width="32" height="22" rx="4" fill="#334155" stroke="#0F172A" stroke-width="1.5"/>
+          <!-- メタル脚 -->
+          <rect x="18" y="56" width="4" height="8" fill="#94A3B8"/>
+          <rect x="83" y="56" width="4" height="8" fill="#94A3B8"/>
+        </svg>
+      `
+    },
+    {
+      id: 'cool-clock',
+      category: 'cool',
+      name: 'ネオン時計',
+      width: 70,
+      height: 40,
+      svg: `
+        <svg viewBox="0 0 70 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="8" width="58" height="24" rx="6" fill="#0F172A" stroke="#06B6D4" stroke-width="2.5" filter="drop-shadow(0 0 6px #06B6D4)"/>
+          <text x="35" y="25" font-family="monospace" font-size="14" font-weight="900" fill="#22D3EE" text-anchor="middle">12:00</text>
+        </svg>
+      `
+    },
+    {
+      id: 'cool-speaker',
+      category: 'cool',
+      name: 'タワースピーカー',
+      width: 45,
+      height: 95,
+      svg: `
+        <svg viewBox="0 0 45 95" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- スピーカー本体（ブラック） -->
+          <rect x="8" y="10" width="29" height="76" rx="4" fill="#0F172A" stroke="#334155" stroke-width="2.5"/>
+          <!-- スピーカーコーン -->
+          <circle cx="22.5" cy="26" r="8" fill="#1E293B" stroke="#06B6D4" stroke-width="1.5"/>
+          <circle cx="22.5" cy="26" r="3" fill="#06B6D4"/>
+          <circle cx="22.5" cy="50" r="10" fill="#1E293B" stroke="#06B6D4" stroke-width="2"/>
+          <circle cx="22.5" cy="50" r="4" fill="#06B6D4"/>
+          <circle cx="22.5" cy="72" r="6" fill="#1E293B" stroke="#475569" stroke-width="1.5"/>
+          <!-- 土台 -->
+          <rect x="6" y="86" width="33" height="4" rx="2" fill="#334155"/>
         </svg>
       `
     }
@@ -627,6 +939,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnRoomSelect = document.getElementById('btn-room-select');
   const btnCamera = document.getElementById('btn-camera');
   const btnAlbum = document.getElementById('btn-album');
+
+  // カメラ・アルバム関連
+  const cameraFlash = document.getElementById('camera-flash');
+  const photoTagModal = document.getElementById('photo-tag-modal');
+  const photoPreviewImg = document.getElementById('photo-preview-img');
+  const btnSavePhoto = document.getElementById('btn-save-photo');
+  const tagButtons = document.querySelectorAll('.btn-tag');
+  const albumModal = document.getElementById('album-modal');
+  const btnCloseAlbum = document.getElementById('btn-close-album');
+  const albumGrid = document.getElementById('album-grid');
+  const albumEmpty = document.getElementById('album-empty');
+  const albumFilterTabs = document.querySelectorAll('.album-filter-tab');
 
   // バッグ関連
   const btnOpenBag = document.getElementById('btn-open-bag');
@@ -1080,13 +1404,341 @@ document.addEventListener('DOMContentLoaded', () => {
     alert('🚪 おへやのきりかえは、つぎのアップデートで登場するよ！お楽しみに♪');
   });
 
-  btnCamera.addEventListener('click', () => {
-    alert('📸 パシャリ機能は、つぎのアップデートで登場するよ！お楽しみに♪');
+  // --------------------------------------------------
+  // 11. 写真撮影（📸 パシャリ）＆ アルバム（🖼️）機能
+  // --------------------------------------------------
+  let currentCapturedPhotoData = null;
+  let selectedPhotoTag = 'パステル';
+  let currentAlbumFilter = 'all';
+  const ALBUM_STORAGE_KEY = 'myroom_album_photos_v1';
+
+  function getAlbumPhotos() {
+    try {
+      const data = localStorage.getItem(ALBUM_STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveAlbumPhotos(photos) {
+    try {
+      localStorage.setItem(ALBUM_STORAGE_KEY, JSON.stringify(photos));
+    } catch (e) {
+      console.warn('Album save failed:', e);
+    }
+  }
+
+  // 撮影フラッシュ演出
+  function triggerFlash() {
+    cameraFlash.classList.add('flash-active');
+    setTimeout(() => {
+      cameraFlash.classList.remove('flash-active');
+    }, 180);
+  }
+
+  // お部屋のスクリーンショット生成（Canvas）
+  async function captureRoomImage() {
+    // 選択枠を一時的に隠す
+    const prevSelected = selectedInstanceId;
+    selectItem(null);
+
+    const stageRect = stage.getBoundingClientRect();
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(stageRect.width * 2);
+    canvas.height = Math.round(stageRect.height * 2);
+    const ctx = canvas.getContext('2d');
+    const scale = canvas.width / stageRect.width;
+
+    ctx.scale(scale, scale);
+
+    // 1. 壁の描画
+    const wallHeight = stageRect.height * 0.58;
+    if (currentWall === 'wall-star-night') {
+      const grad = ctx.createLinearGradient(0, 0, 0, wallHeight);
+      grad.addColorStop(0, '#3d2b6b');
+      grad.addColorStop(0.6, '#7048a8');
+      grad.addColorStop(1, '#b892e8');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, stageRect.width, wallHeight);
+      // 星のドット
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < 24; i++) {
+        const sx = (i * 47) % stageRect.width;
+        const sy = (i * 29) % wallHeight;
+        ctx.beginPath();
+        ctx.arc(sx, sy, (i % 3) + 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (currentWall === 'wall-choco-cafe') {
+      ctx.fillStyle = '#fdf6ee';
+      ctx.fillRect(0, 0, stageRect.width, wallHeight);
+      ctx.strokeStyle = 'rgba(160, 100, 60, 0.1)';
+      ctx.lineWidth = 4;
+      for (let x = -wallHeight; x < stageRect.width; x += 30) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x + wallHeight, wallHeight);
+        ctx.stroke();
+      }
+    } else if (currentWall === 'wall-mint-forest') {
+      ctx.fillStyle = '#ebfbee';
+      ctx.fillRect(0, 0, stageRect.width, wallHeight);
+      ctx.fillStyle = 'rgba(81, 207, 102, 0.15)';
+      for (let x = 20; x < stageRect.width; x += 40) {
+        for (let y = 20; y < wallHeight; y += 40) {
+          ctx.beginPath();
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    } else if (currentWall === 'wall-pop-yellow') {
+      ctx.fillStyle = '#fff9db';
+      ctx.fillRect(0, 0, stageRect.width, wallHeight);
+      ctx.fillStyle = '#ffd43b';
+      for (let x = 16; x < stageRect.width; x += 48) {
+        for (let y = 16; y < wallHeight; y += 48) {
+          ctx.beginPath();
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    } else {
+      // ピンクストライプ
+      ctx.fillStyle = '#ffeef6';
+      ctx.fillRect(0, 0, stageRect.width, wallHeight);
+      ctx.fillStyle = 'rgba(255, 182, 212, 0.22)';
+      for (let x = 0; x < stageRect.width; x += 60) {
+        ctx.fillRect(x, 0, 30, wallHeight);
+      }
+    }
+
+    // 窓の描画
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(36, 24, 110, 110);
+    ctx.fillStyle = '#bae6fd';
+    ctx.fillRect(40, 28, 102, 102);
+    ctx.font = '28px sans-serif';
+    ctx.fillText('☀️', 106, 58);
+    ctx.fillText('☁️', 46, 72);
+
+    // 2. 巾木
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, wallHeight, stageRect.width, 12);
+
+    // 3. 床の描画
+    const floorY = wallHeight + 12;
+    const floorHeight = stageRect.height - floorY;
+    if (currentFloor === 'floor-grass') {
+      ctx.fillStyle = '#a9e34b';
+      ctx.fillRect(0, floorY, stageRect.width, floorHeight);
+    } else if (currentFloor === 'floor-pastel-tile') {
+      ctx.fillStyle = '#fff0f7';
+      ctx.fillRect(0, floorY, stageRect.width, floorHeight);
+      ctx.fillStyle = 'rgba(232, 217, 255, 0.5)';
+      for (let x = 0; x < stageRect.width; x += 40) {
+        for (let y = floorY; y < stageRect.height; y += 40) {
+          if ((Math.floor(x / 40) + Math.floor((y - floorY) / 40)) % 2 === 0) {
+            ctx.fillRect(x, y, 40, 40);
+          }
+        }
+      }
+    } else if (currentFloor === 'floor-cookie') {
+      ctx.fillStyle = '#e9c46a';
+      ctx.fillRect(0, floorY, stageRect.width, floorHeight);
+      ctx.strokeStyle = '#c99a3e';
+      ctx.lineWidth = 2;
+      for (let x = 0; x < stageRect.width; x += 36) {
+        ctx.strokeRect(x, floorY, 36, floorHeight);
+      }
+    } else if (currentFloor === 'floor-tatami') {
+      ctx.fillStyle = '#d8f5a2';
+      ctx.fillRect(0, floorY, stageRect.width, floorHeight);
+    } else {
+      // 木目フロア
+      ctx.fillStyle = '#f7e1c8';
+      ctx.fillRect(0, floorY, stageRect.width, floorHeight);
+      ctx.strokeStyle = 'rgba(214, 172, 131, 0.5)';
+      ctx.lineWidth = 2;
+      for (let y = floorY; y < stageRect.height; y += 32) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(stageRect.width, y);
+        ctx.stroke();
+      }
+    }
+
+    // 4. 家具の描画（zIndex昇順）
+    const sorted = [...placedItems].sort((a, b) => a.zIndex - b.zIndex);
+    const itemPromises = sorted.map(itemData => {
+      const itemDef = FURNITURE_ITEMS.find(i => i.id === itemData.itemId);
+      if (!itemDef) return Promise.resolve();
+
+      return new Promise((resolve) => {
+        const img = new Image();
+        const svgBlob = new Blob([itemDef.svg], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+        img.onload = () => {
+          ctx.save();
+          const centerX = itemData.x + itemDef.width / 2;
+          const centerY = itemData.y + itemDef.height / 2;
+          ctx.translate(centerX, centerY);
+
+          const scaleVal = SIZES[itemData.sizeIndex].scale;
+          const flip = itemData.flipX ? -1 : 1;
+          ctx.scale(flip * scaleVal, scaleVal);
+          ctx.rotate((itemData.rotation * Math.PI) / 180);
+
+          ctx.drawImage(img, -itemDef.width / 2, -itemDef.height / 2, itemDef.width, itemDef.height);
+          ctx.restore();
+          URL.revokeObjectURL(url);
+          resolve();
+        };
+        img.onerror = () => resolve();
+        img.src = url;
+      });
+    });
+
+    await Promise.all(itemPromises);
+
+    if (prevSelected) selectItem(prevSelected);
+    return canvas.toDataURL('image/jpeg', 0.9);
+  }
+
+  // 📸 パシャリボタン押下
+  btnCamera.addEventListener('click', async () => {
+    triggerFlash();
+    try {
+      const photoDataUrl = await captureRoomImage();
+      currentCapturedPhotoData = photoDataUrl;
+      photoPreviewImg.src = photoDataUrl;
+
+      // タグの初期選択
+      selectedPhotoTag = 'パステル';
+      tagButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tag === selectedPhotoTag);
+      });
+
+      // ポップアップを開く
+      photoTagModal.classList.remove('hidden');
+      drawerBackdrop.classList.remove('hidden');
+    } catch (e) {
+      console.error('Capture failed:', e);
+    }
   });
 
-  btnAlbum.addEventListener('click', () => {
-    alert('🖼️ アルバム機能は、つぎのアップデートで登場するよ！お楽しみに♪');
+  // タグボタンの選択
+  tagButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tagButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedPhotoTag = btn.dataset.tag;
+    });
   });
+
+  // アルバムに保存ボタン
+  btnSavePhoto.addEventListener('click', () => {
+    if (!currentCapturedPhotoData) return;
+
+    const now = new Date();
+    const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const newPhoto = {
+      id: 'photo_' + Date.now(),
+      dataUrl: currentCapturedPhotoData,
+      tag: selectedPhotoTag,
+      date: dateStr
+    };
+
+    const photos = getAlbumPhotos();
+    photos.unshift(newPhoto); // 先頭に追加
+    saveAlbumPhotos(photos);
+
+    // 閉じてキラキラ
+    photoTagModal.classList.add('hidden');
+    drawerBackdrop.classList.add('hidden');
+    currentCapturedPhotoData = null;
+
+    const stageRect = stage.getBoundingClientRect();
+    triggerSparkles(stageRect.width / 2, stageRect.height / 2);
+  });
+
+  // 🖼️ アルバムを開く
+  function openAlbumModal() {
+    renderAlbum();
+    albumModal.classList.remove('hidden');
+    drawerBackdrop.classList.remove('hidden');
+  }
+
+  function closeAlbumModal() {
+    albumModal.classList.add('hidden');
+    drawerBackdrop.classList.add('hidden');
+  }
+
+  btnAlbum.addEventListener('click', openAlbumModal);
+  btnCloseAlbum.addEventListener('click', closeAlbumModal);
+
+  // アルバム内フィルター
+  albumFilterTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      albumFilterTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentAlbumFilter = tab.dataset.filter;
+      renderAlbum();
+    });
+  });
+
+  // アルバム写真のレンダリング
+  function renderAlbum() {
+    albumGrid.innerHTML = '';
+    const allPhotos = getAlbumPhotos();
+    const filtered = currentAlbumFilter === 'all'
+      ? allPhotos
+      : allPhotos.filter(p => p.tag === currentAlbumFilter);
+
+    if (filtered.length === 0) {
+      albumEmpty.classList.remove('hidden');
+      return;
+    }
+    albumEmpty.classList.add('hidden');
+
+    filtered.forEach(photo => {
+      const card = document.createElement('div');
+      card.className = 'album-photo-card';
+      card.innerHTML = `
+        <div class="album-photo-img-wrap">
+          <img src="${photo.dataUrl}" alt="おへや写真">
+          <span class="photo-tag-badge">${photo.tag}</span>
+        </div>
+        <div class="album-photo-footer">
+          <span class="album-photo-date">${photo.date}</span>
+          <div class="album-photo-actions">
+            <button class="photo-action-btn btn-dl" title="ほぞん">📥</button>
+            <button class="photo-action-btn btn-del" title="けす">🗑️</button>
+          </div>
+        </div>
+      `;
+
+      // ダウンロードボタン
+      card.querySelector('.btn-dl').addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = photo.dataUrl;
+        a.download = `my-room-${photo.tag}-${Date.now()}.jpg`;
+        a.click();
+      });
+
+      // 削除ボタン
+      card.querySelector('.btn-del').addEventListener('click', () => {
+        const ok = confirm('このしゃしんを アルバムから けす？');
+        if (!ok) return;
+        const updated = getAlbumPhotos().filter(p => p.id !== photo.id);
+        saveAlbumPhotos(updated);
+        renderAlbum();
+      });
+
+      albumGrid.appendChild(card);
+    });
+  }
 
   // --------------------------------------------------
   // 11. キラキラ演出 ✨
