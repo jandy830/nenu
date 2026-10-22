@@ -315,29 +315,308 @@ document.addEventListener('DOMContentLoaded', () => {
       height: 90,
       svg: `
         <svg viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- チェスト本体 -->
           <rect x="12" y="14" width="56" height="64" rx="8" fill="#F8F0FC" stroke="#C084FC" stroke-width="3"/>
-          <!-- 引き出し1段目（ピンク） -->
           <rect x="16" y="18" width="48" height="16" rx="4" fill="#FFD6E8" stroke="#FF85A1" stroke-width="2"/>
           <circle cx="40" cy="26" r="3" fill="#FFE066" stroke="#F59F00" stroke-width="1.5"/>
-          <!-- 引き出し2段目（ミント） -->
           <rect x="16" y="38" width="48" height="16" rx="4" fill="#D3F9D8" stroke="#69DB7C" stroke-width="2"/>
           <circle cx="40" cy="46" r="3" fill="#FFE066" stroke="#F59F00" stroke-width="1.5"/>
-          <!-- 引き出し3段目（パープル） -->
           <rect x="16" y="58" width="48" height="16" rx="4" fill="#E8D9FF" stroke="#B197FC" stroke-width="2"/>
           <circle cx="40" cy="66" r="3" fill="#FFE066" stroke="#F59F00" stroke-width="1.5"/>
-          <!-- 脚 -->
           <rect x="16" y="78" width="6" height="8" rx="2" fill="#C084FC"/>
           <rect x="58" y="78" width="6" height="8" rx="2" fill="#C084FC"/>
+        </svg>
+      `
+    },
+
+    // --- 追加お菓子家具 ---
+    {
+      id: 'sw-macaron',
+      category: 'sweets',
+      name: 'マカロンタワー',
+      width: 70,
+      height: 90,
+      svg: `
+        <svg viewBox="0 0 70 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- お皿 -->
+          <ellipse cx="35" cy="80" rx="30" ry="8" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+          <!-- 下段マカロン（パープル） -->
+          <rect x="14" y="60" width="42" height="16" rx="8" fill="#D8B4FE" stroke="#A855F7" stroke-width="2"/>
+          <line x1="14" y1="68" x2="56" y2="68" stroke="#FFFFFF" stroke-width="3"/>
+          <!-- 中段マカロン（ミント） -->
+          <rect x="20" y="42" width="30" height="15" rx="7.5" fill="#A7F3D0" stroke="#10B981" stroke-width="2"/>
+          <line x1="20" y1="49.5" x2="50" y2="49.5" stroke="#FFFFFF" stroke-width="2.5"/>
+          <!-- 上段マカロン（ピンク） -->
+          <rect x="24" y="24" width="22" height="14" rx="7" fill="#FBCFE8" stroke="#EC4899" stroke-width="2"/>
+          <line x1="24" y1="31" x2="46" y2="31" stroke="#FFFFFF" stroke-width="2"/>
+          <!-- てっぺんチェリー -->
+          <circle cx="35" cy="16" r="6" fill="#EF4444"/>
+          <path d="M35 12 Q 38 4 44 6" stroke="#10B981" stroke-width="2" fill="none"/>
+        </svg>
+      `
+    },
+    {
+      id: 'sw-pudding',
+      category: 'sweets',
+      name: 'プリンチェア',
+      width: 70,
+      height: 70,
+      svg: `
+        <svg viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- プリン本体 -->
+          <path d="M20 28 L 50 28 L 58 60 L 12 60 Z" fill="#FDE047" stroke="#EAB308" stroke-width="2.5"/>
+          <!-- カラメルソース -->
+          <path d="M20 28 L 50 28 C 48 38 42 36 38 42 C 34 36 28 40 20 28 Z" fill="#78350F"/>
+          <!-- さくらんぼ -->
+          <circle cx="35" cy="20" r="5" fill="#EF4444"/>
+          <path d="M35 16 Q 40 8 46 10" stroke="#10B981" stroke-width="2" fill="none"/>
+          <!-- ホイップ -->
+          <ellipse cx="35" cy="25" rx="8" ry="3" fill="#FFFFFF"/>
+        </svg>
+      `
+    },
+    {
+      id: 'sw-rollcake',
+      category: 'sweets',
+      name: 'ロールソファ',
+      width: 110,
+      height: 75,
+      svg: `
+        <svg viewBox="0 0 110 75" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- ソファ本体（ロールケーキの横置き） -->
+          <rect x="15" y="25" width="80" height="40" rx="14" fill="#FFEDD5" stroke="#FB923C" stroke-width="3"/>
+          <path d="M15 45 Q 55 58 95 45" stroke="#F43F5E" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <!-- クッション座面 -->
+          <rect x="22" y="30" width="66" height="22" rx="8" fill="#FFF1F2" stroke="#FDA4AF" stroke-width="2"/>
+          <!-- ロール断面（左側） -->
+          <ellipse cx="15" cy="45" rx="10" ry="18" fill="#FFEDD5" stroke="#FB923C" stroke-width="2.5"/>
+          <path d="M15 45 m -5 0 a 5 9 0 1 0 10 0 a 5 9 0 1 0 -10 0" stroke="#F43F5E" stroke-width="2.5" fill="none"/>
+          <!-- 脚 -->
+          <rect x="24" y="65" width="6" height="8" rx="2" fill="#78350F"/>
+          <rect x="80" y="65" width="6" height="8" rx="2" fill="#78350F"/>
+        </svg>
+      `
+    },
+
+    // --- 追加ナチュラル家具 ---
+    {
+      id: 'nat-tulip',
+      category: 'natural',
+      name: 'チューリップ花びん',
+      width: 50,
+      height: 75,
+      svg: `
+        <svg viewBox="0 0 50 75" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 花びん -->
+          <path d="M18 42 L 32 42 L 36 68 L 14 68 Z" fill="#E0F2FE" stroke="#38BDF8" stroke-width="2.5"/>
+          <!-- チューリップ茎 -->
+          <line x1="22" y1="42" x2="18" y2="22" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="28" y1="42" x2="32" y2="18" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- チューリップ花1（ピンク） -->
+          <path d="M14 22 C 12 12 22 12 20 22 C 22 14 26 14 24 22 Z" fill="#F43F5E"/>
+          <!-- チューリップ花2（イエロー） -->
+          <path d="M28 18 C 26 8 36 8 34 18 C 36 10 40 10 38 18 Z" fill="#FBBF24"/>
+        </svg>
+      `
+    },
+    {
+      id: 'nat-bookshelf',
+      category: 'natural',
+      name: 'もくせい本だな',
+      width: 75,
+      height: 95,
+      svg: `
+        <svg viewBox="0 0 75 95" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 棚フレーム -->
+          <rect x="10" y="10" width="55" height="78" rx="6" fill="#FDE68A" stroke="#B45309" stroke-width="3"/>
+          <line x1="10" y1="48" x2="65" y2="48" stroke="#B45309" stroke-width="2.5"/>
+          <!-- 上段の本 -->
+          <rect x="16" y="24" width="8" height="24" rx="2" fill="#F43F5E"/>
+          <rect x="26" y="20" width="10" height="28" rx="2" fill="#3B82F6"/>
+          <rect x="38" y="26" width="7" height="22" rx="2" fill="#10B981"/>
+          <!-- 下段の本 -->
+          <rect x="16" y="58" width="9" height="26" rx="2" fill="#A855F7"/>
+          <rect x="27" y="62" width="8" height="22" rx="2" fill="#F59E0B"/>
+          <rect x="37" y="56" width="10" height="28" rx="2" fill="#EC4899"/>
+          <!-- 脚 -->
+          <rect x="14" y="88" width="6" height="6" rx="1" fill="#B45309"/>
+          <rect x="55" y="88" width="6" height="6" rx="1" fill="#B45309"/>
+        </svg>
+      `
+    },
+    {
+      id: 'nat-round-table',
+      category: 'natural',
+      name: 'まるテーブル',
+      width: 80,
+      height: 70,
+      svg: `
+        <svg viewBox="0 0 80 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 天板 -->
+          <ellipse cx="40" cy="28" rx="34" ry="14" fill="#FCD34D" stroke="#B45309" stroke-width="3"/>
+          <ellipse cx="40" cy="28" rx="28" ry="10" stroke="#F59E0B" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+          <!-- 一本脚 -->
+          <rect x="37" y="42" width="6" height="20" fill="#92400E"/>
+          <ellipse cx="40" cy="62" rx="18" ry="5" fill="#B45309"/>
+        </svg>
+      `
+    },
+
+    // --- 追加ポップ家具 ---
+    {
+      id: 'pop-neon-moon',
+      category: 'pop',
+      name: 'ネオンムーン',
+      width: 60,
+      height: 70,
+      svg: `
+        <svg viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 三日月 -->
+          <path d="M36 12 C 22 14 16 26 18 42 C 20 54 30 60 42 58 C 30 54 28 40 32 28 C 34 22 38 16 36 12 Z" fill="#FDE047" stroke="#EAB308" stroke-width="3" filter="drop-shadow(0 0 8px #FACC15)"/>
+          <!-- ちいさなお星さま -->
+          <polygon points="46,26 48,32 54,32 50,36 52,42 46,38 40,42 42,36 38,32 44,32" fill="#38BDF8"/>
+        </svg>
+      `
+    },
+    {
+      id: 'pop-skateboard',
+      category: 'pop',
+      name: 'スケートボード',
+      width: 80,
+      height: 40,
+      svg: `
+        <svg viewBox="0 0 80 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- デッキ -->
+          <rect x="8" y="14" width="64" height="12" rx="6" fill="#F43F5E" stroke="#BE123C" stroke-width="2"/>
+          <circle cx="28" cy="20" r="3" fill="#FDE047"/>
+          <circle cx="40" cy="20" r="3" fill="#38BDF8"/>
+          <circle cx="52" cy="20" r="3" fill="#FDE047"/>
+          <!-- ウィール（タイヤ） -->
+          <circle cx="20" cy="28" r="5" fill="#3B82F6" stroke="#1D4ED8" stroke-width="1.5"/>
+          <circle cx="60" cy="28" r="5" fill="#3B82F6" stroke="#1D4ED8" stroke-width="1.5"/>
+        </svg>
+      `
+    },
+    {
+      id: 'pop-tv',
+      category: 'pop',
+      name: 'レトロテレビ',
+      width: 75,
+      height: 70,
+      svg: `
+        <svg viewBox="0 0 75 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- アンテナ -->
+          <line x1="28" y1="18" x2="20" y2="6" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+          <line x1="42" y1="18" x2="52" y2="8" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+          <!-- 本体 -->
+          <rect x="12" y="18" width="52" height="38" rx="8" fill="#A855F7" stroke="#7E22CE" stroke-width="2.5"/>
+          <!-- 画面 -->
+          <rect x="18" y="24" width="30" height="26" rx="4" fill="#38BDF8"/>
+          <!-- アンテナノイズ風 -->
+          <circle cx="33" cy="37" r="4" fill="#FFFFFF" opacity="0.7"/>
+          <!-- ダイヤル -->
+          <circle cx="56" cy="28" r="3" fill="#FDE047"/>
+          <circle cx="56" cy="38" r="3" fill="#FDE047"/>
+          <!-- 脚 -->
+          <line x1="20" y1="56" x2="16" y2="66" stroke="#7E22CE" stroke-width="3" stroke-linecap="round"/>
+          <line x1="56" y1="56" x2="60" y2="66" stroke="#7E22CE" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      `
+    },
+
+    // --- 追加ゆめかわ家具 ---
+    {
+      id: 'yume-cloud',
+      category: 'yumekawa',
+      name: 'もくもく雲シェルフ',
+      width: 75,
+      height: 50,
+      svg: `
+        <svg viewBox="0 0 75 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 雲形シェルフ -->
+          <path d="M18 36 C 10 36 8 26 16 22 C 14 12 28 8 36 14 C 44 8 58 12 56 22 C 64 26 62 36 54 36 Z" fill="#FFFFFF" stroke="#C084FC" stroke-width="2.5"/>
+          <!-- 棚の天板 -->
+          <rect x="14" y="32" width="48" height="5" rx="2" fill="#FCE7F3" stroke="#F472B6" stroke-width="1.5"/>
+          <!-- 棚の上の小瓶 -->
+          <circle cx="28" cy="26" r="3" fill="#67E8F9"/>
+          <circle cx="44" cy="26" r="3" fill="#FDE047"/>
+        </svg>
+      `
+    },
+    {
+      id: 'yume-bear',
+      category: 'yumekawa',
+      name: 'くまちゃん',
+      width: 65,
+      height: 70,
+      svg: `
+        <svg viewBox="0 0 65 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 耳 -->
+          <circle cx="20" cy="22" r="7" fill="#FBCFE8" stroke="#F472B6" stroke-width="2"/>
+          <circle cx="20" cy="22" r="3" fill="#F472B6"/>
+          <circle cx="45" cy="22" r="7" fill="#FBCFE8" stroke="#F472B6" stroke-width="2"/>
+          <circle cx="45" cy="22" r="3" fill="#F472B6"/>
+          <!-- 体 -->
+          <ellipse cx="32" cy="48" rx="16" ry="14" fill="#FBCFE8" stroke="#F472B6" stroke-width="2"/>
+          <!-- 頭 -->
+          <circle cx="32" cy="30" r="14" fill="#FBCFE8" stroke="#F472B6" stroke-width="2"/>
+          <!-- 顔パーツ -->
+          <ellipse cx="32" cy="33" rx="5" ry="3" fill="#FFFFFF"/>
+          <circle cx="32" cy="32" r="1.5" fill="#831843"/>
+          <circle cx="27" cy="28" r="1.5" fill="#831843"/>
+          <circle cx="37" cy="28" r="1.5" fill="#831843"/>
+          <ellipse cx="25" cy="32" rx="2" ry="1.5" fill="#FDA4AF"/>
+          <ellipse cx="39" cy="32" rx="2" ry="1.5" fill="#FDA4AF"/>
+          <!-- 首のリボン -->
+          <polygon points="28,40 36,40 32,38" fill="#A855F7"/>
+          <circle cx="32" cy="39" r="2" fill="#E9D5FF"/>
+        </svg>
+      `
+    },
+    {
+      id: 'yume-star-lamp',
+      category: 'yumekawa',
+      name: 'お星さまランプ',
+      width: 60,
+      height: 80,
+      svg: `
+        <svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- つるすコード -->
+          <line x1="30" y1="0" x2="30" y2="35" stroke="#C084FC" stroke-width="2"/>
+          <!-- お星さまライト -->
+          <polygon points="30,25 36,38 50,38 38,48 42,62 30,54 18,62 22,48 10,38 24,38" fill="#FEF08A" stroke="#FACC15" stroke-width="2.5" filter="drop-shadow(0 0 6px #FDE047)"/>
+          <circle cx="26" cy="44" r="2" fill="#A16207"/>
+          <circle cx="34" cy="44" r="2" fill="#A16207"/>
+          <path d="M28 48 Q 30 50 32 48" stroke="#A16207" stroke-width="1.5" fill="none"/>
         </svg>
       `
     }
   ];
 
   // --------------------------------------------------
+  // 1.5 壁紙・床の定義データ
+  // --------------------------------------------------
+  const WALLPAPERS = [
+    { id: 'wall-pink-stripe', name: 'ピンクストライプ', icon: '🎀', previewBg: 'linear-gradient(180deg, #ffeef6 0%, #fff7fa 100%)' },
+    { id: 'wall-star-night', name: 'ほしぞらナイト', icon: '🌙', previewBg: 'linear-gradient(180deg, #3d2b6b 0%, #7048a8 100%)' },
+    { id: 'wall-choco-cafe', name: 'チョコカフェ', icon: '🍫', previewBg: 'linear-gradient(180deg, #fdf6ee 0%, #f7ebd9 100%)' },
+    { id: 'wall-mint-forest', name: 'ミントのもり', icon: '🌿', previewBg: 'linear-gradient(180deg, #ebfbee 0%, #d3f9d8 100%)' },
+    { id: 'wall-pop-yellow', name: 'ポップドット', icon: '⚡️', previewBg: 'linear-gradient(180deg, #fff9db 0%, #fff3bf 100%)' }
+  ];
+
+  const FLOORS = [
+    { id: 'floor-wood', name: 'もくめフロア', icon: '🪵', previewBg: '#f7e1c8' },
+    { id: 'floor-pastel-tile', name: 'パステルタイル', icon: '🌸', previewBg: '#fff0f7' },
+    { id: 'floor-grass', name: 'ふかふかしばふ', icon: '🌷', previewBg: '#a9e34b' },
+    { id: 'floor-cookie', name: 'ビスケット', icon: '🍪', previewBg: '#e9c46a' },
+    { id: 'floor-tatami', name: 'たたみ', icon: '🍵', previewBg: '#d8f5a2' }
+  ];
+
+  // --------------------------------------------------
   // 2. DOM要素の取得
   // --------------------------------------------------
   const stage = document.getElementById('room-stage');
+  const roomWall = document.getElementById('room-wall');
+  const roomFloor = document.getElementById('room-floor');
   const furnitureLayer = document.getElementById('furniture-layer');
   const sparkleLayer = document.getElementById('sparkle-layer');
   const itemToolbar = document.getElementById('item-toolbar');
@@ -372,6 +651,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedInstanceId = null;
   let nextZIndex = 10;
   let currentCategory = 'sweets';
+  let currentWall = 'wall-pink-stripe';
+  let currentFloor = 'floor-wood';
 
   const SIZES = [
     { label: 'しょう', scale: 0.75 },
@@ -380,13 +661,29 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // --------------------------------------------------
-  // 4. ローカルストレージ保存・読み込み
+  // 4. ローカルストレージ保存・読み込み & スタイル適用
   // --------------------------------------------------
   const STORAGE_KEY = 'myroom_placed_items_v1';
+  const STORAGE_STYLE_KEY = 'myroom_style_v1';
+
+  function applyRoomStyle(wallId, floorId, shouldSave = true) {
+    if (wallId) {
+      WALLPAPERS.forEach(w => roomWall.classList.remove(w.id));
+      roomWall.classList.add(wallId);
+      currentWall = wallId;
+    }
+    if (floorId) {
+      FLOORS.forEach(f => roomFloor.classList.remove(f.id));
+      roomFloor.classList.add(floorId);
+      currentFloor = floorId;
+    }
+    if (shouldSave) saveState();
+  }
 
   function saveState() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(placedItems));
+      localStorage.setItem(STORAGE_STYLE_KEY, JSON.stringify({ wall: currentWall, floor: currentFloor }));
     } catch (e) {
       console.warn('Storage save failed:', e);
     }
@@ -394,6 +691,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loadState() {
     try {
+      // 壁と床の復元
+      const styleData = localStorage.getItem(STORAGE_STYLE_KEY);
+      if (styleData) {
+        const { wall, floor } = JSON.parse(styleData);
+        applyRoomStyle(wall, floor, false);
+      } else {
+        applyRoomStyle('wall-pink-stripe', 'floor-wood', false);
+      }
+
+      // 家具の復元
       const data = localStorage.getItem(STORAGE_KEY);
       if (data) {
         const loaded = JSON.parse(data);
@@ -401,7 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
           loaded.forEach(item => addItemToStage(item.itemId, item.x, item.y, item, false));
         }
       } else {
-        // 初めて遊ぶときの初期配置（ベッドとテーブルを置いてあげる）
+        // 初めて遊ぶときの初期配置
         addItemToStage('sw-bed', 70, 210, { rotation: 0, flipX: false, sizeIndex: 1 });
         addItemToStage('sw-table', 240, 260, { rotation: 0, flipX: false, sizeIndex: 1 });
         addItemToStage('yume-unicorn', 90, 180, { rotation: 0, flipX: false, sizeIndex: 0 });
@@ -416,6 +723,56 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------
   function renderBagItems(category) {
     itemsGrid.innerHTML = '';
+
+    // 「かべ＆ゆか」タブの場合
+    if (category === 'room-style') {
+      // 壁紙セクション
+      const wallTitle = document.createElement('div');
+      wallTitle.className = 'room-style-section-title';
+      wallTitle.innerHTML = '<span>🧱</span> かべがみをえらぶ';
+      itemsGrid.appendChild(wallTitle);
+
+      WALLPAPERS.forEach(w => {
+        const card = document.createElement('div');
+        card.className = `item-card ${currentWall === w.id ? 'style-active' : ''}`;
+        card.innerHTML = `
+          <div class="style-preview-box" style="background: ${w.previewBg};"></div>
+          <div class="item-card-name">${w.icon} ${w.name}</div>
+        `;
+        card.addEventListener('click', () => {
+          applyRoomStyle(w.id, null);
+          const stageRect = stage.getBoundingClientRect();
+          triggerSparkles(stageRect.width / 2, stageRect.height * 0.3);
+          renderBagItems('room-style');
+        });
+        itemsGrid.appendChild(card);
+      });
+
+      // 床セクション
+      const floorTitle = document.createElement('div');
+      floorTitle.className = 'room-style-section-title';
+      floorTitle.innerHTML = '<span>🪵</span> ゆかをえらぶ';
+      itemsGrid.appendChild(floorTitle);
+
+      FLOORS.forEach(f => {
+        const card = document.createElement('div');
+        card.className = `item-card ${currentFloor === f.id ? 'style-active' : ''}`;
+        card.innerHTML = `
+          <div class="style-preview-box" style="background: ${f.previewBg};"></div>
+          <div class="item-card-name">${f.icon} ${f.name}</div>
+        `;
+        card.addEventListener('click', () => {
+          applyRoomStyle(null, f.id);
+          const stageRect = stage.getBoundingClientRect();
+          triggerSparkles(stageRect.width / 2, stageRect.height * 0.7);
+          renderBagItems('room-style');
+        });
+        itemsGrid.appendChild(card);
+      });
+      return;
+    }
+
+    // 通常の家具アイテム
     const filtered = FURNITURE_ITEMS.filter(item => item.category === category);
 
     filtered.forEach(item => {

@@ -177,6 +177,47 @@ body {
       transparent 60px
     );
   overflow: hidden;
+  transition: background 0.3s ease;
+}
+
+/* 壁紙バリエーション */
+.room-wall.wall-pink-stripe {
+  background: linear-gradient(180deg, #ffeef6 0%, #fff7fa 100%);
+  background-image: repeating-linear-gradient(90deg, rgba(255, 182, 212, 0.22) 0px, rgba(255, 182, 212, 0.22) 30px, transparent 30px, transparent 60px);
+}
+
+.room-wall.wall-star-night {
+  background: linear-gradient(180deg, #3d2b6b 0%, #7048a8 60%, #b892e8 100%);
+  background-image: 
+    radial-gradient(circle, #ffffff 15%, transparent 20%),
+    radial-gradient(circle, #fef08a 12%, transparent 18%),
+    radial-gradient(circle, #ffb3d9 10%, transparent 15%);
+  background-size: 60px 60px, 90px 90px, 75px 75px;
+  background-position: 10px 10px, 40px 30px, 20px 50px;
+}
+
+.room-wall.wall-choco-cafe {
+  background: linear-gradient(180deg, #fdf6ee 0%, #f7ebd9 100%);
+  background-image: 
+    repeating-linear-gradient(45deg, rgba(160, 100, 60, 0.08) 0px, rgba(160, 100, 60, 0.08) 20px, transparent 20px, transparent 40px),
+    repeating-linear-gradient(-45deg, rgba(160, 100, 60, 0.08) 0px, rgba(160, 100, 60, 0.08) 20px, transparent 20px, transparent 40px);
+}
+
+.room-wall.wall-mint-forest {
+  background: linear-gradient(180deg, #ebfbee 0%, #d3f9d8 100%);
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(81, 207, 102, 0.15) 20%, transparent 22%),
+    radial-gradient(circle at 0% 0%, rgba(81, 207, 102, 0.1) 20%, transparent 22%);
+  background-size: 40px 40px;
+}
+
+.room-wall.wall-pop-yellow {
+  background: linear-gradient(180deg, #fff9db 0%, #fff3bf 100%);
+  background-image: 
+    radial-gradient(circle, #ffd43b 22%, transparent 24%),
+    radial-gradient(circle, #ff922b 18%, transparent 20%);
+  background-size: 48px 48px, 48px 48px;
+  background-position: 0 0, 24px 24px;
 }
 
 /* 壁の窓 */
@@ -294,6 +335,48 @@ body {
       transparent 128px
     );
   z-index: 1;
+  transition: background 0.3s ease;
+}
+
+/* 床バリエーション */
+.room-floor.floor-wood {
+  background-color: #f7e1c8;
+  background-image: 
+    repeating-linear-gradient(0deg, rgba(214, 172, 131, 0.45) 0px, rgba(214, 172, 131, 0.45) 2px, transparent 2px, transparent 32px),
+    repeating-linear-gradient(90deg, rgba(214, 172, 131, 0.25) 0px, rgba(214, 172, 131, 0.25) 64px, transparent 64px, transparent 128px);
+}
+
+.room-floor.floor-pastel-tile {
+  background-color: #fff0f7;
+  background-image: 
+    linear-gradient(45deg, #e8d9ff 25%, transparent 25%),
+    linear-gradient(-45deg, #e8d9ff 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e8d9ff 75%),
+    linear-gradient(-45deg, transparent 75%, #e8d9ff 75%);
+  background-size: 40px 40px;
+  background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+}
+
+.room-floor.floor-grass {
+  background-color: #a9e34b;
+  background-image: 
+    radial-gradient(circle, #94d82d 30%, transparent 32%),
+    radial-gradient(circle, #74c0fc 10%, #d8f5a2 12%, transparent 14%);
+  background-size: 28px 28px, 48px 48px;
+}
+
+.room-floor.floor-cookie {
+  background-color: #e9c46a;
+  background-image: 
+    repeating-linear-gradient(0deg, #c99a3e 0px, #c99a3e 3px, transparent 3px, transparent 36px),
+    repeating-linear-gradient(90deg, #c99a3e 0px, #c99a3e 3px, transparent 3px, transparent 36px);
+}
+
+.room-floor.floor-tatami {
+  background-color: #d8f5a2;
+  background-image: 
+    repeating-linear-gradient(0deg, rgba(140, 180, 80, 0.3) 0px, rgba(140, 180, 80, 0.3) 1px, transparent 1px, transparent 6px),
+    repeating-linear-gradient(90deg, rgba(100, 140, 50, 0.35) 0px, rgba(100, 140, 50, 0.35) 4px, transparent 4px, transparent 120px);
 }
 
 /* 家具配置レイヤー */
@@ -739,3 +822,35 @@ body {
     font-size: 9px;
   }
 }
+
+/* --------------------------------------------------
+   かべ＆ゆか 着せ替えメニュー用スタイル
+   -------------------------------------------------- */
+.room-style-section-title {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  font-weight: 900;
+  color: #7b4eb2;
+  margin: 10px 0 4px;
+  padding-bottom: 4px;
+  border-bottom: 2px dashed #eedbf5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.item-card.style-active {
+  border-color: #ff5092;
+  background: #fff0f7;
+  box-shadow: 0 0 0 3px rgba(255, 80, 146, 0.35);
+}
+
+.style-preview-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  margin-bottom: 6px;
+}
+
