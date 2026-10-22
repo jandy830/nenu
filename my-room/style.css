@@ -351,7 +351,88 @@ body {
   background: #ffffff;
   box-shadow: 0 3px 6px rgba(120, 80, 140, 0.12);
   z-index: 2;
+  transition: all 0.3s ease;
 }
+
+/* ==================================================
+   お庭モード (Garden Mode) 専用スタイル
+   ================================================== */
+.room-stage.room-mode-garden .room-wall {
+  background: linear-gradient(180deg, #38bdf8 0%, #7dd3fc 40%, #bae6fd 75%, #e0f2fe 100%) !important;
+  background-image: 
+    radial-gradient(circle at 15% 25%, #fef08a 18px, transparent 20px),
+    radial-gradient(circle at 75% 28%, rgba(255, 255, 255, 0.85) 26px, transparent 28px),
+    radial-gradient(circle at 80% 24%, rgba(255, 255, 255, 0.85) 32px, transparent 34px),
+    radial-gradient(circle at 85% 28%, rgba(255, 255, 255, 0.85) 24px, transparent 26px) !important;
+}
+
+.room-stage.room-mode-garden .wall-window,
+.room-stage.room-mode-garden .wall-garland {
+  display: none !important;
+}
+
+/* 白いウッドフェンス（柵） */
+.room-stage.room-mode-garden .room-baseboard {
+  top: calc(58% - 22px);
+  height: 34px;
+  background: transparent;
+  box-shadow: none;
+  background-image: repeating-linear-gradient(90deg, 
+    #ffffff 0px, 
+    #ffffff 14px, 
+    #f1f5f9 14px, 
+    #f1f5f9 18px, 
+    transparent 18px, 
+    transparent 26px
+  );
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.room-stage.room-mode-garden .room-baseboard::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* ==================================================
+   お風呂モード (Bath Mode) 専用スタイル
+   ================================================== */
+.room-stage.room-mode-bath .room-wall {
+  background-color: #e0f2fe !important;
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.22) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.22) 2px, transparent 2px) !important;
+  background-size: 32px 32px !important;
+}
+
+.room-stage.room-mode-bath .wall-window {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  border-color: #bae6fd;
+}
+
+.room-stage.room-mode-bath .window-frame {
+  border-radius: 8px;
+  border-color: #93c5fd;
+}
+
+.room-stage.room-mode-bath .window-frame::before,
+.room-stage.room-mode-bath .window-frame::after {
+  background: #93c5fd;
+}
+
+.room-stage.room-mode-bath .wall-garland {
+  content: '🫧 🧼 🫧 🚿 🫧';
+  font-size: 24px;
+  letter-spacing: 12px;
+}
+
 
 /* 床エリア（下部42%） */
 .room-floor {

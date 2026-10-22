@@ -889,16 +889,225 @@ document.addEventListener('DOMContentLoaded', () => {
       height: 95,
       svg: `
         <svg viewBox="0 0 45 95" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- スピーカー本体（ブラック） -->
           <rect x="8" y="10" width="29" height="76" rx="4" fill="#0F172A" stroke="#334155" stroke-width="2.5"/>
-          <!-- スピーカーコーン -->
           <circle cx="22.5" cy="26" r="8" fill="#1E293B" stroke="#06B6D4" stroke-width="1.5"/>
           <circle cx="22.5" cy="26" r="3" fill="#06B6D4"/>
           <circle cx="22.5" cy="50" r="10" fill="#1E293B" stroke="#06B6D4" stroke-width="2"/>
           <circle cx="22.5" cy="50" r="4" fill="#06B6D4"/>
           <circle cx="22.5" cy="72" r="6" fill="#1E293B" stroke="#475569" stroke-width="1.5"/>
-          <!-- 土台 -->
           <rect x="6" y="86" width="33" height="4" rx="2" fill="#334155"/>
+        </svg>
+      `
+    },
+
+    // === おにわ (garden) ===
+    {
+      id: 'gar-fountain',
+      category: 'garden',
+      name: 'ガーデンふんすい',
+      width: 80,
+      height: 95,
+      svg: `
+        <svg viewBox="0 0 80 95" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 上段の水受け -->
+          <ellipse cx="40" cy="38" rx="22" ry="7" fill="#E0F2FE" stroke="#38BDF8" stroke-width="2"/>
+          <!-- 下段の水受け -->
+          <ellipse cx="40" cy="62" rx="36" ry="11" fill="#BAE6FD" stroke="#38BDF8" stroke-width="2.5"/>
+          <!-- 柱 -->
+          <rect x="36" y="38" width="8" height="24" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+          <rect x="34" y="70" width="12" height="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+          <!-- 土台 -->
+          <ellipse cx="40" cy="86" rx="24" ry="6" fill="#F1F5F9" stroke="#94A3B8" stroke-width="2"/>
+          <!-- てっぺんから出る水しぶき -->
+          <path d="M40 38 Q 40 18 32 24" stroke="#0284C7" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M40 38 Q 40 16 48 22" stroke="#0284C7" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="40" cy="18" r="3" fill="#38BDF8"/>
+        </svg>
+      `
+    },
+    {
+      id: 'gar-bench',
+      category: 'garden',
+      name: 'ウッドベンチ',
+      width: 90,
+      height: 65,
+      svg: `
+        <svg viewBox="0 0 90 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 背もたれ（白ウッド） -->
+          <rect x="10" y="14" width="70" height="20" rx="3" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+          <line x1="10" y1="20" x2="80" y2="20" stroke="#CBD5E1" stroke-width="1.5"/>
+          <line x1="10" y1="26" x2="80" y2="26" stroke="#CBD5E1" stroke-width="1.5"/>
+          <!-- 座面 -->
+          <rect x="8" y="34" width="74" height="10" rx="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+          <!-- 脚 -->
+          <line x1="16" y1="44" x2="12" y2="60" stroke="#64748B" stroke-width="3" stroke-linecap="round"/>
+          <line x1="74" y1="44" x2="78" y2="60" stroke="#64748B" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      `
+    },
+    {
+      id: 'gar-flowerbed',
+      category: 'garden',
+      name: 'カラフル花だん',
+      width: 90,
+      height: 50,
+      svg: `
+        <svg viewBox="0 0 90 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- レンガ枠 -->
+          <rect x="8" y="26" width="74" height="18" rx="4" fill="#D97706" stroke="#B45309" stroke-width="2"/>
+          <line x1="32" y1="26" x2="32" y2="44" stroke="#92400E" stroke-width="1.5"/>
+          <line x1="58" y1="26" x2="58" y2="44" stroke="#92400E" stroke-width="1.5"/>
+          <!-- お花たち -->
+          <circle cx="20" cy="18" r="7" fill="#F43F5E"/>
+          <circle cx="20" cy="18" r="3" fill="#FDE047"/>
+          <circle cx="36" cy="15" r="7" fill="#FBBF24"/>
+          <circle cx="36" cy="15" r="3" fill="#B45309"/>
+          <circle cx="54" cy="18" r="7" fill="#A855F7"/>
+          <circle cx="54" cy="18" r="3" fill="#FDE047"/>
+          <circle cx="70" cy="16" r="7" fill="#EC4899"/>
+          <circle cx="70" cy="16" r="3" fill="#FFFFFF"/>
+        </svg>
+      `
+    },
+    {
+      id: 'gar-parasol',
+      category: 'garden',
+      name: 'パラソルテーブル',
+      width: 85,
+      height: 100,
+      svg: `
+        <svg viewBox="0 0 85 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- パラソル傘 -->
+          <path d="M12 36 Q 42 12 72 36 Z" fill="#F472B6" stroke="#DB2777" stroke-width="2"/>
+          <path d="M27 36 Q 42 12 57 36 Z" fill="#FFFFFF"/>
+          <circle cx="42" cy="16" r="3" fill="#FDE047"/>
+          <!-- 支柱 -->
+          <line x1="42" y1="36" x2="42" y2="92" stroke="#64748B" stroke-width="3"/>
+          <!-- テーブル天板 -->
+          <ellipse cx="42" cy="62" rx="26" ry="7" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+          <!-- テーブル土台 -->
+          <ellipse cx="42" cy="92" rx="16" ry="5" fill="#CBD5E1"/>
+        </svg>
+      `
+    },
+    {
+      id: 'gar-bird',
+      category: 'garden',
+      name: 'ことりちゃん',
+      width: 50,
+      height: 60,
+      svg: `
+        <svg viewBox="0 0 50 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 止まり木スタンド -->
+          <line x1="25" y1="28" x2="25" y2="56" stroke="#B45309" stroke-width="3" stroke-linecap="round"/>
+          <line x1="12" y1="28" x2="38" y2="28" stroke="#B45309" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="25" cy="56" rx="14" ry="4" fill="#D97706"/>
+          <!-- 小鳥の体（黄色） -->
+          <ellipse cx="25" cy="18" rx="10" ry="8" fill="#FDE047" stroke="#EAB308" stroke-width="1.5"/>
+          <polygon points="15,18 8,19 14,22" fill="#F97316"/>
+          <circle cx="21" cy="16" r="1.5" fill="#000000"/>
+          <!-- つばさ -->
+          <ellipse cx="28" cy="18" rx="6" ry="4" fill="#FACC15"/>
+        </svg>
+      `
+    },
+
+    // === おふろ (bath) ===
+    {
+      id: 'bath-tub',
+      category: 'bath',
+      name: 'あわあわバスタブ',
+      width: 130,
+      height: 80,
+      svg: `
+        <svg viewBox="0 0 130 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- バスタブ本体 -->
+          <path d="M14 26 C 14 26 12 56 30 62 L 100 62 C 118 56 116 26 116 26 Z" fill="#FFFFFF" stroke="#38BDF8" stroke-width="3"/>
+          <ellipse cx="65" cy="26" rx="52" ry="8" fill="#BAE6FD" stroke="#38BDF8" stroke-width="2"/>
+          <!-- もこもこ泡🫧 -->
+          <circle cx="45" cy="22" r="7" fill="#FFFFFF"/>
+          <circle cx="58" cy="18" r="9" fill="#FFFFFF"/>
+          <circle cx="72" cy="20" r="8" fill="#FFFFFF"/>
+          <circle cx="85" cy="23" r="6" fill="#FFFFFF"/>
+          <circle cx="95" cy="24" r="5" fill="#FFFFFF"/>
+          <!-- 猫足 -->
+          <path d="M26 62 Q 24 72 18 74" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <path d="M104 62 Q 106 72 112 74" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        </svg>
+      `
+    },
+    {
+      id: 'bath-shower',
+      category: 'bath',
+      name: 'スタンドシャワー',
+      width: 55,
+      height: 105,
+      svg: `
+        <svg viewBox="0 0 55 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- パイプ支柱 -->
+          <path d="M18 96 V 16 Q 18 10 28 10 H 36" stroke="#94A3B8" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <!-- シャワーヘッド -->
+          <path d="M34 8 L 44 14 L 38 22 L 28 16 Z" fill="#CBD5E1" stroke="#64748B" stroke-width="2"/>
+          <!-- シャワーの水滴 -->
+          <line x1="38" y1="22" x2="36" y2="38" stroke="#38BDF8" stroke-width="2" stroke-dasharray="3 3"/>
+          <line x1="42" y1="22" x2="44" y2="40" stroke="#38BDF8" stroke-width="2" stroke-dasharray="3 3"/>
+          <!-- 蛇口ハンドル -->
+          <rect x="14" y="56" width="8" height="6" rx="2" fill="#0284C7"/>
+        </svg>
+      `
+    },
+    {
+      id: 'bath-duck',
+      category: 'bath',
+      name: 'アヒルちゃん',
+      width: 50,
+      height: 45,
+      svg: `
+        <svg viewBox="0 0 50 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- アヒルの体 -->
+          <path d="M16 22 C 16 16 24 10 32 10 C 38 10 40 14 40 18 C 40 24 44 26 44 32 C 44 38 36 40 26 40 C 16 40 12 34 16 22 Z" fill="#FDE047" stroke="#EAB308" stroke-width="2"/>
+          <!-- くちばし -->
+          <polygon points="16,20 8,23 16,26" fill="#F97316"/>
+          <!-- 目 -->
+          <circle cx="24" cy="18" r="2" fill="#000000"/>
+          <circle cx="25" cy="17" r="0.8" fill="#FFFFFF"/>
+          <!-- つばさ -->
+          <ellipse cx="32" cy="28" rx="6" ry="4" fill="#FACC15"/>
+        </svg>
+      `
+    },
+    {
+      id: 'bath-bottles',
+      category: 'bath',
+      name: 'シャンプーセット',
+      width: 60,
+      height: 50,
+      svg: `
+        <svg viewBox="0 0 60 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- シャンプーボトル（ピンク） -->
+          <rect x="10" y="16" width="16" height="28" rx="4" fill="#F472B6" stroke="#DB2777" stroke-width="1.5"/>
+          <rect x="15" y="10" width="6" height="6" fill="#FFFFFF"/>
+          <path d="M18 10 H 24 V 8 H 18 Z" fill="#94A3B8"/>
+          <!-- コンディショナーボトル（ミント） -->
+          <rect x="32" y="14" width="16" height="30" rx="4" fill="#6EE7B7" stroke="#059669" stroke-width="1.5"/>
+          <rect x="37" y="8" width="6" height="6" fill="#FFFFFF"/>
+          <path d="M40 8 H 46 V 6 H 40 Z" fill="#94A3B8"/>
+        </svg>
+      `
+    },
+    {
+      id: 'bath-stool',
+      category: 'bath',
+      name: 'おふろイス＆湯おけ',
+      width: 65,
+      height: 50,
+      svg: `
+        <svg viewBox="0 0 65 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- お風呂イス -->
+          <path d="M12 24 C 12 18 20 16 30 16 C 40 16 48 18 48 24 L 46 44 L 40 44 L 42 28 C 38 26 22 26 18 28 L 20 44 L 14 44 Z" fill="#BAE6FD" stroke="#0284C7" stroke-width="2"/>
+          <!-- 湯おけ（洗面器） -->
+          <ellipse cx="48" cy="36" rx="14" ry="5" fill="#FDE68A" stroke="#D97706" stroke-width="1.5"/>
+          <ellipse cx="48" cy="38" rx="12" ry="4" fill="#FEF08A"/>
         </svg>
       `
     }
@@ -1075,6 +1284,9 @@ document.addEventListener('DOMContentLoaded', () => {
         applyRoomStyle(roomDef.defaultWall, roomDef.defaultFloor, false);
       }
 
+      // ステージの部屋モードクラスを更新
+      stage.className = 'room-stage room-mode-' + roomId;
+
       // 家具の復元
       furnitureLayer.innerHTML = '';
       placedItems = [];
@@ -1098,14 +1310,18 @@ document.addEventListener('DOMContentLoaded', () => {
           addItemToStage('pop-tv', 70, 210, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
           addItemToStage('nat-bookshelf', 340, 160, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
         } else if (roomId === 'garden') {
-          addItemToStage('pop-star-rug', 180, 240, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
-          addItemToStage('nat-tulip', 90, 220, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
-          addItemToStage('nat-plant', 300, 200, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
-          addItemToStage('nat-chair', 140, 260, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          // お庭：ベンチ、噴水、花だん、小鳥ちゃん
+          addItemToStage('gar-bench', 70, 210, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('gar-fountain', 260, 170, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('gar-flowerbed', 80, 280, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('gar-bird', 340, 220, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
         } else if (roomId === 'bath') {
-          addItemToStage('yume-mirror', 90, 160, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
-          addItemToStage('yume-chest', 260, 200, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
-          addItemToStage('sw-donut', 180, 270, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          // お風呂：バスタブ、シャワー、アヒルちゃん、シャンプー、イス
+          addItemToStage('bath-tub', 60, 200, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('bath-shower', 230, 150, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('bath-duck', 120, 190, { rotation: 0, flipX: false, sizeIndex: 0 }, false);
+          addItemToStage('bath-bottles', 270, 240, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('bath-stool', 200, 260, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
         }
       }
     } catch (e) {
@@ -1592,87 +1808,155 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ctx.scale(scale, scale);
 
-    // 1. 壁の描画
+    // 1. 壁・背景の描画
     const wallHeight = stageRect.height * 0.58;
-    if (currentWall === 'wall-star-night') {
-      const grad = ctx.createLinearGradient(0, 0, 0, wallHeight);
-      grad.addColorStop(0, '#3d2b6b');
-      grad.addColorStop(0.6, '#7048a8');
-      grad.addColorStop(1, '#b892e8');
-      ctx.fillStyle = grad;
+
+    if (currentRoomId === 'garden') {
+      // --- お庭（青空・太陽・雲・遠くの緑） ---
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, wallHeight);
+      skyGrad.addColorStop(0, '#38bdf8');
+      skyGrad.addColorStop(0.4, '#7dd3fc');
+      skyGrad.addColorStop(0.75, '#bae6fd');
+      skyGrad.addColorStop(1, '#e0f2fe');
+      ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, stageRect.width, wallHeight);
-      // 星のドット
-      ctx.fillStyle = '#ffffff';
-      for (let i = 0; i < 24; i++) {
-        const sx = (i * 47) % stageRect.width;
-        const sy = (i * 29) % wallHeight;
-        ctx.beginPath();
-        ctx.arc(sx, sy, (i % 3) + 1.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    } else if (currentWall === 'wall-choco-cafe') {
-      ctx.fillStyle = '#fdf6ee';
+
+      // 太陽
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(stageRect.width * 0.15, wallHeight * 0.3, 24, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 雲
+      ctx.font = '36px sans-serif';
+      ctx.fillText('☁️', stageRect.width * 0.65, wallHeight * 0.35);
+      ctx.fillText('☁️', stageRect.width * 0.8, wallHeight * 0.25);
+    } else if (currentRoomId === 'bath') {
+      // --- お風呂（水色タイル壁・シャボン玉） ---
+      ctx.fillStyle = '#e0f2fe';
       ctx.fillRect(0, 0, stageRect.width, wallHeight);
-      ctx.strokeStyle = 'rgba(160, 100, 60, 0.1)';
-      ctx.lineWidth = 4;
-      for (let x = -wallHeight; x < stageRect.width; x += 30) {
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.28)';
+      ctx.lineWidth = 2;
+      for (let x = 0; x < stageRect.width; x += 32) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
-        ctx.lineTo(x + wallHeight, wallHeight);
+        ctx.lineTo(x, wallHeight);
         ctx.stroke();
       }
-    } else if (currentWall === 'wall-mint-forest') {
-      ctx.fillStyle = '#ebfbee';
-      ctx.fillRect(0, 0, stageRect.width, wallHeight);
-      ctx.fillStyle = 'rgba(81, 207, 102, 0.15)';
-      for (let x = 20; x < stageRect.width; x += 40) {
-        for (let y = 20; y < wallHeight; y += 40) {
-          ctx.beginPath();
-          ctx.arc(x, y, 6, 0, Math.PI * 2);
-          ctx.fill();
-        }
+      for (let y = 0; y < wallHeight; y += 32) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(stageRect.width, y);
+        ctx.stroke();
       }
-    } else if (currentWall === 'wall-pop-yellow') {
-      ctx.fillStyle = '#fff9db';
-      ctx.fillRect(0, 0, stageRect.width, wallHeight);
-      ctx.fillStyle = '#ffd43b';
-      for (let x = 16; x < stageRect.width; x += 48) {
-        for (let y = 16; y < wallHeight; y += 48) {
-          ctx.beginPath();
-          ctx.arc(x, y, 6, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
+
+      // 換気小窓
+      ctx.fillStyle = '#bae6fd';
+      ctx.fillRect(36, 24, 80, 80);
+      ctx.strokeStyle = '#93c5fd';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(36, 24, 80, 80);
+
+      // 泡
+      ctx.font = '22px sans-serif';
+      ctx.fillText('🫧', stageRect.width * 0.75, 40);
+      ctx.fillText('🫧', stageRect.width * 0.85, 60);
     } else {
-      // ピンクストライプ
-      ctx.fillStyle = '#ffeef6';
-      ctx.fillRect(0, 0, stageRect.width, wallHeight);
-      ctx.fillStyle = 'rgba(255, 182, 212, 0.22)';
-      for (let x = 0; x < stageRect.width; x += 60) {
-        ctx.fillRect(x, 0, 30, wallHeight);
+      // --- 通常のお部屋の壁紙 ---
+      if (currentWall === 'wall-star-night') {
+        const grad = ctx.createLinearGradient(0, 0, 0, wallHeight);
+        grad.addColorStop(0, '#3d2b6b');
+        grad.addColorStop(0.6, '#7048a8');
+        grad.addColorStop(1, '#b892e8');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, stageRect.width, wallHeight);
+        ctx.fillStyle = '#ffffff';
+        for (let i = 0; i < 24; i++) {
+          const sx = (i * 47) % stageRect.width;
+          const sy = (i * 29) % wallHeight;
+          ctx.beginPath();
+          ctx.arc(sx, sy, (i % 3) + 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else if (currentWall === 'wall-choco-cafe') {
+        ctx.fillStyle = '#fdf6ee';
+        ctx.fillRect(0, 0, stageRect.width, wallHeight);
+        ctx.strokeStyle = 'rgba(160, 100, 60, 0.1)';
+        ctx.lineWidth = 4;
+        for (let x = -wallHeight; x < stageRect.width; x += 30) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x + wallHeight, wallHeight);
+          ctx.stroke();
+        }
+      } else if (currentWall === 'wall-mint-forest') {
+        ctx.fillStyle = '#ebfbee';
+        ctx.fillRect(0, 0, stageRect.width, wallHeight);
+        ctx.fillStyle = 'rgba(81, 207, 102, 0.15)';
+        for (let x = 20; x < stageRect.width; x += 40) {
+          for (let y = 20; y < wallHeight; y += 40) {
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      } else if (currentWall === 'wall-pop-yellow') {
+        ctx.fillStyle = '#fff9db';
+        ctx.fillRect(0, 0, stageRect.width, wallHeight);
+        ctx.fillStyle = '#ffd43b';
+        for (let x = 16; x < stageRect.width; x += 48) {
+          for (let y = 16; y < wallHeight; y += 48) {
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      } else {
+        ctx.fillStyle = '#ffeef6';
+        ctx.fillRect(0, 0, stageRect.width, wallHeight);
+        ctx.fillStyle = 'rgba(255, 182, 212, 0.22)';
+        for (let x = 0; x < stageRect.width; x += 60) {
+          ctx.fillRect(x, 0, 30, wallHeight);
+        }
       }
+
+      // 窓
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(36, 24, 110, 110);
+      ctx.fillStyle = '#bae6fd';
+      ctx.fillRect(40, 28, 102, 102);
+      ctx.font = '28px sans-serif';
+      ctx.fillText('☀️', 106, 58);
+      ctx.fillText('☁️', 46, 72);
     }
 
-    // 窓の描画
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(36, 24, 110, 110);
-    ctx.fillStyle = '#bae6fd';
-    ctx.fillRect(40, 28, 102, 102);
-    ctx.font = '28px sans-serif';
-    ctx.fillText('☀️', 106, 58);
-    ctx.fillText('☁️', 46, 72);
-
-    // 2. 巾木
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, wallHeight, stageRect.width, 12);
+    // 2. 巾木（またはお庭のウッドフェンス）
+    if (currentRoomId === 'garden') {
+      // 白い木製フェンス
+      const fenceY = wallHeight - 16;
+      ctx.fillStyle = '#ffffff';
+      for (let x = 4; x < stageRect.width; x += 24) {
+        ctx.fillRect(x, fenceY, 14, 28);
+      }
+      ctx.fillRect(0, fenceY + 10, stageRect.width, 6);
+    } else {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, wallHeight, stageRect.width, 12);
+    }
 
     // 3. 床の描画
     const floorY = wallHeight + 12;
     const floorHeight = stageRect.height - floorY;
-    if (currentFloor === 'floor-grass') {
+    if (currentRoomId === 'garden' || currentFloor === 'floor-grass') {
       ctx.fillStyle = '#a9e34b';
       ctx.fillRect(0, floorY, stageRect.width, floorHeight);
-    } else if (currentFloor === 'floor-pastel-tile') {
+      ctx.fillStyle = '#94d82d';
+      for (let x = 10; x < stageRect.width; x += 32) {
+        ctx.beginPath();
+        ctx.arc(x, floorY + 20, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (currentFloor === 'floor-pastel-tile' || currentRoomId === 'bath') {
       ctx.fillStyle = '#fff0f7';
       ctx.fillRect(0, floorY, stageRect.width, floorHeight);
       ctx.fillStyle = 'rgba(232, 217, 255, 0.5)';
@@ -1754,8 +2038,17 @@ document.addEventListener('DOMContentLoaded', () => {
       currentCapturedPhotoData = photoDataUrl;
       photoPreviewImg.src = photoDataUrl;
 
-      // タグの初期選択
-      selectedPhotoTag = 'パステル';
+      // タグの初期選択をお部屋に連動
+      if (currentRoomId === 'garden') {
+        selectedPhotoTag = 'おにわ';
+      } else if (currentRoomId === 'bath') {
+        selectedPhotoTag = 'おふろ';
+      } else if (currentRoomId === 'living') {
+        selectedPhotoTag = 'ナチュラル';
+      } else {
+        selectedPhotoTag = 'パステル';
+      }
+
       tagButtons.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tag === selectedPhotoTag);
       });
