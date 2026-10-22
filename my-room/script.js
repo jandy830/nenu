@@ -937,8 +937,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // ヘッダーボタン
   const btnClear = document.getElementById('btn-clear');
   const btnRoomSelect = document.getElementById('btn-room-select');
+  const currentRoomLabel = document.getElementById('current-room-label');
   const btnCamera = document.getElementById('btn-camera');
   const btnAlbum = document.getElementById('btn-album');
+
+  // BGMコントロール
+  const btnBgm = document.getElementById('btn-bgm');
+  const bgmLabel = document.getElementById('bgm-label');
+  const bgmSelect = document.getElementById('bgm-select');
+
+  // お部屋きりかえ関連
+  const roomModal = document.getElementById('room-modal');
+  const btnCloseRoom = document.getElementById('btn-close-room');
+  const roomSelectCards = document.querySelectorAll('.room-select-card');
 
   // カメラ・アルバム関連
   const cameraFlash = document.getElementById('camera-flash');
@@ -969,8 +980,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const toolRemove = document.getElementById('tool-remove');
 
   // --------------------------------------------------
-  // 3. アプリの状態管理 (State)
+  // 3. アプリの状態管理 (State) & お部屋定義
   // --------------------------------------------------
+  const ROOM_DEFS = {
+    myroom: {
+      id: 'myroom',
+      name: 'マイルーム',
+      icon: '🎀',
+      defaultWall: 'wall-pink-stripe',
+      defaultFloor: 'floor-wood'
+    },
+    living: {
+      id: 'living',
+      name: 'リビング',
+      icon: '☕',
+      defaultWall: 'wall-mint-forest',
+      defaultFloor: 'floor-wood'
+    },
+    garden: {
+      id: 'garden',
+      name: 'おにわ',
+      icon: '🌷',
+      defaultWall: 'wall-star-night',
+      defaultFloor: 'floor-grass'
+    },
+    bath: {
+      id: 'bath',
+      name: 'おふろ',
+      icon: '🛁',
+      defaultWall: 'wall-pop-yellow',
+      defaultFloor: 'floor-pastel-tile'
+    }
+  };
+
+  let currentRoomId = 'myroom';
   let placedItems = []; // { id, itemId, x, y, rotation, flipX, sizeIndex, zIndex }
   let selectedInstanceId = null;
   let nextZIndex = 10;
@@ -985,10 +1028,14 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // --------------------------------------------------
-  // 4. ローカルストレージ保存・読み込み & スタイル適用
+  // 4. ローカルストレージ保存・読み込み & スタイル適用（部屋別）
   // --------------------------------------------------
-  const STORAGE_KEY = 'myroom_placed_items_v1';
-  const STORAGE_STYLE_KEY = 'myroom_style_v1';
+  function getStorageKeys(roomId) {
+    return {
+      itemsKey: `myroom_placed_items_${roomId}_v2`,
+      styleKey: `myroom_style_${roomId}_v2`
+    };
+  }
 
   function applyRoomStyle(wallId, floorId, shouldSave = true) {
     if (wallId) {
@@ -1006,36 +1053,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function saveState() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(placedItems));
-      localStorage.setItem(STORAGE_STYLE_KEY, JSON.stringify({ wall: currentWall, floor: currentFloor }));
+      const keys = getStorageKeys(currentRoomId);
+      localStorage.setItem(keys.itemsKey, JSON.stringify(placedItems));
+      localStorage.setItem(keys.styleKey, JSON.stringify({ wall: currentWall, floor: currentFloor }));
     } catch (e) {
       console.warn('Storage save failed:', e);
     }
   }
 
-  function loadState() {
+  function loadState(roomId = currentRoomId) {
     try {
+      const keys = getStorageKeys(roomId);
+      const roomDef = ROOM_DEFS[roomId] || ROOM_DEFS.myroom;
+
       // 壁と床の復元
-      const styleData = localStorage.getItem(STORAGE_STYLE_KEY);
+      const styleData = localStorage.getItem(keys.styleKey);
       if (styleData) {
         const { wall, floor } = JSON.parse(styleData);
         applyRoomStyle(wall, floor, false);
       } else {
-        applyRoomStyle('wall-pink-stripe', 'floor-wood', false);
+        applyRoomStyle(roomDef.defaultWall, roomDef.defaultFloor, false);
       }
 
       // 家具の復元
-      const data = localStorage.getItem(STORAGE_KEY);
+      furnitureLayer.innerHTML = '';
+      placedItems = [];
+      selectItem(null);
+
+      const data = localStorage.getItem(keys.itemsKey);
       if (data) {
         const loaded = JSON.parse(data);
         if (Array.isArray(loaded)) {
           loaded.forEach(item => addItemToStage(item.itemId, item.x, item.y, item, false));
         }
       } else {
-        // 初めて遊ぶときの初期配置
-        addItemToStage('sw-bed', 70, 210, { rotation: 0, flipX: false, sizeIndex: 1 });
-        addItemToStage('sw-table', 240, 260, { rotation: 0, flipX: false, sizeIndex: 1 });
-        addItemToStage('yume-unicorn', 90, 180, { rotation: 0, flipX: false, sizeIndex: 0 });
+        // 各お部屋の初期配置
+        if (roomId === 'myroom') {
+          addItemToStage('sw-bed', 70, 210, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('sw-table', 240, 260, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('yume-unicorn', 90, 180, { rotation: 0, flipX: false, sizeIndex: 0 }, false);
+        } else if (roomId === 'living') {
+          addItemToStage('basic-sofa', 180, 240, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('nat-round-table', 240, 280, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('pop-tv', 70, 210, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('nat-bookshelf', 340, 160, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+        } else if (roomId === 'garden') {
+          addItemToStage('pop-star-rug', 180, 240, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('nat-tulip', 90, 220, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('nat-plant', 300, 200, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('nat-chair', 140, 260, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+        } else if (roomId === 'bath') {
+          addItemToStage('yume-mirror', 90, 160, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('yume-chest', 260, 200, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+          addItemToStage('sw-donut', 180, 270, { rotation: 0, flipX: false, sizeIndex: 1 }, false);
+        }
       }
     } catch (e) {
       console.warn('Storage load failed:', e);
@@ -1065,6 +1136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         card.addEventListener('click', () => {
           applyRoomStyle(w.id, null);
+          if (window.soundManager) window.soundManager.playSparkle();
           const stageRect = stage.getBoundingClientRect();
           triggerSparkles(stageRect.width / 2, stageRect.height * 0.3);
           renderBagItems('room-style');
@@ -1087,6 +1159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         card.addEventListener('click', () => {
           applyRoomStyle(null, f.id);
+          if (window.soundManager) window.soundManager.playSparkle();
           const stageRect = stage.getBoundingClientRect();
           triggerSparkles(stageRect.width / 2, stageRect.height * 0.7);
           renderBagItems('room-style');
@@ -1114,6 +1187,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const instance = addItemToStage(item.id, spawnX, spawnY);
         selectItem(instance.id);
+
+        // 効果音 & キラキラ
+        if (window.soundManager) {
+          window.soundManager.playPlace();
+          window.soundManager.playSparkle();
+        }
         triggerSparkles(spawnX + item.width / 2, spawnY + item.height / 2);
         closeBagDrawer();
       });
@@ -1380,6 +1459,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById(selectedInstanceId);
     if (el) el.remove();
 
+    if (window.soundManager) window.soundManager.playRemove();
+
     placedItems = placedItems.filter(i => i.id !== selectedInstanceId);
     selectItem(null);
     saveState();
@@ -1399,9 +1480,68 @@ document.addEventListener('DOMContentLoaded', () => {
     saveState();
   });
 
-  // フェーズ3, 4用の案内
-  btnRoomSelect.addEventListener('click', () => {
-    alert('🚪 おへやのきりかえは、つぎのアップデートで登場するよ！お楽しみに♪');
+  // --------------------------------------------------
+  // 10.5 お部屋きりかえ（フェーズ3）
+  // --------------------------------------------------
+  function openRoomModal() {
+    roomModal.classList.remove('hidden');
+    drawerBackdrop.classList.remove('hidden');
+    roomSelectCards.forEach(c => {
+      c.classList.toggle('active', c.dataset.room === currentRoomId);
+    });
+  }
+
+  function closeRoomModal() {
+    roomModal.classList.add('hidden');
+    drawerBackdrop.classList.add('hidden');
+  }
+
+  btnRoomSelect.addEventListener('click', openRoomModal);
+  btnCloseRoom.addEventListener('click', closeRoomModal);
+
+  roomSelectCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const targetRoom = card.dataset.room;
+      if (targetRoom === currentRoomId) {
+        closeRoomModal();
+        return;
+      }
+      switchRoom(targetRoom);
+    });
+  });
+
+  function switchRoom(targetRoomId) {
+    saveState(); // 現在の部屋を保存
+
+    currentRoomId = targetRoomId;
+    const def = ROOM_DEFS[targetRoomId] || ROOM_DEFS.myroom;
+    currentRoomLabel.textContent = def.name;
+
+    roomSelectCards.forEach(c => {
+      c.classList.toggle('active', c.dataset.room === targetRoomId);
+    });
+
+    closeRoomModal();
+    loadState(targetRoomId);
+
+    if (window.soundManager) window.soundManager.playSparkle();
+    const stageRect = stage.getBoundingClientRect();
+    triggerSparkles(stageRect.width / 2, stageRect.height / 2);
+  }
+
+  // --------------------------------------------------
+  // 10.8 BGMコントロール連携
+  // --------------------------------------------------
+  btnBgm.addEventListener('click', () => {
+    if (!window.soundManager) return;
+    const isPlaying = window.soundManager.toggleBgm();
+    btnBgm.classList.toggle('playing', isPlaying);
+    bgmLabel.textContent = isPlaying ? 'BGM: オン 🎵' : 'BGM: オフ';
+  });
+
+  bgmSelect.addEventListener('change', (e) => {
+    if (!window.soundManager) return;
+    window.soundManager.setTrack(e.target.value);
   });
 
   // --------------------------------------------------
@@ -1608,6 +1748,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 📸 パシャリボタン押下
   btnCamera.addEventListener('click', async () => {
     triggerFlash();
+    if (window.soundManager) window.soundManager.playCamera();
     try {
       const photoDataUrl = await captureRoomImage();
       currentCapturedPhotoData = photoDataUrl;

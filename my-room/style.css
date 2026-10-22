@@ -134,6 +134,46 @@ body {
   color: #e63973;
 }
 
+/* BGMボタングループ */
+.bgm-control-group {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 2px solid #ecd8f8;
+  border-radius: 999px;
+  padding: 2px 4px;
+  box-shadow: 0 4px 10px rgba(180, 140, 200, 0.2);
+  gap: 2px;
+}
+
+.btn-bgm {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  color: #7b4eb2;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.btn-bgm.playing {
+  background: linear-gradient(135deg, #ff6ea7 0%, #ff8dbb 100%);
+  color: #ffffff;
+}
+
+.bgm-select {
+  font-family: var(--font-main);
+  font-size: 11px;
+  font-weight: 800;
+  color: #634388;
+  background: #f7f1fc;
+  border: 1px solid #eedbf5;
+  border-radius: 999px;
+  padding: 3px 6px;
+  outline: none;
+  cursor: pointer;
+  max-width: 110px;
+}
+
 /* --------------------------------------------------
    お部屋表示エリア（ステージ）
    -------------------------------------------------- */
@@ -1173,5 +1213,69 @@ body {
   font-weight: 800;
   line-height: 1.6;
 }
+
+/* --------------------------------------------------
+   お部屋きりかえモーダル スタイル
+   -------------------------------------------------- */
+.room-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.room-select-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 3px solid #eedbf5;
+  border-radius: 20px;
+  padding: 14px 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(180, 140, 200, 0.12);
+  transition: all 0.15s ease;
+}
+
+.room-select-card:hover {
+  transform: translateY(-2px);
+  border-color: #ff85a1;
+  box-shadow: 0 10px 22px rgba(255, 110, 167, 0.25);
+}
+
+.room-select-card:active {
+  transform: scale(0.96);
+}
+
+.room-select-card.active {
+  border-color: #ff5092;
+  background: #fff0f7;
+  box-shadow: 0 0 0 3px rgba(255, 80, 146, 0.35);
+}
+
+.room-card-emoji {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.room-card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.room-card-name {
+  font-size: 15px;
+  font-weight: 900;
+  color: #ff5092;
+  margin-bottom: 2px;
+}
+
+.room-card-desc {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7b6395;
+  line-height: 1.3;
+}
+
 
 

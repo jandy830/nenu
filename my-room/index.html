@@ -22,8 +22,21 @@
         <h1 class="app-title">マイルームメーカー <span class="badge">🛋️</span></h1>
       </div>
       <div class="header-right">
+        <!-- BGMコントロール -->
+        <div class="bgm-control-group">
+          <button id="btn-bgm" class="btn-head btn-bgm" title="おんがくをならす">
+            <span class="icon">🎵</span> <span id="bgm-label">BGM: オフ</span>
+          </button>
+          <select id="bgm-select" class="bgm-select" title="きょくをえらぶ">
+            <option value="0">🧸 1. ゆめかわワルツ</option>
+            <option value="1">🎶 2. たのしいポップ</option>
+            <option value="2">🌙 3. ほしぞらオルゴール</option>
+            <option value="3">☕ 4. おだやかカフェ</option>
+            <option value="4">🕶️ 5. クールシンセ</option>
+          </select>
+        </div>
         <button id="btn-room-select" class="btn-head btn-secondary" title="へやをかえる">
-          <span class="icon">🚪</span> おへや
+          <span class="icon">🚪</span> <span id="current-room-label">マイルーム</span>
         </button>
         <button id="btn-camera" class="btn-head btn-secondary" title="しゃしんをとる">
           <span class="icon">📸</span> パシャリ
@@ -205,10 +218,55 @@
       </div>
     </div>
 
+    <!-- お部屋きりかえモーダル -->
+    <div id="room-modal" class="custom-modal hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="album-title-group">
+            <span class="modal-icon">🚪</span>
+            <h3>おへやをえらぶ</h3>
+          </div>
+          <button id="btn-close-room" class="btn-close" title="とじる">✕</button>
+        </div>
+        <p class="modal-desc">どのお部屋にもようがえしに行く？</p>
+        <div class="room-cards-grid">
+          <div class="room-select-card active" data-room="myroom">
+            <span class="room-card-emoji">🎀</span>
+            <div class="room-card-info">
+              <span class="room-card-name">マイルーム</span>
+              <span class="room-card-desc">じぶんのベッドルーム♡</span>
+            </div>
+          </div>
+          <div class="room-select-card" data-room="living">
+            <span class="room-card-emoji">☕</span>
+            <div class="room-card-info">
+              <span class="room-card-name">リビング</span>
+              <span class="room-card-desc">みんなであつまるひろい部屋♪</span>
+            </div>
+          </div>
+          <div class="room-select-card" data-room="garden">
+            <span class="room-card-emoji">🌷</span>
+            <div class="room-card-info">
+              <span class="room-card-name">おにわ</span>
+              <span class="room-card-desc">あおぞらとお花のガーデン🌿</span>
+            </div>
+          </div>
+          <div class="room-select-card" data-room="bath">
+            <span class="room-card-emoji">🛁</span>
+            <div class="room-card-info">
+              <span class="room-card-name">おふろ</span>
+              <span class="room-card-desc">あわあわバスルーム✨</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 背景暗幕（バッグやモーダルが開いている時） -->
     <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
   </div>
 
+  <script src="audio.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
