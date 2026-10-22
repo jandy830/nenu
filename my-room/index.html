@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+  <title>マイルームメーカー 🛋️✨</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛋️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-wrap">
+    <!-- ヘッダーバー -->
+    <header class="app-header">
+      <div class="header-left">
+        <a href="../" class="btn-head btn-back" title="ポータルへもどる">
+          <span class="icon">🏠</span> もどる
+        </a>
+        <h1 class="app-title">マイルームメーカー <span class="badge">🛋️</span></h1>
+      </div>
+      <div class="header-right">
+        <button id="btn-room-select" class="btn-head btn-secondary" title="へやをかえる">
+          <span class="icon">🚪</span> おへや
+        </button>
+        <button id="btn-camera" class="btn-head btn-secondary" title="しゃしんをとる">
+          <span class="icon">📸</span> パシャリ
+        </button>
+        <button id="btn-album" class="btn-head btn-secondary" title="アルバムをみる">
+          <span class="icon">🖼️</span> アルバム
+        </button>
+        <button id="btn-clear" class="btn-head btn-danger" title="ぜんぶかたづける">
+          <span class="icon">🧹</span> かたづけ
+        </button>
+      </div>
+    </header>
+
+    <!-- お部屋メインエリア -->
+    <main class="room-viewport">
+      <div id="room-stage" class="room-stage">
+        <!-- 壁 -->
+        <div id="room-wall" class="room-wall">
+          <div class="wall-window">
+            <div class="window-frame">
+              <div class="window-sky">
+                <span class="sun">☀️</span>
+                <span class="cloud cloud-1">☁️</span>
+                <span class="cloud cloud-2">☁️</span>
+              </div>
+            </div>
+          </div>
+          <div class="wall-garland">✨ 🌸 🎀 🌸 ✨</div>
+        </div>
+
+        <!-- 巾木（境界線） -->
+        <div class="room-baseboard"></div>
+
+        <!-- 床 -->
+        <div id="room-floor" class="room-floor"></div>
+
+        <!-- 配置された家具が入るレイヤー -->
+        <div id="furniture-layer" class="furniture-layer"></div>
+
+        <!-- 家具選択時の操作ツールバー（フローティング） -->
+        <div id="item-toolbar" class="item-toolbar hidden">
+          <button id="tool-rotate" class="tool-btn" title="くるっとまわす">
+            <span class="tool-icon">🔄</span>
+            <span class="tool-label">まわす</span>
+          </button>
+          <button id="tool-flip" class="tool-btn" title="はんてん">
+            <span class="tool-icon">↔️</span>
+            <span class="tool-label">はんてん</span>
+          </button>
+          <button id="tool-size" class="tool-btn" title="おおきさチェンジ">
+            <span class="tool-icon">📏</span>
+            <span id="tool-size-label" class="tool-label">ちゅう</span>
+          </button>
+          <button id="tool-forward" class="tool-btn" title="てまえにだす">
+            <span class="tool-icon">⬆️</span>
+            <span class="tool-label">まえへ</span>
+          </button>
+          <button id="tool-backward" class="tool-btn" title="おくにさげる">
+            <span class="tool-icon">⬇️</span>
+            <span class="tool-label">うしろへ</span>
+          </button>
+          <button id="tool-remove" class="tool-btn tool-btn-remove" title="バッグにしまう">
+            <span class="tool-icon">🎒</span>
+            <span class="tool-label">しまう</span>
+          </button>
+        </div>
+
+        <!-- キラキラエフェクト用コンテナ -->
+        <div id="sparkle-layer" class="sparkle-layer"></div>
+      </div>
+    </main>
+
+    <!-- 画面下のバッグ呼び出しボタン -->
+    <footer class="app-footer">
+      <button id="btn-open-bag" class="btn-big-bag">
+        <span class="bag-icon">🎒</span>
+        <span class="bag-text">家具をえらぶ（バッグをひらく）</span>
+      </button>
+    </footer>
+
+    <!-- バッグ（家具メニュー）ドロワー -->
+    <div id="bag-drawer" class="bag-drawer hidden">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <span class="drawer-icon">🎒</span>
+          <h2>かぐバッグ</h2>
+          <span class="drawer-sub">タップしておへやにおこう！</span>
+        </div>
+        <button id="btn-close-bag" class="btn-close" title="バッグをとじる">✕</button>
+      </div>
+
+      <!-- カテゴリタブ -->
+      <nav class="category-tabs">
+        <button class="cat-tab active" data-category="sweets">
+          <span class="cat-icon">🍰</span> おかし
+        </button>
+        <button class="cat-tab" data-category="natural">
+          <span class="cat-icon">🌿</span> ナチュラル
+        </button>
+        <button class="cat-tab" data-category="pop">
+          <span class="cat-icon">⚡️</span> ポップ
+        </button>
+        <button class="cat-tab" data-category="yumekawa">
+          <span class="cat-icon">🦄</span> ゆめかわ
+        </button>
+      </nav>
+
+      <!-- アイテム一覧 -->
+      <div id="items-grid" class="items-grid">
+        <!-- JSで動的に追加 -->
+      </div>
+    </div>
+
+    <!-- 背景暗幕（バッグが開いている時） -->
+    <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
